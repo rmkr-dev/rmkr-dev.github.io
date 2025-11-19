@@ -1,83 +1,192 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Ramkumar Ethiraj — Principal Software Engineer</title>
-<link rel="stylesheet" href="styles.css">
-<meta name="description" content="Ramkumar Ethiraj — Principal Software Engineer. Cloud architect, Azure, Java, Spring Boot, Data & Observability.">
+<style>
+  :root {
+    --bg: #0b0f14;
+    --card: #0f1720;
+    --muted: #9aa6b2;
+    --accent: #58a6ff;
+    --text: #e6eef6;
+    --line: #2d4a67;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  header.top {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 12px 0;
+    background: rgba(255,255,255,0.02);
+  }
+  header .wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 600;
+  }
+  .role {
+    color: var(--muted);
+    margin: 4px 0 0;
+  }
+  .section-title {
+    font-size: 24px;
+    margin-top: 32px;
+    font-weight: 600;
+    border-left: 4px solid var(--accent);
+    padding-left: 12px;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  }
+  .badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.06);
+    margin: 6px;
+    font-size: 14px;
+    border-radius: 50px;
+  }
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .yearline {
+    position: relative;
+    margin: 40px 0;
+    padding: 20px 0 40px;
+  }
+  .yearline .track {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--line);
+    border-radius: 4px;
+  }
+  .event {
+    position: relative;
+    margin-top: 60px;
+  }
+  .event .dot {
+    width: 18px;
+    height: 18px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: absolute;
+    top: -40px;
+  }
+  .event h3 {
+    margin: 0;
+    font-size: 18px;
+  }
+  .event p {
+    margin: 4px 0 0;
+    color: var(--muted);
+  }
+</style>
 </head>
 <body>
-<header class="hero">
-<div class="container">
-<h1>Ramkumar Ethiraj</h1>
-<p class="role">Principal Software Engineer — Cloud & Architecture</p>
-<p class="lead">Architected enterprise-grade pricing, orchestration, and clinical analytics platforms on Azure. Specializes in performance tuning, secure data orchestration, and scalable CI/CD.</p>
-<nav class="actions">
-<a class="primary" href="/Ramkumar-Ethiraj.pdf" download>Resume (PDF)</a>
-<a class="ghost" href="https://github.com/ramethiraj" target="_blank">View GitHub</a>
-</nav>
-</div>
+<header class="top">
+  <div class="wrap">
+    <div>
+      <h1>Ramkumar Ethiraj</h1>
+      <p class="role">Principal Software Engineer • Cloud Architecture • Java • Azure</p>
+    </div>
+  </div>
 </header>
 
+<div class="wrap">
+  <h2 class="section-title">About Me</h2>
+  <div class="card">
+    <p>Principal Software Engineer with 11+ years of experience architecting enterprise-scale platforms across pricing, clinical analytics, orchestration, and cloud modernization. Specializes in Azure-native design, distributed systems, Java/Spring Boot engineering, and secure data flow handling for regulated workloads.</p>
+  </div>
 
-<main class="container grid">
-<section class="two-col">
-<article class="card">
-<h2>Technical Depth</h2>
-<p>Designing resilient microservices and data platforms with secure, field-level governance for PHI/PII. Strong experience with Java, Spring Boot, Azure AKS, Synapse, Databricks, and CI/CD pipelines.</p>
-<ul class="stack">
-<li>Java • Spring Boot • Spring Security</li>
-<li>Azure AKS • Key Vault • Synapse • Data Factory</li>
-<li>Databricks • Spark • Netezza • PostgreSQL</li>
-<li>GitHub Actions • Terraform • Observability</li>
-</ul>
-</article>
+  <h2 class="section-title">Technical Expertise</h2>
+  <div class="card">
+    <div class="badge">Java</div>
+    <div class="badge">Spring Boot</div>
+    <div class="badge">Spring Security</div>
+    <div class="badge">Azure AKS</div>
+    <div class="badge">Azure Key Vault</div>
+    <div class="badge">Azure Data Factory</div>
+    <div class="badge">Azure Synapse</div>
+    <div class="badge">Azure Databricks</div>
+    <div class="badge">Netezza</div>
+    <div class="badge">PostgreSQL</div>
+    <div class="badge">Spark</div>
+    <div class="badge">GitHub Actions</div>
+    <div class="badge">Kubernetes</div>
+    <div class="badge">Terraform</div>
+  </div>
 
+  <h2 class="section-title">Career Timeline</h2>
+  <div class="card yearline">
+    <div class="track"></div>
 
-<article class="card">
-<h2>Leadership & Impact</h2>
-<ul>
-<li>Led platform modernization — reduced release friction by 30% and improved scalability</li>
-<li>Designed approval & orchestration solution handling 20x load</li>
-<li>Delivered Clinical Trials analytics with 40% perf gains and successful cloud migration</li>
-</ul>
-</article>
-</section>
+    <div class="event" style="left: 5%;">
+      <div class="dot"></div>
+      <h3>2014</h3>
+      <p>Started career in application development focusing on Java, SQL, engineering modernization.</p>
+    </div>
 
+    <div class="event" style="left: 28%;">
+      <div class="dot"></div>
+      <h3>2017</h3>
+      <p>Shifted into distributed systems & big data engineering. Improved critical MapR job performance by 4x.</p>
+    </div>
 
-<section class="metrics">
-<div class="metric"><strong id="m1">0</strong><span>CI/CD efficiency %</span></div>
-<div class="metric"><strong id="m2">0</strong><span>Approval throughput (x)</span></div>
-<div class="metric"><strong id="m3">0</strong><span>Perf improvement %</span></div>
-</section>
+    <div class="event" style="left: 55%;">
+      <div class="dot"></div>
+      <h3>2018 – 2022</h3>
+      <p>Architected clinical analytics platform, migrated workloads to Azure, achieved 40% performance gain.</p>
+    </div>
 
+    <div class="event" style="left: 80%;">
+      <div class="dot"></div>
+      <h3>2022 – Present</h3>
+      <p>Leading modernization of pricing platforms, 30% CI/CD efficiency boost, 20x orchestration scale.</p>
+    </div>
+  </div>
 
-<section class="projects card">
-<h2>Selected Projects & Architecture notes</h2>
-<ol>
-<li>
-<strong>Pricing Platform Modernization</strong> — Unified microservice infra with centralized security modules, AKS deployment, GitHub Actions pipelines, and Key Vault integration.
-</li>
-<li>
-<strong>Clinical Trials Analytics</strong> — Migrated to Azure Synapse & Databricks, implemented data lineage and field-level governance for PHI.
-</li>
-<li>
-<strong>MapR Rework</strong> — Rewrote MapReduce flows and utilities; achieved 4x performance improvement for retention jobs.
-</li>
-</ol>
-</section>
+  <h2 class="section-title">Key Impact Areas</h2>
+  <div class="card">
+    <ul>
+      <li>Modernized large-scale pricing platforms with performance and scalability improvements.</li>
+      <li>Designed multi-layered security for PHI/PII flows with field-level governance.</li>
+      <li>Led distributed orchestration engine capable of handling 20x approval volume.</li>
+      <li>Migrated complex analytics workloads into Azure Synapse & Databricks ecosystem.</li>
+      <li>Built unified CI/CD workflows improving deployment throughput by 30%.</li>
+    </ul>
+  </div>
 
+  <h2 class="section-title">Contact</h2>
+  <div class="card">
+    <p>Email: <a href="mailto:ramkumar.ethiraj@gmail.com">ramkumar.ethiraj@gmail.com</a></p>
+    <p>GitHub: <a href="https://github.com/ramethiraj" target="_blank">github.com/ramethiraj</a></p>
+    <p>LinkedIn: <a href="https://linkedin.com/in/ramkumarethiraj" target="_blank">linkedin.com/in/ramkumarethiraj</a></p>
+  </div>
+</div>
 
-<section class="contact card">
-<h2>Contact</h2>
-<p>Email: <a href="mailto:ramkumar.ethiraj@gmail.com">ramkumar.ethiraj@gmail.com</a></p>
-<p>Phone: +91-7708185008</p>
-<p>LinkedIn / GitHub links available in header.</p>
-</section>
-</main>
-
-
-<script src="metrics.js"></script>
 </body>
 </html>
