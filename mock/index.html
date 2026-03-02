@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mock Gen | RMKR Dev</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23FFC300' d='M448 96c0-35.3-28.7-64-64-64H128C92.7 32 64 60.7 64 96v320c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V96z'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --color-bg: #0C1524; --color-card: #18233C; --color-accent: #FFC300; --color-line: #2D3748; }
+        body { font-family: 'Inter', sans-serif; background: var(--color-bg); color: #F0F4F8; }
+        textarea { font-family: 'Fira Code', monospace; background: #080E1A; border: 1px solid var(--color-line); color: #4ade80; resize: none; width: 100%; padding: 1rem; border-radius: 12px; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-8 border-b border-[--color-line] pb-4">
+            <h1 class="text-2xl font-black italic">MOCK<span class="text-[--color-accent] not-italic">GEN</span></h1>
+            <a href="../" class="text-xs font-bold text-[--color-accent] hover:underline uppercase">Back to Hub</a>
+        </header>
+
+        <div class="mb-6">
+            <label class="text-[10px] font-bold uppercase text-[--color-muted] mb-2 block">Comma separated keys for Mock Object</label>
+            <input id="keys" type="text" value="id, name, email, status, timestamp" class="w-full bg-[#080E1A] border border-[--color-line] p-3 rounded-lg text-white mb-4 outline-none focus:border-[--color-accent]">
+            <button onclick="generate()" class="bg-[--color-accent] text-black font-black px-6 py-2 rounded-lg text-xs uppercase">Generate 10 Records</button>
+        </div>
+
+        <textarea id="output" class="h-96 text-xs" readonly></textarea>
+    </div>
+
+    <script>
+        function generate() {
+            const keys = document.getElementById('keys').value.split(',').map(k => k.trim());
+            const data = [];
+            for (let i = 1; i <= 10; i++) {
+                const obj = {};
+                keys.forEach(k => {
+                    if (k === 'id') obj[k] = i;
+                    else if (k.includes('email')) obj[k] = `user${i}@example.com`;
+                    else if (k.includes('timestamp')) obj[k] = new Date().toISOString();
+                    else obj[k] = `mock_${k}_${Math.floor(Math.random() * 1000)}`;
+                });
+                data.push(obj);
+            }
+            document.getElementById('output').value = JSON.stringify(data, null, 4);
+        }
+    </script>
+</body>
+</html>
