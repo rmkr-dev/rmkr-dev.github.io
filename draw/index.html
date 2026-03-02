@@ -2,148 +2,239 @@
 <html lang="en">
 <head>
     <script>fetch('https://api.countapi.xyz/hit/rmkr-dev.github.io/draw');</script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Architect Draw | RMKR Dev</title>
     
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23FFC300' d='M448 96c0-35.3-28.7-64-64-64H128C92.7 32 64 60.7 64 96v320c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V96zM128 80h256c8.8 0 16 7.2 16 16v24H112V96c0-8.8 7.2-16 16-16zm256 352H128c-8.8 0-16-7.2-16-16v-24h288v24c0 8.8-7.2 16-16 16z'/%3E%3C/svg%3E">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Fira+Code:wght@300..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-
     <style>
         :root {
             --color-bg: #0C1524; --color-card: #18233C; 
             --color-accent: #FFC300; --color-text: #F0F4F8; 
             --color-muted: #A0AEC0; --color-line: #2D3748;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); }
-        .wrap { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); overflow: hidden; }
+        .wrap { max-width: 1400px; margin: 0 auto; padding: 2rem; height: 100vh; display: flex; flex-direction: column; }
         
-        textarea {
-            font-family: 'Fira Code', monospace;
-            background: #080E1A !important;
-            color: #4ade80 !important; /* Code Green */
-            resize: none;
-            outline: none;
-            border: 1px solid var(--color-line);
-        }
-        
-        #diagram-output {
-            background: rgba(255,255,255,0.02);
-            border: 1px dashed var(--color-line);
+        /* Whiteboard Canvas */
+        #whiteboard {
+            background-color: #F0F4F8; /* White/Light Gray background for drawing */
             border-radius: 12px;
-            min-height: 500px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: auto;
+            cursor: crosshair;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            flex-grow: 1;
+            width: 100%;
         }
 
-        /* Customizing Mermaid SVG Colors */
-        .mermaid svg { max-width: 100% !important; height: auto !important; }
+        /* Tool Palette */
+        .tool-palette {
+            background: var(--color-card);
+            border: 1px solid var(--color-line);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .tool-btn {
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; border: 1px solid transparent;
+            color: var(--color-muted);
+            transition: all 0.2s;
+        }
+        .tool-btn:hover { background: rgba(255,195,0,0.1); color: var(--color-accent); }
+        .tool-btn.active { background: var(--color-accent); color: var(--color-bg); font-weight: bold; border-color: var(--color-accent); }
+
+        .color-dot {
+            width: 20px; height: 20px; border-radius: 50%;
+            cursor: pointer; border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .color-dot:hover { transform: scale(1.1); }
+        .color-dot.active { border-color: #fff; box-shadow: 0 0 5px rgba(255,255,255,0.5); }
+
+        .btn-gold { background: var(--color-accent); color: var(--color-bg); padding: 8px 16px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
 <div class="wrap">
-    <header class="flex justify-between items-center mb-8 border-b border-[--color-line] pb-4">
+    <header class="flex justify-between items-center mb-6 border-b border-[--color-line] pb-4">
         <div>
-            <h1 class="text-2xl font-bold italic tracking-tighter">ARCHITECT<span class="text-[--color-accent] not-italic">DRAW</span></h1>
-            <p class="text-xs text-[--color-muted] font-bold uppercase tracking-widest mt-1">Diagrams as Code</p>
+            <h1 class="text-2xl font-bold tracking-tighteritalic">ARCHITECT<span class="text-[--color-accent] not-italic">DRAW</span></h1>
+            <p class="text-xs text-[--color-muted] font-bold uppercase tracking-widest mt-1">Client-side Whiteboard</p>
         </div>
-        <div class="flex gap-4">
-            <button onclick="downloadSVG()" class="text-xs font-bold text-[--color-accent] hover:underline uppercase">Export SVG</button>
-            <a href="../" class="text-sm font-bold text-[--color-accent] hover:underline"><i class="fa-solid fa-house mr-1"></i> HUB</a>
-        </div>
+        <a href="../" class="bg-[--color-card] p-3 rounded-xl border border-[--color-line] hover:border-[--color-accent] transition">
+            <i class="fa-solid fa-house-user"></i>
+        </a>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[75vh]">
-        <div class="lg:col-span-4 flex flex-col gap-4">
-            <div class="bg-[--color-card] p-4 rounded-xl border border-[--color-line] flex-grow flex flex-col">
-                <label class="text-[10px] font-black text-[--color-muted] uppercase mb-2">Mermaid Script</label>
-                <textarea id="editor" class="w-full flex-grow p-4 rounded-lg text-xs leading-relaxed" spellcheck="false">graph TD
-    A[Client] -->|Request| B(API Gateway)
-    B --> C{Authorizer}
-    C -->|Allow| D[Service A]
-    C -->|Deny| E[403 Forbidden]
-    D --> F[(Database)]</textarea>
-                <p class="text-[9px] text-gray-500 mt-3 uppercase font-mono italic">Live rendering enabled</p>
-            </div>
+    <div class="tool-palette flex flex-wrap">
+        <div class="flex gap-1 border-r border-[--color-line] pr-4">
+            <button onclick="setTool('pencil')" id="btn-pencil" class="tool-btn active"><i class="fa-solid fa-pencil"></i></button>
+            <button onclick="setTool('rect')" id="btn-rect" class="tool-btn"><i class="fa-regular fa-square"></i></button>
+            <button onclick="setTool('circle')" id="btn-circle" class="tool-btn"><i class="fa-regular fa-circle"></i></button>
+            <button onclick="setTool('line')" id="btn-line" class="tool-btn"><i class="fa-solid fa-grip-lines"></i></button>
         </div>
 
-        <div class="lg:col-span-8 bg-[--color-card] rounded-xl border border-[--color-line] p-6 flex flex-col overflow-hidden">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-[10px] font-black text-[--color-muted] uppercase">Live Preview</span>
-                <div class="flex gap-2">
-                    <button onclick="updateDiagram('graph TD\n  A-->B')" class="text-[9px] bg-[--color-line] px-2 py-1 rounded text-white">Flow</button>
-                    <button onclick="updateDiagram('sequenceDiagram\n  Alice->>Bob: Hello')" class="text-[9px] bg-[--color-line] px-2 py-1 rounded text-white">Sequence</button>
-                </div>
-            </div>
-            <div id="diagram-output" class="mermaid">
-                </div>
+        <div class="flex gap-2 border-r border-[--color-line] pr-4 ml-2">
+            <div onclick="setColor('#0C1524')" style="background:#0C1524" class="color-dot active"></div>
+            <div onclick="setColor('#ef4444')" style="background:#ef4444" class="color-dot"></div>
+            <div onclick="setColor('#22c55e')" style="background:#22c55e" class="color-dot"></div>
+            <div onclick="setColor('#3b82f6')" style="background:#3b82f6" class="color-dot"></div>
+            <div onclick="setColor('#FFC300')" style="background:#FFC300" class="color-dot"></div>
+        </div>
+
+        <button onclick="clearCanvas()" class="text-xs font-bold text-red-400/50 hover:text-red-400 ml-2 uppercase">Clear</button>
+
+        <div class="ml-auto flex gap-3">
+            <button onclick="exportJPG()" class="btn-gold uppercase">Export JPG</button>
+            <button onclick="exportPDF()" class="btn-gold uppercase">Export PDF</button>
         </div>
     </div>
+
+    <canvas id="whiteboard"></canvas>
 </div>
 
 <script>
-    // Initialize Mermaid with Dark Theme
-    mermaid.initialize({
-        startOnLoad: false,
-        theme: 'dark',
-        themeVariables: {
-            primaryColor: '#FFC300',
-            primaryTextColor: '#0C1524',
-            primaryBorderColor: '#FFC300',
-            lineColor: '#A0AEC0',
-            secondaryColor: '#18233C',
-            tertiaryColor: '#0C1524'
+    const canvas = document.getElementById('whiteboard');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas dimensions based on container
+    function resizeCanvas() {
+        // Create an offline buffer to save the state
+        const buffer = document.createElement('canvas');
+        buffer.width = canvas.width;
+        buffer.height = canvas.height;
+        buffer.getContext('2d').drawImage(canvas, 0, 0);
+
+        canvas.width = canvas.parentElement.offsetWidth - 32; // Include padding
+        canvas.height = canvas.parentElement.offsetHeight - 200; // Offset for headers
+
+        // Restore state
+        ctx.drawImage(buffer, 0, 0);
+    }
+
+    // Whiteboard State
+    let drawing = false;
+    let currentTool = 'pencil';
+    let currentColor = '#0C1524';
+    let startX, startY;
+    let savedCanvasImage;
+
+    function setTool(tool) {
+        currentTool = tool;
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-'+tool).classList.add('active');
+    }
+
+    function setColor(color) {
+        currentColor = color;
+        document.querySelectorAll('.color-dot').forEach(b => b.classList.remove('active'));
+        // Find the color dot by its style background and add active class
+        event.target.classList.add('active');
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Core Drawing Logic
+    function startDrawing(e) {
+        drawing = true;
+        startX = e.offsetX;
+        startY = e.offsetY;
+        
+        if (currentTool === 'pencil') {
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+        } else {
+            // Save the state for shape preview
+            savedCanvasImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
-    });
+    }
 
-    const editor = document.getElementById('editor');
-    const output = document.getElementById('diagram-output');
+    function stopDrawing() {
+        drawing = false;
+        ctx.beginPath(); // Reset path for pencil
+    }
 
-    async function render() {
-        const code = editor.value;
-        try {
-            output.innerHTML = ''; // Clear old
-            const { svg } = await mermaid.render('mermaid-svg', code);
-            output.innerHTML = svg;
-        } catch (err) {
-            // Silently wait for user to finish typing valid Mermaid syntax
+    function draw(e) {
+        if (!drawing) return;
+        const x = e.offsetX;
+        const y = e.offsetY;
+
+        ctx.lineWidth = currentTool === 'pencil' ? 3 : 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = currentColor;
+
+        if (currentTool === 'pencil') {
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        } else {
+            // Shape Preview Logic
+            ctx.putImageData(savedCanvasImage, 0, 0); // Restore original state
+            ctx.beginPath();
+            
+            if (currentTool === 'rect') {
+                ctx.rect(startX, startY, x - startX, y - startY);
+            } else if (currentTool === 'circle') {
+                const radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+                ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+            } else if (currentTool === 'line') {
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
         }
     }
 
-    function updateDiagram(template) {
-        editor.value = template;
-        render();
+    // Export Logic
+    function exportJPG() {
+        // Create a temporary canvas to add the solid background
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = canvas.width;
+        exportCanvas.height = canvas.height;
+        const eCtx = exportCanvas.getContext('2d');
+        
+        // Add solid background (JPG doesn't support transparency)
+        eCtx.fillStyle = "#F0F4F8"; 
+        eCtx.fillRect(0, 0, canvas.width, canvas.height);
+        eCtx.drawImage(canvas, 0, 0);
+
+        const link = document.createElement('a');
+        link.download = 'whiteboard-sketch.jpg';
+        link.href = exportCanvas.toDataURL('image/jpeg', 0.9);
+        link.click();
     }
 
-    function downloadSVG() {
-        const svgData = document.getElementById('mermaid-svg').outerHTML;
-        const svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
-        const svgUrl = URL.createObjectURL(svgBlob);
-        const downloadLink = document.createElement("a");
-        downloadLink.href = svgUrl;
-        downloadLink.download = "architecture-diagram.svg";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+    function exportPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('l', 'px', [canvas.width, canvas.height]);
+        
+        // Jspdf works best with base64 images
+        const imgData = canvas.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        doc.save('whiteboard-sketch.pdf');
     }
 
-    // Debounced listener
-    let timeout = null;
-    editor.addEventListener('input', () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(render, 500);
-    });
+    // Event Listeners
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
 
-    // Initial load
-    window.onload = render;
+    window.addEventListener('load', resizeCanvas);
+    window.addEventListener('resize', resizeCanvas);
+
 </script>
 </body>
 </html>
