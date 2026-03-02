@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>fetch('https://api.countapi.xyz/hit/rmkr-dev.github.io/draw');</script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architect Draw | RMKR Dev</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23FFC300' d='M448 96c0-35.3-28.7-64-64-64H128C92.7 32 64 60.7 64 96v320c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V96zM128 80h256c8.8 0 16 7.2 16 16v24H112V96c0-8.8 7.2-16 16-16zm256 352H128c-8.8 0-16-7.2-16-16v-24h288v24c0 8.8-7.2 16-16 16z'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Fira+Code:wght@300..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+    <style>
+        :root {
+            --color-bg: #0C1524; --color-card: #18233C; 
+            --color-accent: #FFC300; --color-text: #F0F4F8; 
+            --color-muted: #A0AEC0; --color-line: #2D3748;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); }
+        .wrap { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        
+        textarea {
+            font-family: 'Fira Code', monospace;
+            background: #080E1A !important;
+            color: #4ade80 !important; /* Code Green */
+            resize: none;
+            outline: none;
+            border: 1px solid var(--color-line);
+        }
+        
+        #diagram-output {
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed var(--color-line);
+            border-radius: 12px;
+            min-height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        /* Customizing Mermaid SVG Colors */
+        .mermaid svg { max-width: 100% !important; height: auto !important; }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+    <header class="flex justify-between items-center mb-8 border-b border-[--color-line] pb-4">
+        <div>
+            <h1 class="text-2xl font-bold italic tracking-tighter">ARCHITECT<span class="text-[--color-accent] not-italic">DRAW</span></h1>
+            <p class="text-xs text-[--color-muted] font-bold uppercase tracking-widest mt-1">Diagrams as Code</p>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="downloadSVG()" class="text-xs font-bold text-[--color-accent] hover:underline uppercase">Export SVG</button>
+            <a href="../" class="text-sm font-bold text-[--color-accent] hover:underline"><i class="fa-solid fa-house mr-1"></i> HUB</a>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[75vh]">
+        <div class="lg:col-span-4 flex flex-col gap-4">
+            <div class="bg-[--color-card] p-4 rounded-xl border border-[--color-line] flex-grow flex flex-col">
+                <label class="text-[10px] font-black text-[--color-muted] uppercase mb-2">Mermaid Script</label>
+                <textarea id="editor" class="w-full flex-grow p-4 rounded-lg text-xs leading-relaxed" spellcheck="false">graph TD
+    A[Client] -->|Request| B(API Gateway)
+    B --> C{Authorizer}
+    C -->|Allow| D[Service A]
+    C -->|Deny| E[403 Forbidden]
+    D --> F[(Database)]</textarea>
+                <p class="text-[9px] text-gray-500 mt-3 uppercase font-mono italic">Live rendering enabled</p>
+            </div>
+        </div>
+
+        <div class="lg:col-span-8 bg-[--color-card] rounded-xl border border-[--color-line] p-6 flex flex-col overflow-hidden">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-[10px] font-black text-[--color-muted] uppercase">Live Preview</span>
+                <div class="flex gap-2">
+                    <button onclick="updateDiagram('graph TD\n  A-->B')" class="text-[9px] bg-[--color-line] px-2 py-1 rounded text-white">Flow</button>
+                    <button onclick="updateDiagram('sequenceDiagram\n  Alice->>Bob: Hello')" class="text-[9px] bg-[--color-line] px-2 py-1 rounded text-white">Sequence</button>
+                </div>
+            </div>
+            <div id="diagram-output" class="mermaid">
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize Mermaid with Dark Theme
+    mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+            primaryColor: '#FFC300',
+            primaryTextColor: '#0C1524',
+            primaryBorderColor: '#FFC300',
+            lineColor: '#A0AEC0',
+            secondaryColor: '#18233C',
+            tertiaryColor: '#0C1524'
+        }
+    });
+
+    const editor = document.getElementById('editor');
+    const output = document.getElementById('diagram-output');
+
+    async function render() {
+        const code = editor.value;
+        try {
+            output.innerHTML = ''; // Clear old
+            const { svg } = await mermaid.render('mermaid-svg', code);
+            output.innerHTML = svg;
+        } catch (err) {
+            // Silently wait for user to finish typing valid Mermaid syntax
+        }
+    }
+
+    function updateDiagram(template) {
+        editor.value = template;
+        render();
+    }
+
+    function downloadSVG() {
+        const svgData = document.getElementById('mermaid-svg').outerHTML;
+        const svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+        const svgUrl = URL.createObjectURL(svgBlob);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = svgUrl;
+        downloadLink.download = "architecture-diagram.svg";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+
+    // Debounced listener
+    let timeout = null;
+    editor.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(render, 500);
+    });
+
+    // Initial load
+    window.onload = render;
+</script>
+</body>
+</html>
