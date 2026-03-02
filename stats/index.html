@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Stats | RMKR Dev</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23FFC300' d='M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64V400c0 44.2 35.8 80 80 80H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H80c-8.8 0-16-7.2-16-16V64zm400 96c0-17.7-14.3-32-32-32s-32 14.3-32 32V320c0 17.7 14.3 32 32 32s32-14.3 32-32V160zm-128 64c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7 14.3 32 32 32s32-14.3 32-32V224zm-128 64c0-17.7-14.3-32-32-32s-32 14.3-32 32v32c0 17.7 14.3 32 32 32s32-14.3 32-32V288z'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    
+    <style>
+        :root {
+            --color-bg: #0C1524; --color-card: #18233C; 
+            --color-accent: #FFC300; --color-text: #F0F4F8; 
+            --color-muted: #A0AEC0; --color-line: #2D3748;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); }
+        .wrap { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        
+        .stat-card {
+            background: var(--color-card); border-radius: 12px; padding: 2rem;
+            border: 1px solid var(--color-line); text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--color-accent); }
+        .number { font-size: 3rem; font-weight: 900; color: var(--color-accent); font-family: 'Courier New', monospace; }
+        .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--color-muted); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="wrap min-h-screen">
+    <header class="flex justify-between items-center mb-12 border-b border-[--color-line] pb-6">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight">System <span class="text-[--color-accent]">Telemetry</span></h1>
+            <p class="text-sm text-[--color-muted]">All-time page interaction metrics.</p>
+        </div>
+        <a href="../" class="text-[--color-accent] hover:scale-110 transition"><i class="fa-solid fa-circle-xmark text-2xl"></i></a>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="stat-card md:col-span-2">
+            <div class="label mb-2">Total Hub Entrances</div>
+            <div id="stat-home" class="number">----</div>
+            <div class="text-[10px] text-gray-500 mt-4 italic">Tracking unique page loads across rmkr-dev.github.io</div>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-key text-[--color-muted] mb-4"></i>
+            <div class="label">JWT Debugger</div>
+            <div id="stat-jwt" class="number text-2xl text-white">---</div>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-file-lines text-[--color-muted] mb-4"></i>
+            <div class="label">Markdown Viewer</div>
+            <div id="stat-md" class="number text-2xl text-white">---</div>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-clock text-[--color-muted] mb-4"></i>
+            <div class="label">Time Overlay</div>
+            <div id="stat-time" class="number text-2xl text-white">---</div>
+        </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-user-tie text-[--color-muted] mb-4"></i>
+            <div class="label">Profile Deep Dives</div>
+            <div id="stat-profile" class="number text-2xl text-white">---</div>
+        </div>
+    </div>
+
+    <footer class="mt-16 text-center text-[10px] text-[--color-line] font-mono tracking-widest uppercase">
+        Real-time Data fetched from CountAPI Namespace: rmkr-dev.github.io
+    </footer>
+</div>
+
+<script>
+    const namespace = "rmkr-dev.github.io";
+
+    async function fetchStat(key, elementId) {
+        try {
+            // We use 'get' here so viewing the stats page doesn't increment the counts
+            const response = await fetch(`https://api.countapi.xyz/get/${namespace}/${key}`);
+            const data = await response.json();
+            document.getElementById(elementId).innerText = data.value.toLocaleString();
+        } catch (e) {
+            document.getElementById(elementId).innerText = "ERROR";
+            console.error(e);
+        }
+    }
+
+    // Load all stats on page mount
+    window.onload = () => {
+        fetchStat('home', 'stat-home');
+        fetchStat('jwt', 'stat-jwt');
+        fetchStat('md', 'stat-md');
+        fetchStat('time', 'stat-time');
+        fetchStat('profile', 'stat-profile');
+    };
+</script>
+
+</body>
+</html>
