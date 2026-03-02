@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>fetch('https://api.countapi.xyz/hit/rmkr-dev.github.io/time');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time Zone Overlay | RMKR Dev</title>
@@ -17,48 +18,62 @@
             --color-accent: #FFC300; --color-text: #F0F4F8; 
             --color-muted: #A0AEC0; --color-line: #2D3748;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); }
-        .wrap { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); overflow-x: hidden; }
+        .wrap { max-width: 1100px; margin: 0 auto; padding: 2rem; }
         
         .timeline-row {
             background: var(--color-card);
             border: 1px solid var(--color-line);
             border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            position: relative;
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* The scrollable grid container */
+        .grid-container {
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-line) transparent;
         }
 
         .hour-grid {
             display: grid;
-            grid-template-columns: repeat(24, 1fr);
-            gap: 2px;
+            grid-template-columns: repeat(24, minmax(40px, 1fr));
+            gap: 4px;
             margin-top: 10px;
+            min-width: 960px; /* Ensures cells don't get too squished */
         }
 
         .hour-cell {
-            height: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: var(--color-muted);
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .hour-cell:hover { background: rgba(255, 195, 0, 0.2); }
-        .hour-cell.active { background: var(--color-accent); color: var(--color-bg); font-weight: bold; }
-        .hour-cell.business { border-bottom: 2px solid #4ade80; } /* Simple indicator for 9-5 */
+        .hour-cell:hover { background: rgba(255, 195, 0, 0.15); border-color: var(--color-accent); }
+        .hour-cell.active { background: var(--color-accent) !important; color: var(--color-bg) !important; font-weight: 800; border-color: var(--color-accent); transform: scale(1.05); z-index: 2; }
+        .hour-cell.business { border-bottom: 3px solid #4ade80; } 
+        .hour-cell.night { background: rgba(0, 0, 0, 0.2); }
+
+        .ampm { font-size: 0.55rem; opacity: 0.7; }
 
         select {
             background: #0C1524; color: white; border: 1px solid var(--color-line);
-            padding: 4px 8px; border-radius: 6px; font-size: 0.8rem;
+            padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; outline: none;
         }
 
-        .btn-gold { background: var(--color-accent); color: var(--color-bg); padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
+        .btn-gold { background: var(--color-accent); color: var(--color-bg); padding: 0.5rem 1.25rem; border-radius: 6px; font-weight: 700; transition: all 0.2s; }
+        .btn-gold:hover { opacity: 0.9; transform: translateY(-1px); }
     </style>
 </head>
 <body>
@@ -66,51 +81,59 @@
 <div class="wrap">
     <header class="flex justify-between items-center mb-8 border-b border-[--color-line] pb-4">
         <div>
-            <h1 class="text-2xl font-bold">Time Overlay <span class="text-[--color-accent]">Comparison</span></h1>
-            <p class="text-sm text-[--color-muted]">Compare time across regions with DST support.</p>
+            <h1 class="text-2xl font-bold tracking-tight">Time <span class="text-[--color-accent]">Sync</span> Overlay</h1>
+            <p class="text-xs text-[--color-muted] mt-1 uppercase tracking-widest">Global Meeting Planner</p>
         </div>
-        <a href="../" class="text-sm font-bold text-[--color-accent] hover:underline"><i class="fa-solid fa-house mr-1"></i> Hub</a>
+        <a href="../" class="text-sm font-bold text-[--color-accent] border border-[--color-accent] px-3 py-1 rounded hover:bg-[--color-accent] hover:text-[--color-bg] transition-all"><i class="fa-solid fa-house mr-1"></i> Hub</a>
     </header>
 
-    <div class="flex flex-wrap gap-4 mb-8 items-center bg-[#18233C] p-4 rounded-xl">
+    <div class="flex flex-wrap gap-4 mb-6 items-center bg-[#18233C] p-5 rounded-2xl border border-[--color-line]">
         <div class="flex flex-col">
-            <label class="text-[10px] uppercase font-bold text-muted mb-1">Add Timezone</label>
-            <select id="tz-selector" class="w-64">
-                <option value="UTC">UTC (Universal)</option>
-                <option value="America/New_York">New York (EST/EDT)</option>
-                <option value="Europe/London">London (GMT/BST)</option>
-                <option value="Asia/Kolkata">India (IST)</option>
-                <option value="Asia/Singapore">Singapore / SGT</option>
-                <option value="America/Los_Angeles">Pacific Time (PST/PDT)</option>
-                <option value="Europe/Berlin">Berlin / CET</option>
-                <option value="Australia/Sydney">Sydney / AEDT</option>
-            </select>
+            <label class="text-[10px] uppercase font-bold text-[--color-muted] mb-2 ml-1">Add Location</label>
+            <div class="flex gap-2">
+                <select id="tz-selector" class="w-64">
+                    <option value="UTC">UTC (Universal Time)</option>
+                    <option value="Asia/Kolkata">India (IST)</option>
+                    <option value="America/New_York">New York (EST/EDT)</option>
+                    <option value="Europe/London">London (GMT/BST)</option>
+                    <option value="Asia/Singapore">Singapore (SGT)</option>
+                    <option value="America/Los_Angeles">Pacific Time (PST/PDT)</option>
+                    <option value="Europe/Berlin">Berlin (CET/CEST)</option>
+                    <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
+                    <option value="Asia/Dubai">Dubai (GST)</option>
+                    <option value="Asia/Tokyo">Tokyo (JST)</option>
+                </select>
+                <button onclick="addTimezone()" class="btn-gold">Add</button>
+            </div>
         </div>
-        <button onclick="addTimezone()" class="btn-gold self-end">
-            <i class="fa-solid fa-plus mr-1"></i> Add
-        </button>
-        <div class="ml-auto text-right">
-            <p class="text-[10px] uppercase font-bold text-muted">Current System Time</p>
-            <p id="local-clock" class="text-xl font-mono text-[--color-accent]">00:00:00</p>
+        
+        <div class="ml-auto text-right bg-[#0C1524] px-4 py-2 rounded-lg border border-[--color-line]">
+            <p class="text-[9px] uppercase font-bold text-[--color-muted]">Your System Time</p>
+            <p id="local-clock" class="text-lg font-mono text-[--color-accent] font-bold">00:00:00</p>
         </div>
     </div>
 
-    <div id="timelines-root">
-        </div>
+    <div id="timelines-root"></div>
+
+    <footer class="mt-8 text-center text-[10px] text-[--color-muted] uppercase tracking-widest opacity-50">
+        WorldTimeBuddy Logic — DST Inclusive — Client-Side Only
+    </footer>
 </div>
 
 <script>
     // Configuration
-    let selectedHour = new Date().getHours();
-    let timezones = ['UTC']; // Default start
-    
-    // Auto-detect local timezone and add it if not UTC
+    // We use a "Global Reference Hour" in UTC (0-23) to sync everything
+    let globalRefUtcHour = new Date().getUTCHours();
+    let timezones = [];
+
+    // Initialize with Local and UTC
     const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (localTZ !== 'UTC') timezones.unshift(localTZ);
+    timezones.push(localTZ);
+    if (localTZ !== 'UTC') timezones.push('UTC');
 
     function updateClocks() {
         const now = new Date();
-        document.getElementById('local-clock').innerText = now.toLocaleTimeString();
+        document.getElementById('local-clock').innerText = now.toLocaleTimeString([], { hour12: true });
     }
 
     function addTimezone() {
@@ -127,50 +150,68 @@
         render();
     }
 
+    function selectHour(utcHour) {
+        globalRefUtcHour = utcHour;
+        render();
+    }
+
     function render() {
         const root = document.getElementById('timelines-root');
         root.innerHTML = '';
 
-        timezones.forEach((tz, index) => {
+        timezones.forEach((tz, tzIndex) => {
             const row = document.createElement('div');
-            row.className = 'timeline-row';
-            
-            // Get current time in this specific timezone
+            row.className = 'timeline-row animate-in fade-in duration-500';
+
+            // Get current time info for the header
             const now = new Date();
-            const formatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: tz,
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
-                weekday: 'short'
-            });
-            const parts = formatter.formatToParts(now);
-            const timeStr = formatter.format(now);
-            
+            const timeStr = now.toLocaleTimeString('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true });
+            const dateStr = now.toLocaleDateString('en-US', { timeZone: tz, weekday: 'short', month: 'short', day: 'numeric' });
+
             row.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
-                    <div>
-                        <span class="font-bold text-[--color-accent]">${tz.split('/').pop().replace('_', ' ')}</span>
-                        <span class="text-xs text-[--color-muted] ml-2">${tz}</span>
+                <div class="flex justify-between items-end mb-3">
+                    <div class="flex items-baseline gap-2">
+                        <span class="font-bold text-lg text-[--color-accent] leading-none">${tz.split('/').pop().replace('_', ' ')}</span>
+                        <span class="text-[10px] font-mono text-[--color-muted] uppercase opacity-60">${tz}</span>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <span class="font-mono text-sm">${timeStr}</span>
-                        ${index !== 0 ? `<button onclick="removeTimezone(${index})" class="text-red-400 hover:text-red-300 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-white block">${timeStr}</span>
+                        <span class="text-[9px] text-[--color-muted] uppercase font-medium">${dateStr}</span>
                     </div>
+                    ${tzIndex > 0 ? `<button onclick="removeTimezone(${tzIndex})" class="ml-4 text-[--color-line] hover:text-red-400 transition-colors"><i class="fa-solid fa-circle-minus"></i></button>` : ''}
                 </div>
-                <div class="hour-grid" id="grid-${index}"></div>
+                <div class="grid-container">
+                    <div class="hour-grid" id="grid-${tzIndex}"></div>
+                </div>
             `;
             root.appendChild(row);
 
-            // Generate 24-hour strip
-            const grid = document.getElementById(`grid-${index}`);
-            for (let h = 0; h < 24; h++) {
-                const cell = document.createElement('div');
-                cell.className = `hour-cell ${h >= 9 && h <= 18 ? 'business' : ''} ${h === selectedHour && index === 0 ? 'active' : ''}`;
+            const grid = document.getElementById(`grid-${tzIndex}`);
+            
+            // Logic: We always render 24 blocks. 
+            // The "spine" is UTC. We calculate what hour in THIS timezone corresponds to UTC 0 to 23.
+            for (let utcHour = 0; utcHour < 24; utcHour++) {
+                // Create a date object set to Today at utcHour:00 UTC
+                const refDate = new Date();
+                refDate.setUTCHours(utcHour, 0, 0, 0);
+
+                // Convert that specific UTC moment to the target timezone's hour
+                const tzHourStr = refDate.toLocaleTimeString('en-US', { timeZone: tz, hour: 'numeric', hour12: false });
+                const tzHour = parseInt(tzHourStr);
+                const isAMPM = refDate.toLocaleTimeString('en-US', { timeZone: tz, hour: 'numeric', hour12: true });
                 
-                // Calculate what time 'h' in local translates to in 'tz'
-                // This is the core logic for the "WorldTimeBuddy" overlay
-                cell.innerText = h;
+                const cell = document.createElement('div');
+                const isBusiness = tzHour >= 9 && tzHour <= 18;
+                const isNight = tzHour < 6 || tzHour >= 22;
+                const isActive = utcHour === globalRefUtcHour;
+
+                cell.className = `hour-cell ${isBusiness ? 'business' : ''} ${isNight ? 'night' : ''} ${isActive ? 'active' : ''}`;
+                
+                // Format display (e.g., "12 AM" or "5 PM")
+                const [hPart, ampmPart] = isAMPM.split(' ');
+                cell.innerHTML = `<span>${hPart}</span><span class="ampm">${ampmPart}</span>`;
+                
+                cell.onclick = () => selectHour(utcHour);
                 grid.appendChild(cell);
             }
         });
