@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadmap Planner | RMKR Dev</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23FFC300' d='M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0z'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --color-bg: #0C1524; --color-card: #18233C; --color-accent: #FFC300; --color-line: #2D3748; }
+        body { font-family: 'Inter', sans-serif; background: var(--color-bg); color: #F0F4F8; }
+        .roadmap-container { display: flex; overflow-x: auto; padding-bottom: 20px; gap: 4px; }
+        .quarter { min-width: 250px; background: var(--color-card); border: 1px solid var(--color-line); border-radius: 12px; padding: 1rem; }
+        .item { background: #080E1A; border-left: 3px solid var(--color-accent); padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.75rem; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8 border-b border-[--color-line] pb-4">
+            <h1 class="text-2xl font-black italic uppercase">Architecture<span class="text-[--color-accent] not-italic ml-2">Roadmap</span></h1>
+            <a href="../" class="text-xs font-bold text-[--color-accent] hover:underline">Back to Hub</a>
+        </header>
+
+        <div class="roadmap-container">
+            <div class="quarter">
+                <h3 class="font-black text-[--color-accent] text-xs uppercase border-b border-[--color-line] pb-2">Q1 2026</h3>
+                <div class="item">Foundation & API Gateway Migration</div>
+                <div class="item">Auth Service Consolidation</div>
+            </div>
+            <div class="quarter">
+                <h3 class="font-black text-[--color-accent] text-xs uppercase border-b border-[--color-line] pb-2">Q2 2026</h3>
+                <div class="item">Data Lakehouse Integration</div>
+                <div class="item">Observability Mesh Rollout</div>
+            </div>
+            <div class="quarter">
+                <h3 class="font-black text-[--color-accent] text-xs uppercase border-b border-[--color-line] pb-2">Q3 2026</h3>
+                <div class="item">Multi-Region Failover Tests</div>
+            </div>
+            <div class="quarter">
+                <h3 class="font-black text-[--color-accent] text-xs uppercase border-b border-[--color-line] pb-2">Q4 2026</h3>
+                <div class="item">Global Edge Deployment</div>
+            </div>
+        </div>
+        <p class="mt-8 text-[10px] text-[--color-muted] font-bold uppercase italic">Note: Static template. Visualizing strategic architectural direction.</p>
+    </div>
+</body>
+</html>
