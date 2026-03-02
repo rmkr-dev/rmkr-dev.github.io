@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Viewer | RMKR Dev</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+    
+    <style>
+        body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #0d1117; /* Matches GitHub Dark */
+            color: #c9d1d9;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            background: #161b22;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        .markdown-body {
+            background-color: transparent !important;
+            border: 1px solid #30363d;
+            padding: 30px;
+            border-radius: 6px;
+            min-height: 300px;
+        }
+
+        h1 { border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+        .back-link { color: #58a6ff; text-decoration: none; margin-bottom: 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <a href="../" class="back-link">← Back to Profile</a>
+    <h1>Markdown Viewer</h1>
+
+    <div class="controls">
+        <label for="md-input">Paste Markdown here:</label>
+        <textarea id="md-input" placeholder="# Hello World..."></textarea>
+    </div>
+
+    <div id="preview" class="markdown-body">
+        <p style="color: #8b949e;">Your rendered output will appear here...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        const input = document.getElementById('md-input');
+        const output = document.getElementById('preview');
+
+        // Update preview on typing
+        input.addEventListener('input', () => {
+            const rawValue = input.value;
+            if (rawValue.trim() === "") {
+                output.innerHTML = '<p style="color: #8b949e;">Your rendered output will appear here...</p>';
+                return;
+            }
+            // Parse Markdown to HTML
+            output.innerHTML = marked.parse(rawValue);
+        });
+
+        // Optional: Auto-focus the textarea on load
+        window.onload = () => input.focus();
+    </script>
+</body>
+</html>
