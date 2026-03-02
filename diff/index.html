@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payload Diff | RMKR Dev</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23FFC300' d='M448 96c0-35.3-28.7-64-64-64H128C92.7 32 64 60.7 64 96v320c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V96z'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        :root { --color-bg: #0C1524; --color-card: #18233C; --color-accent: #FFC300; --color-muted: #A0AEC0; --color-line: #2D3748; }
+        body { font-family: 'Inter', sans-serif; background: var(--color-bg); color: #F0F4F8; }
+        textarea { font-family: 'Fira Code', monospace; background: #080E1A; border: 1px solid var(--color-line); color: #4ade80; resize: none; }
+        .diff-added { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .diff-removed { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-width-7xl mx-auto">
+        <header class="flex justify-between items-center mb-8 border-b border-[--color-line] pb-4">
+            <h1 class="text-2xl font-black italic">PAYLOAD<span class="text-[--color-accent] not-italic">DIFF</span></h1>
+            <a href="../" class="text-xs font-bold text-[--color-accent] hover:underline uppercase">Back to Hub</a>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+            <textarea id="left" class="h-64 p-4 rounded-xl text-xs" placeholder="Original JSON/Text..."></textarea>
+            <textarea id="right" class="h-64 p-4 rounded-xl text-xs" placeholder="Modified JSON/Text..."></textarea>
+        </div>
+        
+        <button onclick="compare()" class="w-full bg-[--color-accent] text-black font-black py-3 rounded-xl mb-6 uppercase tracking-widest text-sm">Find Differences</button>
+
+        <div id="result" class="bg-[--color-card] p-6 rounded-xl border border-[--color-line] font-mono text-xs whitespace-pre overflow-auto max-h-96">
+            Compare payloads to see results...
+        </div>
+    </div>
+
+    <script>
+        function compare() {
+            const left = document.getElementById('left').value.split('\n');
+            const right = document.getElementById('right').value.split('\n');
+            const res = document.getElementById('result');
+            res.innerHTML = '';
+
+            const maxLength = Math.max(left.length, right.length);
+            for (let i = 0; i < maxLength; i++) {
+                const lLine = left[i] || "";
+                const rLine = right[i] || "";
+                const div = document.createElement('div');
+                
+                if (lLine === rLine) {
+                    div.className = "py-1 px-2 opacity-50";
+                    div.innerText = `  ${lLine}`;
+                } else {
+                    if (lLine) {
+                        const del = document.createElement('div');
+                        del.className = "diff-removed py-1 px-2";
+                        del.innerText = `- ${lLine}`;
+                        res.appendChild(del);
+                    }
+                    if (rLine) {
+                        const add = document.createElement('div');
+                        add.className = "diff-added py-1 px-2";
+                        add.innerText = `+ ${rLine}`;
+                        res.appendChild(add);
+                    }
+                    continue;
+                }
+                res.appendChild(div);
+            }
+        }
+    </script>
+</body>
+</html>
