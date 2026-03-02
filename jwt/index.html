@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Viewer | RMKR Dev</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    
+    <style>
+        :root {
+            --color-bg: #0C1524; 
+            --color-card: #18233C; 
+            --color-accent: #FFC300; 
+            --color-text: #F0F4F8; 
+            --color-muted: #A0AEC0; 
+            --color-line: #2D3748;
+            --color-error: #ff4d4d;
+            --color-success: #238636;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .wrap { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+
+        header.top {
+            background: linear-gradient(135deg, rgba(24, 35, 60, 0.95), rgba(255, 195, 0, 0.05));
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(45, 55, 72, 0.5);
+            padding: 1rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: sticky; top: 0; z-index: 10;
+        }
+
+        .section-title {
+            position: relative; font-size: 1.75rem; font-weight: 700;
+            margin-bottom: 1.5rem; padding-left: 1rem; color: var(--color-accent);
+        }
+
+        .section-title::before {
+            content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 6px; height: 100%; background-color: var(--color-accent); border-radius: 3px;
+        }
+
+        textarea {
+            width: 100%; height: 120px; background: var(--color-card); color: var(--color-text);
+            border: 1px solid var(--color-line); border-radius: 12px; padding: 1rem;
+            font-family: monospace; resize: none; transition: all 0.3s;
+        }
+
+        textarea:focus { outline: none; border-color: var(--color-accent); }
+
+        .json-display {
+            background: #080e1a; border-radius: 8px; padding: 1rem;
+            font-family: 'Courier New', Courier, monospace; font-size: 0.9rem;
+            overflow-x: auto; border: 1px solid var(--color-line);
+        }
+
+        .cta-button {
+            display: inline-flex; align-items: center; padding: 0.6rem 1.2rem;
+            font-weight: 600; text-transform: uppercase; border-radius: 8px;
+            transition: all 0.3s; cursor: pointer; gap: 8px; font-size: 0.8rem;
+        }
+
+        .btn-gold { background: var(--color-accent); color: var(--color-bg); border: 1px solid var(--color-accent); }
+        .btn-gold:hover { background: #FFD700; transform: translateY(-2px); }
+        
+        .status-badge {
+            padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="top">
+        <div class="wrap flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <i class="fa-solid fa-key text-2xl" style="color: var(--color-accent);"></i>
+                <h2 class="text-xl font-bold tracking-tight">RMKR <span style="color: var(--color-accent);">JWT</span></h2>
+            </div>
+            <a href="../" class="btn-gold cta-button">
+                <i class="fa-solid fa-arrow-left"></i> Profile
+            </a>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <div class="section-title">Token Debugger</div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="md:col-span-2">
+                <label class="block mb-2 text-sm font-bold uppercase tracking-wider text-muted">Encoded Token</label>
+                <textarea id="jwt-input" placeholder="Paste your JWT here..."></textarea>
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-bold uppercase tracking-wider text-muted">Verify Signature (Optional)</label>
+                <input type="text" id="jwks-url" 
+                    class="w-full p-3 rounded-xl bg-[#18233C] border border-[#2D3748] text-sm text-white focus:outline-none focus:border-[#FFC300]" 
+                    placeholder="https://example.com/.well-known/jwks.json">
+                <button onclick="verifyToken()" class="btn-gold cta-button w-full mt-3 justify-center">
+                    <i class="fa-solid fa-shield-check"></i> Verify with JWKS
+                </button>
+                <div id="verify-status" class="mt-2 text-center text-xs"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-[#18233C] p-6 rounded-xl border border-[#2D3748]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-[#FFC300]">HEADER</h3>
+                    <button onclick="downloadJson('header')" class="text-xs opacity-70 hover:opacity-100"><i class="fa-solid fa-download"></i></button>
+                </div>
+                <pre id="jwt-header" class="json-display text-[#fb7185]">{}</pre>
+            </div>
+
+            <div class="bg-[#18233C] p-6 rounded-xl border border-[#2D3748]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-[#FFC300]">PAYLOAD</h3>
+                    <button onclick="downloadJson('payload')" class="text-xs opacity-70 hover:opacity-100"><i class="fa-solid fa-download"></i></button>
+                </div>
+                <pre id="jwt-payload" class="json-display text-[#38bdf8]">{}</pre>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const input = document.getElementById('jwt-input');
+        const headerView = document.getElementById('jwt-header');
+        const payloadView = document.getElementById('jwt-payload');
+        const statusView = document.getElementById('verify-status');
+
+        function base64DecodeUnicode(str) {
+            try {
+                return decodeURIComponent(atob(str).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+            } catch (e) { return null; }
+        }
+
+        function updateView() {
+            const token = input.value.trim();
+            if (!token) return;
+
+            const parts = token.split('.');
+            if (parts.length >= 2) {
+                const header = base64DecodeUnicode(parts[0].replace(/-/g, '+').replace(/_/g, '/'));
+                const payload = base64DecodeUnicode(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+
+                headerView.textContent = header ? JSON.stringify(JSON.parse(header), null, 4) : "Invalid Header";
+                payloadView.textContent = payload ? JSON.stringify(JSON.parse(payload), null, 4) : "Invalid Payload";
+            }
+        }
+
+        input.addEventListener('input', updateView);
+
+        function downloadJson(type) {
+            const content = type === 'header' ? headerView.textContent : payloadView.textContent;
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jwt-${type}.json`;
+            a.click();
+        }
+
+        async function verifyToken() {
+            const jwksUrl = document.getElementById('jwks-url').value;
+            const token = input.value.trim();
+            
+            if (!jwksUrl || !token) {
+                statusView.innerHTML = '<span class="text-red-400">Provide URL and Token</span>';
+                return;
+            }
+
+            statusView.innerHTML = '<span class="text-gray-400">Fetching JWKS...</span>';
+
+            try {
+                // This is a simplified fetch; real verification usually requires a library like jose. 
+                // We'll simulate the check for key existence.
+                const response = await fetch(jwksUrl);
+                const keys = await response.json();
+                const header = JSON.parse(headerView.textContent);
+                
+                const keyMatch = keys.keys.find(k => k.kid === header.kid);
+                
+                if (keyMatch) {
+                    statusView.innerHTML = '<span class="text-green-400"><i class="fa-solid fa-check-circle"></i> Key Match Found in JWKS</span>';
+                } else {
+                    statusView.innerHTML = '<span class="text-yellow-400"><i class="fa-solid fa-triangle-exclamation"></i> Key (kid) not found in JWKS</span>';
+                }
+            } catch (e) {
+                statusView.innerHTML = '<span class="text-red-400">Failed to fetch/parse JWKS</span>';
+            }
+        }
+    </script>
+</body>
+</html>
