@@ -20,6 +20,7 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); }
         .wrap { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         
+        /* Timeline Row Styling */
         .timeline-row {
             background: var(--color-card);
             border: 1px solid var(--color-line);
@@ -29,12 +30,9 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .tz-info { width: 240px; flex-shrink: 0; border-right: 1px solid var(--color-line); padding-right: 15px; }
+        .tz-info { width: 240px; flex-shrink: 0; border-right: 1px solid var(--color-line); }
 
         .grid-viewport { flex-grow: 1; overflow-x: auto; scrollbar-width: none; }
         .grid-viewport::-webkit-scrollbar { display: none; }
@@ -42,42 +40,30 @@
         .hour-grid { display: grid; grid-template-columns: repeat(24, 42px); gap: 4px; }
 
         .hour-cell {
-            height: 48px;
-            background: rgba(255, 255, 255, 0.03);
+            height: 48px; background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s;
+            border-radius: 6px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; font-size: 0.7rem;
+            cursor: pointer; transition: all 0.2s;
         }
 
-        .hour-cell:hover { border-color: var(--color-accent); background: rgba(255, 195, 0, 0.1); }
-        .hour-cell.active { 
-            background: var(--color-accent) !important; 
-            color: var(--color-bg) !important; 
-            font-weight: 800; 
-            transform: scale(1.05);
-            z-index: 10;
-        }
+        .hour-cell.active { background: var(--color-accent) !important; color: var(--color-bg) !important; font-weight: 800; transform: scale(1.05); z-index: 10; }
         .hour-cell.work { border-bottom: 3px solid #4ade80; } 
         .hour-cell.night { opacity: 0.4; background: rgba(0,0,0,0.2); }
 
-        input#tz-search {
+        /* Custom Dropdown/Search */
+        .search-container { position: relative; width: 350px; }
+        #tz-input {
             background: #0C1524; color: white; border: 1px solid var(--color-line);
-            padding: 12px 18px; border-radius: 10px; width: 350px; outline: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 12px 18px; border-radius: 10px; width: 100%; outline: none;
         }
-        input#tz-search:focus { border-color: var(--color-accent); }
-
-        .btn-add {
-            background: var(--color-accent); color: var(--color-bg);
-            font-weight: 800; padding: 12px 24px; border-radius: 10px;
-            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;
+        #tz-list {
+            position: absolute; top: 110%; left: 0; width: 100%; max-height: 300px;
+            background: #1e293b; border: 1px solid var(--color-line); border-radius: 10px;
+            overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
+        .tz-option { padding: 10px 15px; cursor: pointer; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .tz-option:hover { background: var(--color-accent); color: var(--color-bg); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -88,24 +74,16 @@
             <h1 class="text-3xl font-black text-white italic">TIME<span class="text-[--color-accent] not-italic">SYNC</span></h1>
             <p class="text-[10px] text-[--color-muted] font-bold tracking-[0.2em] mt-1 uppercase">Principal Engineering Toolkit</p>
         </div>
-        <div class="flex gap-4">
-            <a href="../stats" class="text-[--color-muted] hover:text-[--color-accent] flex items-center gap-2 text-xs font-bold uppercase">
-                <i class="fa-solid fa-chart-simple"></i> Stats
-            </a>
-            <a href="../" class="bg-[--color-card] w-10 h-10 flex items-center justify-center rounded-xl border border-[--color-line] hover:border-[--color-accent] transition">
-                <i class="fa-solid fa-house-user"></i>
-            </a>
-        </div>
+        <a href="../" class="bg-[--color-card] w-10 h-10 flex items-center justify-center rounded-xl border border-[--color-line] hover:border-[--color-accent] transition">
+            <i class="fa-solid fa-house-user"></i>
+        </a>
     </header>
 
     <div class="bg-[--color-card] p-6 rounded-2xl mb-8 border border-[--color-line] flex flex-wrap gap-6 items-center">
-        <div class="flex flex-col gap-2">
-            <span class="text-[10px] font-black text-[--color-muted] uppercase tracking-widest ml-1">Global Database Search</span>
-            <div class="flex gap-3">
-                <input type="text" id="tz-search" list="all-timezones" placeholder="Type city or country (e.g. London, UTC, IST)...">
-                <datalist id="all-timezones"></datalist>
-                <button onclick="addZone()" class="btn-add hover:brightness-110 active:scale-95 transition">Add Zone</button>
-            </div>
+        <div class="search-container">
+            <span class="text-[10px] font-black text-[--color-muted] uppercase tracking-widest ml-1 mb-2 block">Search City / Region</span>
+            <input type="text" id="tz-input" placeholder="Start typing (e.g. New York, Tokyo...)" onfocus="showList()" oninput="filterList()">
+            <div id="tz-list"></div>
         </div>
         
         <div class="ml-auto flex items-center gap-8">
@@ -113,67 +91,61 @@
                 <p class="text-[10px] uppercase text-[--color-muted] font-bold mb-1">Internal Reference</p>
                 <p id="utc-clock" class="font-mono text-xl text-white font-black">00:00 <span class="text-[--color-accent] text-xs">UTC</span></p>
             </div>
-            <button onclick="resetToNow()" class="text-[10px] font-black text-[--color-accent] border-2 border-[--color-accent] px-4 py-2 rounded-lg hover:bg-[--color-accent] hover:text-[--color-bg] transition-all">
-                SYNC TO NOW
-            </button>
+            <button onclick="resetToNow()" class="text-[10px] font-black text-[--color-accent] border-2 border-[--color-accent] px-4 py-2 rounded-lg hover:bg-[--color-accent] hover:text-[--color-bg] transition-all uppercase">Sync to Now</button>
         </div>
     </div>
 
-    <div id="timeline-container" class="space-y-3">
-        </div>
-
-    <div class="mt-8 p-4 bg-blue-900/10 border border-blue-900/30 rounded-xl flex items-center gap-4">
-        <i class="fa-solid fa-circle-info text-blue-400"></i>
-        <p class="text-xs text-blue-200/70"><b>Pro-Tip:</b> Click any hour cell to align the timeline. Green underlines indicate 9 AM - 5 PM business hours for that specific region.</p>
-    </div>
+    <div id="timeline-container" class="space-y-3"></div>
 </div>
 
 <script>
-    // Initial state: Only show the user's current local timezone
     let activeUtcIndex = new Date().getUTCHours();
     const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
     let selectedZones = [localTZ]; 
-
-    // Populate searchable IANA database
     const allZones = Intl.supportedValuesOf('timeZone');
-    const datalist = document.getElementById('all-timezones');
-    allZones.forEach(zone => {
-        let opt = document.createElement('option');
-        opt.value = zone;
-        datalist.appendChild(opt);
+
+    // Setup Custom Search List
+    const input = document.getElementById('tz-input');
+    const list = document.getElementById('tz-list');
+
+    function showList() { list.style.display = 'block'; filterList(); }
+    
+    // Hide list when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) list.style.display = 'none';
     });
+
+    function filterList() {
+        const filter = input.value.toLowerCase();
+        list.innerHTML = '';
+        const filtered = allZones.filter(z => z.toLowerCase().includes(filter));
+        
+        filtered.forEach(zone => {
+            const div = document.createElement('div');
+            div.className = 'tz-option';
+            div.innerText = zone.replace(/_/g, ' ');
+            div.onclick = () => {
+                if (!selectedZones.includes(zone)) {
+                    selectedZones.push(zone);
+                    render();
+                }
+                input.value = '';
+                list.style.display = 'none';
+            };
+            list.appendChild(div);
+        });
+    }
 
     function updateUTC() {
         const now = new Date();
-        document.getElementById('utc-clock').innerHTML = 
-            `${now.getUTCHours().toString().padStart(2,'0')}:${now.getUTCMinutes().toString().padStart(2,'0')} <span class="text-[--color-accent] text-xs">UTC</span>`;
-    }
-
-    function addZone() {
-        const input = document.getElementById('tz-search');
-        const val = input.value;
-        if (allZones.includes(val) && !selectedZones.includes(val)) {
-            selectedZones.push(val);
-            render();
-            input.value = "";
-        } else if (val === "UTC" && !selectedZones.includes("UTC")) {
-            selectedZones.push("UTC");
-            render();
-            input.value = "";
-        }
+        document.getElementById('utc-clock').innerHTML = `${now.getUTCHours().toString().padStart(2,'0')}:${now.getUTCMinutes().toString().padStart(2,'0')} <span class="text-[--color-accent] text-xs">UTC</span>`;
     }
 
     function removeZone(index) {
-        if (selectedZones.length > 1) {
-            selectedZones.splice(index, 1);
-            render();
-        }
+        if (selectedZones.length > 1) { selectedZones.splice(index, 1); render(); }
     }
 
-    function resetToNow() {
-        activeUtcIndex = new Date().getUTCHours();
-        render();
-    }
+    function resetToNow() { activeUtcIndex = new Date().getUTCHours(); render(); }
 
     function render() {
         const container = document.getElementById('timeline-container');
@@ -182,45 +154,34 @@
         selectedZones.forEach((zone, idx) => {
             const row = document.createElement('div');
             row.className = 'timeline-row';
-
             const now = new Date();
             const timeInZone = now.toLocaleTimeString('en-US', { timeZone: zone, hour: '2-digit', minute: '2-digit', hour12: true });
             const offsetName = new Intl.DateTimeFormat('en-US', {timeZone: zone, timeZoneName:'short'}).formatToParts(now).find(p => p.type === 'timeZoneName').value;
 
             row.innerHTML = `
                 <div class="tz-info">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-black text-white text-sm tracking-tight">${zone.split('/').pop().replace('_', ' ')}</span>
+                    <div class="flex justify-between items-center mb-1 pr-4">
+                        <span class="font-black text-white text-sm tracking-tight">${zone.split('/').pop().replace(/_/g, ' ')}</span>
                         <span class="text-[11px] font-mono text-[--color-accent] font-bold">${timeInZone}</span>
                     </div>
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center pr-4">
                         <span class="text-[9px] text-[--color-muted] font-bold uppercase tracking-tighter">${offsetName}</span>
-                        ${idx !== 0 ? `<button onclick="removeZone(${idx})" class="text-[9px] font-black text-red-400/50 hover:text-red-400 uppercase tracking-widest">Delete</button>` : `<span class="text-[9px] text-blue-400 font-black uppercase tracking-widest">Local</span>`}
+                        ${idx !== 0 ? `<button onclick="removeZone(${idx})" class="text-[9px] font-black text-red-400/50 hover:text-red-400 uppercase">Delete</button>` : `<span class="text-[9px] text-blue-400 font-black uppercase">Local</span>`}
                     </div>
                 </div>
-                <div class="grid-viewport">
-                    <div class="hour-grid"></div>
-                </div>
+                <div class="grid-viewport"><div class="hour-grid" id="grid-${idx}"></div></div>
             `;
 
             const grid = row.querySelector('.hour-grid');
-            
-            // Build 24-hour UTC-aligned spine
             for (let i = 0; i < 24; i++) {
                 const cell = document.createElement('div');
-                const d = new Date();
-                d.setUTCHours(i, 0, 0, 0);
-                
+                const d = new Date(); d.setUTCHours(i, 0, 0, 0);
                 const localHour = parseInt(d.toLocaleTimeString('en-US', { timeZone: zone, hour12: false, hour: 'numeric' }));
                 const ampm = d.toLocaleTimeString('en-US', { timeZone: zone, hour: 'numeric', hour12: true }).split(' ')[1];
-
-                const isWork = localHour >= 9 && localHour <= 17;
-                const isNight = localHour >= 22 || localHour <= 6;
                 const isActive = i === activeUtcIndex;
 
-                cell.className = `hour-cell ${isWork ? 'work' : ''} ${isNight ? 'night' : ''} ${isActive ? 'active' : ''}`;
+                cell.className = `hour-cell ${localHour >= 9 && localHour <= 17 ? 'work' : ''} ${localHour >= 22 || localHour <= 6 ? 'night' : ''} ${isActive ? 'active' : ''}`;
                 cell.innerHTML = `<span class="text-xs font-bold">${localHour % 12 || 12}</span><span class="text-[7px] font-black uppercase opacity-60">${ampm}</span>`;
-                
                 cell.onclick = () => { activeUtcIndex = i; render(); };
                 grid.appendChild(cell);
             }
@@ -232,6 +193,5 @@
     render();
     updateUTC();
 </script>
-
 </body>
 </html>
