@@ -76,6 +76,12 @@
             <div class="label">Architect Draw</div>
             <div id="stat-draw" class="number text-2xl text-white">---</div>
         </div>
+
+        <div class="stat-card">
+            <i class="fa-solid fa-wand-magic-sparkles text-[--color-muted] mb-4"></i>
+            <div class="label">Payload Knife</div>
+            <div id="stat-transform" class="number text-2xl text-white">---</div>
+        </div>
     </div>
 
     <footer class="mt-16 text-center text-[10px] text-[--color-line] font-mono tracking-widest uppercase">
@@ -106,6 +112,7 @@
         fetchStat('time', 'stat-time');
         fetchStat('profile', 'stat-profile');
         fetchStat('draw', 'stat-draw');
+        fetchStat('transform', 'stat-transform');
     };
 </script>
 
