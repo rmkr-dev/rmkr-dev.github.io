@@ -3,405 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramkumar Ethiraj — Principal Software Engineer & Architect</title>
-    <!-- Load Tailwind CSS -->
+    <title>Ramkumar Ethiraj | RMKR Dev</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23FFC300' d='M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V288H216c-13.3 0-24 10.7-24 24s10.7 24 24 24H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zm384 64H256V0L384 128z'/%3E%3C/svg%3E">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <!-- Load Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     
     <style>
-        /* Refined Custom Theme: Deep Navy Blue with Professional Gold Accent (RESTORED) */
         :root {
-            --color-bg: #0C1524; /* Deeper Navy */
-            --color-card: #18233C; /* Slightly Lighter Card Background */
-            --color-accent: #FFC300; /* Professional Gold/Amber */
-            --color-text: #F0F4F8; /* Light Off-White */
-            --color-muted: #A0AEC0; /* Soft Gray */
-            --color-line: #2D3748;
+            --color-bg: #0C1524; --color-card: #18233C; 
+            --color-accent: #FFC300; --color-text: #F0F4F8; 
+            --color-muted: #A0AEC0; --color-line: #2D3748;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-bg);
-            color: var(--color-text);
-            transition: background-color 0.3s ease;
-            line-height: 1.6; /* Ensure readability */
-        }
-
-        .wrap {
-            max-width: 1200px; /* Original wider wrap */
-            margin: 0 auto;
-            padding: 1.5rem;
-        }
-
-        /* Styling for the Main Header */
-        header.top {
-            background: linear-gradient(135deg, rgba(24, 35, 60, 0.95), rgba(255, 195, 0, 0.05));
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(45, 55, 72, 0.5);
-            padding: 1rem 0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        /* Animated Section Title - Left Border Bar */
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); }
+        .wrap { max-width: 900px; margin: 0 auto; padding: 2rem; }
         .section-title {
-            position: relative;
-            font-size: 1.75rem; /* 28px */
-            font-weight: 700;
-            margin-top: 2.5rem; 
-            margin-bottom: 1rem;
-            padding-left: 1rem;
-            color: var(--color-accent);
-            letter-spacing: 0.05em;
+            position: relative; font-size: 1.5rem; font-weight: 700;
+            margin-bottom: 1.5rem; padding-left: 1rem; color: var(--color-accent);
         }
-
-        /* RESTORED: Left accent bar */
         .section-title::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 6px;
-            height: 100%;
-            background-color: var(--color-accent);
-            border-radius: 3px;
-            box-shadow: 0 0 8px var(--color-accent);
+            content: ''; position: absolute; left: 0; top: 0; width: 4px; height: 100%;
+            background: var(--color-accent); border-radius: 2px;
         }
-        
-        /* REMOVED: Section-title::after from Mac Dark Mode */
-        .section-title::after {
-            content: none;
+        .tool-card {
+            background: var(--color-card); border-radius: 16px; padding: 1.5rem;
+            border: 1px solid var(--color-line); transition: all 0.3s ease;
+            display: flex; flex-direction: column; gap: 8px;
         }
-
-
-        /* Card Styling - Elevated and Professional */
-        .card {
-            background: var(--color-card);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-top: 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(45, 55, 72, 0.5);
-        }
-
-        /* Badge/Skill Styling - Highlighting expertise (RESTORED GOLD) */
-        .badge {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            margin: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            border-radius: 9999px; /* Full rounded pill */
-            background-color: rgba(255, 195, 0, 0.1); /* Subtle Gold Background */
-            color: var(--color-accent);
-            border: 1px solid rgba(255, 195, 0, 0.5);
-            transition: all 0.2s ease;
-        }
-
-        .badge:hover {
-            background-color: rgba(255, 195, 0, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(255, 195, 0, 0.3);
-        }
-
-        /* Primary Call-to-Action Buttons */
-        .cta-button {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            margin: 0.5rem 0; 
-            font-weight: 600;
-            text-transform: uppercase; /* RESTORED: Uppercase text */
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-            color: var(--color-text); /* Ensure text is readable */
-            width: 100%; 
-            justify-content: center;
-        }
-        
-        @media (min-width: 640px) { /* sm breakpoint */
-            .cta-button {
-                width: auto;
-                justify-content: flex-start;
-                margin: 0 0.5rem;
-            }
-        }
-
-        .cta-button-primary {
-            background: var(--color-accent);
-            color: var(--color-bg); /* RESTORED: Text is dark on gold */
-            border: 1px solid var(--color-accent);
-        }
-
-        .cta-button-primary:hover {
-            background: #FFD700; /* Brighter gold on hover */
-            box-shadow: 0 0 20px rgba(255, 195, 0, 0.7);
-            transform: translateY(-2px) scale(1.02);
-        }
-        
-        .cta-button-secondary {
-            background: transparent;
-            border: 1px solid var(--color-muted);
-            color: var(--color-muted);
-        }
-        
-        .cta-button-secondary:hover {
-            background: rgba(255, 195, 0, 0.1);
-            border-color: var(--color-accent);
-            color: var(--color-accent);
-            transform: translateY(-2px);
-        }
-
-        /* Timeline Styling - Responsive and Clean (RESTORED GOLD) */
-        .timeline-container {
-            position: relative;
-            padding-left: 20px; /* RESTORED: Thicker padding/line */
-            border-left: 2px solid var(--color-line); /* RESTORED: Solid line */
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-            padding-left: 1.5rem;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -12px; /* Adjusted position for thicker line */
-            top: 0.25rem;
-            width: 20px;
-            height: 20px;
-            background: var(--color-accent);
-            border: 3px solid var(--color-bg); /* RESTORED: Thicker outer ring */
-            border-radius: 50%;
-            z-index: 1;
-        }
-
-        .timeline-item h3 {
-            font-size: 1.25rem; /* 20px */
-            font-weight: 600;
-            color: var(--color-text);
-        }
-        
-        .timeline-item h4 {
-            font-size: 1.125rem; /* 18px */
-            font-weight: 500;
-            color: var(--color-accent);
-            margin-top: 0.25rem;
-        }
-        
-        .timeline-item .description {
-            color: var(--color-muted);
-        }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .wrap {
-                padding: 1rem;
-            }
-            .section-title {
-                font-size: 1.5rem;
-                margin-top: 2rem;
-            }
-            header.top .wrap {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            header.top .flex-col {
-                width: 100%;
-            }
-            .card {
-                padding: 1.25rem;
-            }
+        .tool-card:hover { transform: translateY(-5px); border-color: var(--color-accent); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .cta-gold {
+            background: var(--color-accent); color: var(--color-bg);
+            padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s;
         }
     </style>
 </head>
 <body>
 
-<header class="top">
-    <div class="wrap flex justify-between items-center flex-wrap">
-        <div class="mb-3 sm:mb-0">
-            <h1 class="text-3xl font-extrabold text-white tracking-tight">Ramkumar Ethiraj</h1>
-            <p class="text-xl mt-1 text-gray-400 font-medium">Principal Software Engineer & Cloud Architect</p>
-        </div>
-        <!-- Links: LinkedIn (Primary) and GitHub (Secondary) -->
-        <div class="w-full sm:w-auto flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-3 sm:mt-0">
-            <a href="https://linkedin.com/in/ramkumarethiraj" target="_blank" class="cta-button cta-button-primary">
-                <i class="fab fa-linkedin-in mr-2"></i> View LinkedIn Profile
+<div class="wrap min-h-screen flex flex-col justify-center">
+    <header class="mb-12">
+        <h1 class="text-5xl font-black mb-2 tracking-tight">Ramkumar Ethiraj</h1>
+        <p class="text-2xl text-[--color-accent] font-medium mb-6">Principal Software Engineer & Architect</p>
+        
+        <div class="flex flex-wrap gap-4 items-center">
+            <a href="profile.html" class="cta-gold uppercase text-sm">
+                <i class="fa-solid fa-address-card"></i> View Full Profile
             </a>
-            <a href="https://github.com/rmkr-dev" target="_blank" class="cta-button cta-button-secondary">
-                <i class="fab fa-github mr-2"></i> View GitHub
-            </a>
+            <div class="flex gap-4 text-2xl ml-2">
+                <a href="https://github.com/rmkr-dev" target="_blank" class="hover:text-[--color-accent] transition"><i class="fab fa-github"></i></a>
+                <a href="https://linkedin.com/in/ramkumarethiraj" target="_blank" class="hover:text-[--color-accent] transition"><i class="fab fa-linkedin"></i></a>
+                </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<div class="wrap">
-    
-    <!-- Professional Summary -->
-    <h2 class="section-title">Architectural Vision & Leadership</h2>
-    <div class="card">
-        <p class="text-lg leading-relaxed text-gray-200">
-            A results-driven <b>Principal Software Engineer</b> with over <b>11 years</b> of experience specializing in architecting and delivering high-performance, enterprise-scale platforms. My expertise lies in defining <b>Azure-native</b> strategies, mastering distributed systems, and leveraging <b>Java/Spring Boot</b> to build robust, secure, and scalable solutions for <b>Healthcare</b> and Telecom industries. I am focused on technical modernization, efficiency gains, and steering complex product lifecycles from concept to delivery.
-        </p>
-        <div class="mt-6 flex flex-wrap">
-            <span class="badge">#CloudArchitecture</span>
-            <span class="badge">#DistributedSystems</span>
-            <span class="badge">#TechLeadership</span>
-            <span class="badge">#AzureNative</span>
-            <span class="badge">#JavaEcosystem</span>
-        </div>
-    </div>
+    <div class="section-title">Developer Toolkit</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+        <a href="/md" class="tool-card">
+            <div class="flex justify-between items-start">
+                <i class="fa-solid fa-file-lines text-2xl text-[--color-accent]"></i>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-30"></i>
+            </div>
+            <h3 class="font-bold text-lg">Markdown Viewer</h3>
+            <p class="text-xs text-[--color-muted]">Preview and Export MD to PDF.</p>
+        </a>
 
-    <!-- Technical Deep Dive -->
-    <h2 class="section-title">Deep Technical Expertise</h2>
-    <div class="card">
-        <p class="text-sm font-semibold mb-3 text-gray-400 uppercase tracking-wider">CORE PLATFORM & LANGUAGE:</p>
-        <div class="flex flex-wrap">
-            <div class="badge">Java (11+)</div>
-            <div class="badge">Spring Boot/Security/Data JPA</div>
-            <div class="badge">API Design & Development</div>
-            <div class="badge">Apache Spark / ETL</div>
-            <div class="badge">PostgreSQL / Oracle / Netezza</div>
-        </div>
-        
-        <div class="w-full h-px bg-gray-700 my-6"></div>
+        <a href="/jwt" class="tool-card">
+            <div class="flex justify-between items-start">
+                <i class="fa-solid fa-shield-halved text-2xl text-[--color-accent]"></i>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-30"></i>
+            </div>
+            <h3 class="font-bold text-lg">JWT Debugger</h3>
+            <p class="text-xs text-[--color-muted]">Decode JWT tokens and verify.</p>
+        </a>
 
-        <p class="text-sm font-semibold mb-3 text-gray-400 uppercase tracking-wider">AZURE & CLOUD INFRASTRUCTURE:</p>
-        <div class="flex flex-wrap">
-            <div class="badge">Azure Kubernetes Services (AKS)</div>
-            <div class="badge">Azure Synapse / Databricks</div>
-            <div class="badge">Azure Key Vault / Networking</div>
-            <div class="badge">Azure Data Factory / Logic Apps</div>
-            <div class="badge">Terraform (Infrastructure as Code)</div>
-        </div>
-        
-        <div class="w-full h-px bg-gray-700 my-6"></div>
-
-        <p class="text-sm font-semibold mb-3 text-gray-400 uppercase tracking-wider">DEVOPS & ORCHESTRATION:</p>
-        <div class="flex flex-wrap">
-            <div class="badge">GitHub Actions & Workflow</div>
-            <div class="badge">CI/CD Automation</div>
-            <div class="badge">Kubernetes & Docker</div>
-            <div class="badge">MapR (Legacy Big Data)</div>
+        <div class="tool-card opacity-50 border-dashed border-2">
+            <i class="fa-solid fa-plus text-2xl mb-2"></i>
+            <h3 class="font-bold">Next Tool</h3>
+            <p class="text-xs">Coming soon...</p>
         </div>
     </div>
 
-    <!-- Experience Timeline -->
-    <h2 class="section-title">Impactful Career Trajectory</h2>
-    <div class="card timeline-container">
-        <!-- Optum - Principal Software Engineer -->
-        <div class="timeline-item">
-            <span class="date block text-xs mb-1 text-gray-500">Mar 2024 – Present</span>
-            <h3>Principal Software Engineer</h3>
-            <h4>Optum, Chennai, India</h4>
-            <ul class="list-disc list-inside mt-2 text-sm space-y-2">
-                <li class="description"><i class="fas fa-microchip mr-2" style="color: var(--color-accent);"></i>Spearheaded the <b>modernization and reconstruction of the UHG pricing platform</b> under a unified infrastructure, significantly enhancing performance and scalability.</li>
-                <li class="description"><i class="fas fa-rocket mr-2" style="color: var(--color-accent);"></i><b>Architected high-scale Approval and Orchestration Solutions</b>, federating ~20x more Approvals per day through robust design.</li>
-                <li class="description"><i class="fas fa-tools mr-2" style="color: var(--color-accent);"></i>Optimized and <b>owned the CI/CD process (GitHub Actions)</b>, resulting in a <b>30% efficiency improvement</b> across integration and deployment cycles.</li>
-            </ul>
-        </div>
-        
-        <!-- Optum - Senior Software Engineer II -->
-        <div class="timeline-item">
-            <span class="date block text-xs mb-1 text-gray-500">Mar 2022 – Mar 2024</span>
-            <h3>Senior Software Engineer II</h3>
-            <h4>Optum, Chennai, India</h4>
-            <ul class="list-disc list-inside mt-2 text-sm space-y-2">
-                <li class="description"><i class="fas fa-shield-alt mr-2" style="color: var(--color-accent);"></i>Led the <b>complete security architecture and orchestration</b> for PHI, PII, and classified data, establishing <b>field-level granularity and governance controls</b> across the Enterprise Data Portal.</li>
-                <li class="description"><i class="fas fa-cloud mr-2" style="color: var(--color-accent);"></i>Enabled teams in large-scale data onboarding from legacy systems (Teradata, DB2) to Azure services like <b>Synapse, Databricks, and Delta Lake</b>.</li>
-            </ul>
-        </div>
-        
-        <!-- Optum - Senior Software Engineer I -->
-        <div class="timeline-item">
-            <span class="date block text-xs mb-1 text-gray-500">Dec 2018 – Mar 2022</span>
-            <h3>Senior Software Engineer I</h3>
-            <h4>Optum, Chennai, India</h4>
-            <ul class="list-disc list-inside mt-2 text-sm space-y-2">
-                <li class="description"><i class="fas fa-chart-line mr-2" style="color: var(--color-accent);"></i>Steered the lifecycle of the UHG Clinical Trials Platform Analytics tool; <b>stabilized and improved RWE product suite performance by 40%</b>.</li>
-                <li class="description"><i class="fas fa-arrow-alt-circle-right mr-2" style="color: var(--color-accent);"></i><b>Architected the Clinical Trials platform</b> towards complete Cloud Migration (Azure) and achieved an <b>All-Star rating</b> from the Enterprise Architecture Review Board (EARB).</li>
-            </ul>
-        </div>
-        
-        <!-- Global Logic -->
-        <div class="timeline-item">
-            <span class="date block text-xs mb-1 text-gray-500">Mar 2017 – Dec 2018</span>
-            <h3>Senior Software Engineer</h3>
-            <h4>Global Logic, Chennai, India</h4>
-            <ul class="list-disc list-inside mt-2 text-sm space-y-2">
-                <li class="description"><i class="fas fa-database mr-2" style="color: var(--color-accent);"></i><b>Redesigned Map-Reduce job</b> for Data-Retention in the Ericsson OSS/BSS product, achieving a <b>4X performance improvement</b>.</li>
-            </ul>
-        </div>
-        
-        <!-- Accenture -->
-        <div class="timeline-item">
-            <span class="date block text-xs mb-1 text-gray-500">Sep 2014 – Feb 2017</span>
-            <h3>Application Development Analyst</h3>
-            <h4>Accenture, Chennai, India</h4>
-            <ul class="list-disc list-inside mt-2 text-sm space-y-2">
-                <li class="description"><i class="fas fa-code-branch mr-2" style="color: var(--color-accent);"></i>Migrated a classical C#.NET application to a modern <b>Java-based light-weight stack</b>.</li>
-            </ul>
-        </div>
-    </div>
-    
-    <!-- Credentials & Recognitions -->
-    <h2 class="section-title">Credentials & Recognition</h2>
-    <div class="card grid md:grid-cols-2 gap-6">
-        <!-- RESTORED: Gold theme styling -->
-        <div class="p-4 rounded-lg" style="background-color: rgba(255, 195, 0, 0.1); border: 1px solid rgba(255, 195, 0, 0.5);">
-            <i class="fas fa-trophy text-2xl mb-2" style="color: var(--color-accent);"></i>
-            <h3 class="text-lg font-semibold text-white">Technology Leadership Career Path</h3>
-            <p class="text-sm text-gray-400">Recognized as a technical leader across the organization (Mar 2025 - Mar 2029 commitment).</p>
-        </div>
-        <!-- RESTORED: Gold theme styling -->
-        <div class="p-4 rounded-lg" style="background-color: rgba(255, 195, 0, 0.1); border: 1px solid rgba(255, 195, 0, 0.5);">
-            <i class="fas fa-star text-2xl mb-2" style="color: var(--color-accent);"></i>
-            <h3 class="text-lg font-semibold text-white">Emerging Leader Certification</h3>
-            <p class="text-sm text-gray-400">Certified for exceptional leadership potential and performance at the Senior Engineer grade (Oct 2021).</p>
-        </div>
-        
-        <!-- Education Section Updated (RESTORED: Gold theme styling) -->
-        <div class="p-4 rounded-lg md:col-span-2" style="background-color: rgba(255, 195, 0, 0.1); border: 1px solid rgba(255, 195, 0, 0.5);">
-            <i class="fas fa-graduation-cap text-2xl text-white mb-2"></i>
-            <h3 class="text-lg font-semibold text-white">Education</h3>
-            
-            <p class="text-base font-medium mt-2 mb-1">M.Tech. - System Software (WILP)</p>
-            <p class="text-sm text-gray-400">
-                BITS Pilani | <b>Aug 2024 – Jun 2026 (In Progress)</b>
-            </p>
-
-            <div class="w-full h-px bg-gray-700 my-3"></div>
-
-            <p class="text-base font-medium mb-1">B.E. - Computer Science and Engineering</p>
-            <p class="text-sm text-gray-400">Coimbatore Institute of Engineering and Technology | 2010–2014</p>
-        </div>
-    </div>
-
-
-    <!-- Location retained for professional context -->
-    <h2 class="section-title">Location</h2>
-    <div class="card flex flex-wrap gap-6">
-        <div class="flex items-center text-lg">
-            <i class="fas fa-globe mr-3" style="color: var(--color-accent);"></i>
-            <span class="text-gray-400">Chennai, India</span>
-        </div>
-    </div>
-    
-    <footer class="mt-12 text-center text-sm text-gray-600 pb-8">
-        Designed & Engineered by Ramkumar Ethiraj.
+    <footer class="text-[--color-line] text-xs font-mono">
+        &copy; 2026 // RMKR-DEV.GITHUB.IO
     </footer>
-
 </div>
 
 </body>
