@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        // Dual-Layer Hit Counter
+        (async () => {
+            const key = 'collab';
+            const ns = 'rmkr-dev-suite';
+            const current = parseInt(localStorage.getItem(`stat-${key}`) || "0");
+            localStorage.setItem(`stat-${key}`, current + 1);
+            try { await fetch(`https://countapi.it/hit/${ns}/${key}`, { mode: 'no-cors' }); } catch (e) {}
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collab Pad | RMKR Dev</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Fira+Code:wght@300..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    
+    <style>
+        :root {
+            --color-bg: #0C1524; --color-card: #18233C; 
+            --color-accent: #FFC300; --color-text: #F0F4F8; 
+            --color-line: #2D3748;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-bg); color: var(--color-text); height: 100vh; overflow: hidden; }
+        .wrap { max-width: 1200px; margin: 0 auto; padding: 2rem; height: 100%; display: flex; flex-direction: column; }
+        
+        textarea {
+            font-family: 'Fira Code', monospace;
+            background: #080E1A !important;
+            color: #4ade80 !important;
+            border: 1px solid var(--color-line);
+            flex-grow: 1; resize: none; outline: none; padding: 2rem;
+            border-radius: 12px; font-size: 0.9rem; line-height: 1.6;
+        }
+        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .status-off { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .status-on { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+    <header class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold italic tracking-tighter">COLLAB<span class="text-[--color-accent] not-italic">PAD</span></h1>
+            <div class="flex items-center gap-2 mt-1">
+                <span id="connection-status" class="status-pill status-off">Disconnected</span>
+                <span class="text-[10px] text-gray-500 font-mono">ID: <span id="my-id" class="text-white">loading...</span></span>
+            </div>
+        </div>
+        <div class="flex gap-3">
+            <input type="text" id="peer-id-input" placeholder="Paste Peer ID to Connect" class="bg-[#080E1A] border border-[--color-line] px-3 py-2 rounded-lg text-xs text-white outline-none focus:border-[--color-accent]">
+            <button onclick="connectToPeer()" class="bg-[--color-accent] text-[--color-bg] px-4 py-2 rounded-lg font-bold text-xs uppercase">Connect</button>
+            <a href="../" class="bg-[--color-card] p-2 rounded-lg border border-[--color-line] text-[--color-accent]"><i class="fa-solid fa-house"></i></a>
+        </div>
+    </header>
+
+    <textarea id="editor" placeholder="Start typing... Everything here is synced with your peer."></textarea>
+    
+    <footer class="mt-4 flex justify-between items-center text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+        <span>P2P Encrypted Session</span>
+        <span id="peer-info">No Peer Connected</span>
+    </footer>
+</div>
+
+<script>
+    const editor = document.getElementById('editor');
+    const myIdDisplay = document.getElementById('my-id');
+    const statusPill = document.getElementById('connection-status');
+    const peerInfo = document.getElementById('peer-info');
+    
+    let peer = new Peer(); // Create a new PeerJS instance
+    let conn = null;
+
+    // 1. Initialize My ID
+    peer.on('open', (id) => {
+        myIdDisplay.innerText = id;
+    });
+
+    // 2. Handle Incoming Connections
+    peer.on('connection', (connection) => {
+        setupConnection(connection);
+    });
+
+    // 3. Connect to a Peer
+    function connectToPeer() {
+        const remoteId = document.getElementById('peer-id-input').value;
+        if (!remoteId) return;
+        const connection = peer.connect(remoteId);
+        setupConnection(connection);
+    }
+
+    function setupConnection(connection) {
+        conn = connection;
+        
+        conn.on('open', () => {
+            statusPill.innerText = "Connected";
+            statusPill.className = "status-pill status-on";
+            peerInfo.innerText = "Connected to: " + conn.peer;
+            
+            // Sync current editor state immediately
+            conn.send(editor.value);
+        });
+
+        conn.on('data', (data) => {
+            // Update editor when data is received from peer
+            if (editor.value !== data) {
+                const selectionStart = editor.selectionStart;
+                const selectionEnd = editor.selectionEnd;
+                editor.value = data;
+                editor.setSelectionRange(selectionStart, selectionEnd);
+            }
+        });
+    }
+
+    // 4. Send Data on Input
+    editor.addEventListener('input', () => {
+        if (conn && conn.open) {
+            conn.send(editor.value);
+        }
+    });
+
+    // Error handling
+    peer.on('error', (err) => {
+        console.error(err);
+        alert("Peer Error: " + err.type);
+    });
+</script>
+</body>
+</html>
