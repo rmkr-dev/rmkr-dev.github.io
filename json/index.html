@@ -1,241 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<script>fetch('https://api.countapi.xyz/hit/rmkr-dev.github.io/jsonviewer');</script>
+
 <meta charset="UTF-8">
-<title>JSON Explorer</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>JSON Viewer | RMKR Dev</title>
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 
 <style>
 
 :root{
-    --bg:#0f172a;
-    --panel:#1e293b;
-    --border:#334155;
-    --text:#e2e8f0;
-    --accent:#38bdf8;
-    --key:#f59e0b;
-    --string:#22c55e;
-    --number:#a78bfa;
+--color-bg:#0C1524;
+--color-card:#18233C;
+--color-accent:#FFC300;
+--color-text:#F0F4F8;
+--color-line:#2D3748;
 }
 
 body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:system-ui;
+font-family:'Inter',sans-serif;
+background:var(--color-bg);
+color:var(--color-text);
 }
 
-header{
-    padding:16px;
-    border-bottom:1px solid var(--border);
-    font-size:20px;
-    font-weight:600;
+.wrap{max-width:1400px;margin:auto;padding:1.5rem}
+
+.json-node{
+margin-left:20px;
+border-left:1px dashed #2D3748;
+padding-left:10px;
 }
 
-.container{
-    padding:16px;
+.json-key{color:#FFC300;font-weight:600}
+
+.json-string{color:#38bdf8}
+
+.json-number{color:#f472b6}
+
+.json-boolean{color:#22c55e}
+
+.json-null{color:#9ca3af}
+
+.toggle{
+cursor:pointer;
+margin-right:6px;
+color:#94a3b8;
+}
+
+.viewer{
+background:#080e1a;
+border:1px solid var(--color-line);
+border-radius:10px;
+padding:16px;
+overflow:auto;
+height:520px;
+font-family:monospace;
+font-size:14px;
 }
 
 textarea{
-    width:100%;
-    height:180px;
-    background:var(--panel);
-    color:var(--text);
-    border:1px solid var(--border);
-    padding:12px;
-    border-radius:8px;
-    font-family:monospace;
+background:var(--color-card);
+border:1px solid var(--color-line);
+border-radius:10px;
+padding:12px;
+width:100%;
+height:520px;
+font-family:monospace;
 }
 
-button{
-    margin-top:10px;
-    padding:8px 16px;
-    background:var(--accent);
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
+.btn{
+background:var(--color-accent);
+color:black;
+padding:8px 14px;
+border-radius:8px;
+font-weight:600;
 }
 
-.tabs{
-    margin-top:20px;
-}
-
-.tab-buttons{
-    display:flex;
-    gap:10px;
-    margin-bottom:12px;
-}
-
-.tab{
-    padding:6px 12px;
-    border:1px solid var(--border);
-    cursor:pointer;
-}
-
-.active{
-    background:var(--accent);
-    color:black;
-}
-
-.panel{
-    background:var(--panel);
-    border:1px solid var(--border);
-    padding:16px;
-    border-radius:8px;
-}
-
-.node{
-    margin-left:18px;
-    font-family:monospace;
-}
-
-.key{
-    color:var(--key);
-}
-
-.string{
-    color:var(--string);
-}
-
-.number{
-    color:var(--number);
-}
-
-.toggle{
-    cursor:pointer;
-    margin-right:6px;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th,td{
-    border:1px solid var(--border);
-    padding:8px;
-}
-
-th{
-    background:#020617;
-}
-
-.path{
-    font-family:monospace;
+.searchbox{
+background:#18233C;
+border:1px solid #2D3748;
+padding:6px 10px;
+border-radius:6px;
 }
 
 </style>
-</head>
 
+</head>
 
 <body>
 
-<header>
-JSON Explorer
+<header class="border-b border-[#2D3748] sticky top-0 bg-[#0C1524]">
+
+<div class="wrap flex justify-between items-center">
+
+<div class="flex items-center gap-3">
+
+<i class="fa-solid fa-code text-xl text-[#FFC300]"></i>
+
+<h2 class="font-bold text-lg">RMKR <span class="text-[#FFC300]">JSON</span></h2>
+
+</div>
+
+<a href="../" class="btn flex items-center gap-2">
+<i class="fa-solid fa-arrow-left"></i> Hub
+</a>
+
+</div>
+
 </header>
 
-<div class="container">
+<main class="wrap">
 
-<textarea id="jsonInput" placeholder="Paste JSON here"></textarea>
+<div class="text-2xl font-bold mb-6 text-[#FFC300]">JSON Explorer</div>
 
-<br>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-<button onclick="renderJSON()">View JSON</button>
-<button onclick="generateSchema()">Generate Schema</button>
+<!-- LEFT EDITOR -->
 
-<div class="tabs">
+<div>
 
-<div class="tab-buttons">
-<div class="tab active" onclick="switchTab('viewer')">JSON Viewer</div>
-<div class="tab" onclick="switchTab('schema')">Schema</div>
-</div>
+<div class="flex justify-between mb-2">
 
-<div id="viewer" class="panel"></div>
+<div class="font-semibold">JSON INPUT</div>
 
-<div id="schema" class="panel" style="display:none"></div>
+<div class="flex gap-2">
 
-</div>
+<button onclick="formatJSON()" class="btn text-sm">Format</button>
+
+<button onclick="downloadJSON()" class="btn text-sm">Download</button>
 
 </div>
 
+</div>
+
+<textarea id="jsonInput" placeholder="Paste JSON here..."></textarea>
+
+</div>
+
+<!-- RIGHT VIEWER -->
+
+<div>
+
+<div class="flex justify-between mb-2">
+
+<div class="font-semibold">TREE VIEW</div>
+
+<input id="searchBox" placeholder="Search..." class="searchbox text-sm">
+
+</div>
+
+<div id="viewer" class="viewer"></div>
+
+</div>
+
+</div>
+
+</main>
 
 <script>
 
-function switchTab(tab){
+const input=document.getElementById("jsonInput")
+const viewer=document.getElementById("viewer")
+const search=document.getElementById("searchBox")
 
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
-event.target.classList.add("active")
-
-document.getElementById("viewer").style.display = tab==="viewer" ? "block":"none"
-document.getElementById("schema").style.display = tab==="schema" ? "block":"none"
-
+function getType(v){
+if(Array.isArray(v)) return "array"
+if(v===null) return "null"
+return typeof v
 }
-
-
-
-function getType(val){
-
-if(Array.isArray(val)) return "array"
-if(val===null) return "null"
-return typeof val
-
-}
-
-
 
 function createNode(key,val,path){
 
 let type=getType(val)
 
 let container=document.createElement("div")
-container.className="node"
+container.className="json-node"
 
-let label=document.createElement("span")
-label.innerHTML=`<span class="key">${key}</span>: `
+let row=document.createElement("div")
 
-container.appendChild(label)
+let toggle=document.createElement("span")
 
+if(type==="object"||type==="array"){
+toggle.innerHTML="▶"
+toggle.className="toggle"
+row.appendChild(toggle)
+}
+
+let keySpan=document.createElement("span")
+keySpan.className="json-key"
+keySpan.textContent=key+": "
+
+row.appendChild(keySpan)
+
+let valueSpan=document.createElement("span")
+
+if(type==="string"){
+valueSpan.className="json-string"
+valueSpan.textContent='"'+val+'"'
+}
+
+else if(type==="number"){
+valueSpan.className="json-number"
+valueSpan.textContent=val
+}
+
+else if(type==="boolean"){
+valueSpan.className="json-boolean"
+valueSpan.textContent=val
+}
+
+else if(type==="null"){
+valueSpan.className="json-null"
+valueSpan.textContent="null"
+}
+
+row.appendChild(valueSpan)
+
+container.appendChild(row)
 
 if(type==="object"||type==="array"){
 
-let toggle=document.createElement("span")
-toggle.className="toggle"
-toggle.innerHTML="▶"
-
-label.prepend(toggle)
-
-let child=document.createElement("div")
-child.style.display="none"
+let children=document.createElement("div")
+children.style.display="none"
 
 toggle.onclick=()=>{
-child.style.display=child.style.display==="none"?"block":"none"
-toggle.innerHTML=child.style.display==="none"?"▶":"▼"
+children.style.display=
+children.style.display==="none"?"block":"none"
+toggle.innerHTML=
+children.style.display==="none"?"▶":"▼"
 }
 
-let entries= type==="array"?val:Object.entries(val)
+if(type==="object"){
+for(let k in val){
+children.appendChild(createNode(k,val[k],path+"."+k))
+}
+}
 
 if(type==="array"){
 val.forEach((v,i)=>{
-child.appendChild(createNode(i,v,path+"."+i))
-})
-}
-else{
-entries.forEach(([k,v])=>{
-child.appendChild(createNode(k,v,path+"."+k))
+children.appendChild(createNode(i,v,path+"."+i))
 })
 }
 
-container.appendChild(child)
-
-}else{
-
-let value=document.createElement("span")
-
-value.className=type
-
-value.textContent=JSON.stringify(val)
-
-container.appendChild(value)
+container.appendChild(children)
 
 }
 
@@ -243,17 +260,11 @@ return container
 
 }
 
-
-
-function renderJSON(){
-
-let input=document.getElementById("jsonInput").value
+function render(){
 
 try{
 
-let json=JSON.parse(input)
-
-let viewer=document.getElementById("viewer")
+let json=JSON.parse(input.value)
 
 viewer.innerHTML=""
 
@@ -261,79 +272,54 @@ viewer.appendChild(createNode("root",json,"root"))
 
 }catch(e){
 
-alert("Invalid JSON")
+viewer.innerHTML="<span class='text-red-400'>Invalid JSON</span>"
 
 }
 
 }
 
+input.addEventListener("input",render)
 
-
-function generateSchema(){
-
-let input=document.getElementById("jsonInput").value
-
-let json
+function formatJSON(){
 
 try{
+let obj=JSON.parse(input.value)
+input.value=JSON.stringify(obj,null,4)
+render()
+}catch{}
+}
 
-json=JSON.parse(input)
+function downloadJSON(){
 
-}catch{
+let blob=new Blob([input.value],{type:"application/json"})
 
-alert("Invalid JSON")
+let url=URL.createObjectURL(blob)
 
-return
+let a=document.createElement("a")
+
+a.href=url
+
+a.download="data.json"
+
+a.click()
 
 }
 
-let rows=[]
+search.addEventListener("input",()=>{
 
-function walk(obj,path){
+let text=search.value.toLowerCase()
 
-let type=getType(obj)
+document.querySelectorAll(".json-node").forEach(n=>{
 
-rows.push({
-path:path,
-type:type
+if(n.innerText.toLowerCase().includes(text)){
+n.style.display="block"
+}else{
+n.style.display="none"
+}
+
 })
 
-if(type==="object"){
-
-Object.entries(obj).forEach(([k,v])=>{
-walk(v,path+"."+k)
 })
-
-}
-
-if(type==="array" && obj.length>0){
-
-walk(obj[0],path+"[]")
-
-}
-
-}
-
-walk(json,"root")
-
-let html=`<table>
-<tr>
-<th>Path</th>
-<th>Type</th>
-</tr>`
-
-rows.forEach(r=>{
-html+=`<tr>
-<td class="path">${r.path}</td>
-<td>${r.type}</td>
-</tr>`
-})
-
-html+="</table>"
-
-document.getElementById("schema").innerHTML=html
-
-}
 
 </script>
 
