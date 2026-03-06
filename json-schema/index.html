@@ -1,120 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<title>JSON Studio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RMKR JSON Studio</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.1.0/diff.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
 <style>
 
-body{
-background:#0B1120;
-color:#E2E8F0;
-font-family: ui-monospace;
+:root{
+--bg:#0C1524;
+--card:#18233C;
+--accent:#FFC300;
+--line:#2D3748;
+--text:#F0F4F8;
 }
 
-.panel{
-background:#111827;
-border:1px solid #1F2937;
-border-radius:12px;
+body{
+font-family:Inter;
+background:var(--bg);
+color:var(--text);
 }
 
 textarea{
-background:#020617;
-color:#e2e8f0;
+background:#080e1a;
+border:1px solid var(--line);
+border-radius:10px;
+font-family:monospace;
 }
 
 .node rect{
-fill:#1E293B;
-stroke:#FFC300;
-stroke-width:1.5px;
+fill:#081b10;
+stroke:#1aff6b;
+stroke-width:1.3;
+rx:8;
 }
 
 .node text{
-fill:#E5E7EB;
 font-size:12px;
+fill:#d8ffe7;
+}
+
+.type{
+font-size:10px;
+fill:#6ef3a5;
 }
 
 .link{
 fill:none;
-stroke:#475569;
-stroke-width:1.5px;
+stroke:#8aa;
+stroke-width:1.2;
 }
 
 </style>
+
 </head>
 
-<body class="p-6">
+<body>
 
-<div class="max-w-7xl mx-auto space-y-6">
+<header class="border-b border-[#2D3748] p-4 flex justify-between items-center">
 
-<h1 class="text-3xl font-bold">
-JSON <span class="text-yellow-400">Studio</span>
-</h1>
+<h2 class="text-xl font-bold">
+RMKR <span class="text-yellow-400">JSON Studio</span>
+</h2>
 
-<div class="grid md:grid-cols-2 gap-6">
+<div class="flex gap-3">
 
-<div class="panel p-4">
+<button onclick="exportPNG()" class="bg-yellow-400 text-black px-3 py-1 rounded text-sm">
+Export PNG
+</button>
 
-<div class="flex justify-between mb-3">
-<h2 class="font-semibold">JSON Input</h2>
+<button onclick="downloadSchema()" class="bg-yellow-400 text-black px-3 py-1 rounded text-sm">
+Export Schema
+</button>
 
-<button onclick="visualize()"
-class="bg-yellow-500 text-black px-3 py-1 rounded text-sm">
+<a href="../" class="bg-yellow-400 text-black px-3 py-1 rounded text-sm">
+Hub
+</a>
+
+</div>
+
+</header>
+
+<div class="p-6 max-w-7xl mx-auto">
+
+<div class="grid md:grid-cols-2 gap-6 mb-6">
+
+<div>
+
+<label class="text-xs uppercase opacity-70">Paste JSON</label>
+
+<textarea id="jsonInput" class="w-full h-44 p-3 mt-2">
+
+{
+ "orderId":"ORD-1001",
+ "status":"PAID",
+ "customer":{
+   "customerId":"C001",
+   "name":"John",
+   "email":"john@email.com",
+   "address":{
+     "city":"London",
+     "country":"UK"
+   }
+ },
+ "items":[
+   {
+     "productId":"P100",
+     "price":120,
+     "quantity":2
+   }
+ ],
+ "payment":{
+   "method":"CARD",
+   "amount":240
+ }
+}
+
+</textarea>
+
+<div class="flex gap-3 mt-3">
+
+<button onclick="renderGraph()" class="bg-yellow-400 text-black px-4 py-2 rounded font-bold">
 Visualize
 </button>
-</div>
 
-<textarea id="jsonInput" class="w-full h-64 p-3 rounded text-sm"></textarea>
-
-</div>
-
-<div class="panel p-4">
-
-<h2 class="font-semibold mb-3">Schema Explorer</h2>
-
-<div id="schemaTable" class="text-sm"></div>
+<input id="searchBox" placeholder="Search field..."
+class="bg-[#18233C] px-3 py-2 rounded text-sm border border-[#2D3748]">
 
 </div>
 
 </div>
 
-<div class="panel p-4">
+<div class="text-sm opacity-80">
 
-<h2 class="font-semibold mb-3">Structure Graph</h2>
+<p class="text-yellow-400 font-semibold mb-3">RMKR JSON Studio</p>
 
-<svg id="graph" width="100%" height="500"></svg>
+<ul class="space-y-1 list-disc ml-5">
 
-</div>
+<li>Automatic JSON schema inference</li>
+<li>Interactive graph visualization</li>
+<li>Pan / zoom navigation</li>
+<li>Copy JSON path</li>
+<li>Export schema</li>
+<li>Export diagram PNG</li>
 
-<div class="grid md:grid-cols-2 gap-6">
-
-<div class="panel p-4">
-
-<h2 class="font-semibold mb-3">JSON Diff</h2>
-
-<textarea id="jsonInput2" class="w-full h-40 p-3 rounded text-sm"></textarea>
-
-<button onclick="runDiff()" class="mt-2 bg-yellow-500 text-black px-3 py-1 rounded text-sm">
-Compare
-</button>
-
-<pre id="diffResult" class="text-xs mt-3"></pre>
+</ul>
 
 </div>
 
-<div class="panel p-4">
-
-<h2 class="font-semibold mb-3">Schema Intelligence</h2>
-
-<div id="aiExplain" class="text-sm text-gray-300"></div>
-
 </div>
+
+<div id="graphContainer"
+class="bg-[#18233C] rounded-xl border border-[#2D3748] p-4 overflow-hidden">
+
+<svg width="1600" height="800"></svg>
 
 </div>
 
@@ -122,73 +169,67 @@ Compare
 
 <script>
 
-function visualize(){
+function typeOf(v){
+if(Array.isArray(v)) return "array"
+if(v===null) return "null"
+return typeof v
+}
 
-let json = JSON.parse(document.getElementById("jsonInput").value);
+function buildTree(name,val,path=""){
 
-renderSchema(json);
+let node={
+name:name,
+type:typeOf(val),
+path:path?path+"."+name:name,
+children:[]
+}
 
-renderGraph(json);
+if(node.type==="object"){
 
-detectOpenAPI(json);
+Object.entries(val).forEach(([k,v])=>{
+node.children.push(buildTree(k,v,node.path))
+})
 
 }
 
-function renderSchema(obj){
+if(node.type==="array" && val.length){
 
-let rows=[];
-
-function walk(o,path="root"){
-
-for(let k in o){
-
-let val=o[k];
-let type=Array.isArray(val)?"array":typeof val;
-
-rows.push(`<tr>
-<td class="px-2">${path}.${k}</td>
-<td>${type}</td>
-</tr>`);
-
-if(typeof val==="object" && val!=null){
-
-walk(val,path+"."+k)
+node.children.push(buildTree("items",val[0],node.path))
 
 }
 
+return node
 }
 
+function renderGraph(){
+
+let json
+
+try{
+json=JSON.parse(document.getElementById("jsonInput").value)
+}catch{
+alert("Invalid JSON")
+return
 }
 
-walk(obj);
+const data=buildTree("root",json)
 
-document.getElementById("schemaTable").innerHTML=
+const svg=d3.select("svg")
 
-`<table class="w-full text-xs">
-<tr class="text-yellow-400">
-<th class="text-left px-2">Field</th>
-<th>Type</th>
-</tr>
-${rows.join("")}
-</table>`
+svg.selectAll("*").remove()
 
-}
+const g=svg.append("g")
 
-function renderGraph(data){
+svg.call(
+d3.zoom().scaleExtent([0.4,3])
+.on("zoom",(e)=>g.attr("transform",e.transform))
+)
 
-const svg=d3.select("#graph");
-svg.selectAll("*").remove();
+const tree=d3.tree().nodeSize([80,260])
 
-const width=800;
-const height=500;
+const root=d3.hierarchy(data)
 
-const root=d3.hierarchy(convert(data));
-
-const tree=d3.tree().size([height,width-200]);
-
-tree(root);
-
-const g=svg.append("g").attr("transform","translate(80,0)");
+tree(root)
 
 g.selectAll(".link")
 .data(root.links())
@@ -198,93 +239,109 @@ g.selectAll(".link")
 .attr("d",d3.linkHorizontal()
 .x(d=>d.y)
 .y(d=>d.x)
-);
+)
 
 const node=g.selectAll(".node")
 .data(root.descendants())
 .enter()
 .append("g")
-.attr("transform",d=>`translate(${d.y},${d.x})`);
+.attr("class","node")
+.attr("transform",d=>"translate("+d.y+","+d.x+")")
 
 node.append("rect")
-.attr("width",120)
-.attr("height",20)
-.attr("rx",4);
+.attr("width",200)
+.attr("height",40)
+.attr("x",-20)
+.attr("y",-20)
 
 node.append("text")
-.attr("dx",5)
-.attr("dy",14)
-.text(d=>d.data.name);
+.attr("dy","-2")
+.text(d=>d.data.name)
 
-}
+node.append("text")
+.attr("class","type")
+.attr("dy","14")
+.text(d=>"type: "+d.data.type)
 
-function convert(obj){
-
-if(typeof obj!=="object"||obj==null){
-
-return {name:String(obj)}
-
-}
-
-return{
-
-name:"object",
-children:Object.keys(obj).map(k=>({
-
-name:k,
-children:[convert(obj[k])]
-
-}))
-
-}
-
-}
-
-function runDiff(){
-
-let a=document.getElementById("jsonInput").value
-let b=document.getElementById("jsonInput2").value
-
-let diff=Diff.diffLines(a,b)
-
-let html=""
-
-diff.forEach(part=>{
-
-let color=part.added?"#22c55e":
-part.removed?"#ef4444":"#94a3b8"
-
-html+=`<span style="color:${color}">${part.value}</span>`
-
+node.on("click",(e,d)=>{
+navigator.clipboard.writeText(d.data.path)
+alert("Copied path: "+d.data.path)
 })
 
-document.getElementById("diffResult").innerHTML=html
+}
+
+renderGraph()
+
+function downloadSchema(){
+
+let json
+
+try{
+json=JSON.parse(document.getElementById("jsonInput").value)
+}catch{
+return
+}
+
+function schema(v){
+
+let t=typeOf(v)
+
+if(t==="object"){
+
+let props={}
+
+Object.entries(v).forEach(([k,val])=>{
+props[k]=schema(val)
+})
+
+return{
+type:"object",
+properties:props
+}
 
 }
 
-function detectOpenAPI(json){
+if(t==="array"){
 
-let text=""
-
-if(json.openapi){
-
-text+=`<p class="text-green-400">OpenAPI schema detected</p>`
-
-if(json.paths){
-
-text+=`<p>Endpoints detected: ${Object.keys(json.paths).length}</p>`
-
+return{
+type:"array",
+items:schema(v[0]||{})
 }
 
 }
 
-else{
-
-text+="Standard JSON structure"
+return{type:t}
 
 }
 
-document.getElementById("aiExplain").innerHTML=text
+const sch=schema(json)
+
+const blob=new Blob(
+[JSON.stringify(sch,null,2)],
+{type:"application/json"}
+)
+
+const a=document.createElement("a")
+
+a.href=URL.createObjectURL(blob)
+a.download="schema.json"
+a.click()
+
+}
+
+function exportPNG(){
+
+const node=document.getElementById("graphContainer")
+
+htmlToImage.toPng(node).then(function(dataUrl){
+
+const a=document.createElement("a")
+
+a.download="json-graph.png"
+a.href=dataUrl
+a.click()
+
+})
 
 }
 
