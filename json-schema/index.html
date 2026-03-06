@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JSON Studio</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.1.0/diff.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+
+body{
+background:#0B1120;
+color:#E2E8F0;
+font-family: ui-monospace;
+}
+
+.panel{
+background:#111827;
+border:1px solid #1F2937;
+border-radius:12px;
+}
+
+textarea{
+background:#020617;
+color:#e2e8f0;
+}
+
+.node rect{
+fill:#1E293B;
+stroke:#FFC300;
+stroke-width:1.5px;
+}
+
+.node text{
+fill:#E5E7EB;
+font-size:12px;
+}
+
+.link{
+fill:none;
+stroke:#475569;
+stroke-width:1.5px;
+}
+
+</style>
+</head>
+
+<body class="p-6">
+
+<div class="max-w-7xl mx-auto space-y-6">
+
+<h1 class="text-3xl font-bold">
+JSON <span class="text-yellow-400">Studio</span>
+</h1>
+
+<div class="grid md:grid-cols-2 gap-6">
+
+<div class="panel p-4">
+
+<div class="flex justify-between mb-3">
+<h2 class="font-semibold">JSON Input</h2>
+
+<button onclick="visualize()"
+class="bg-yellow-500 text-black px-3 py-1 rounded text-sm">
+Visualize
+</button>
+</div>
+
+<textarea id="jsonInput" class="w-full h-64 p-3 rounded text-sm"></textarea>
+
+</div>
+
+<div class="panel p-4">
+
+<h2 class="font-semibold mb-3">Schema Explorer</h2>
+
+<div id="schemaTable" class="text-sm"></div>
+
+</div>
+
+</div>
+
+<div class="panel p-4">
+
+<h2 class="font-semibold mb-3">Structure Graph</h2>
+
+<svg id="graph" width="100%" height="500"></svg>
+
+</div>
+
+<div class="grid md:grid-cols-2 gap-6">
+
+<div class="panel p-4">
+
+<h2 class="font-semibold mb-3">JSON Diff</h2>
+
+<textarea id="jsonInput2" class="w-full h-40 p-3 rounded text-sm"></textarea>
+
+<button onclick="runDiff()" class="mt-2 bg-yellow-500 text-black px-3 py-1 rounded text-sm">
+Compare
+</button>
+
+<pre id="diffResult" class="text-xs mt-3"></pre>
+
+</div>
+
+<div class="panel p-4">
+
+<h2 class="font-semibold mb-3">Schema Intelligence</h2>
+
+<div id="aiExplain" class="text-sm text-gray-300"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function visualize(){
+
+let json = JSON.parse(document.getElementById("jsonInput").value);
+
+renderSchema(json);
+
+renderGraph(json);
+
+detectOpenAPI(json);
+
+}
+
+function renderSchema(obj){
+
+let rows=[];
+
+function walk(o,path="root"){
+
+for(let k in o){
+
+let val=o[k];
+let type=Array.isArray(val)?"array":typeof val;
+
+rows.push(`<tr>
+<td class="px-2">${path}.${k}</td>
+<td>${type}</td>
+</tr>`);
+
+if(typeof val==="object" && val!=null){
+
+walk(val,path+"."+k)
+
+}
+
+}
+
+}
+
+walk(obj);
+
+document.getElementById("schemaTable").innerHTML=
+
+`<table class="w-full text-xs">
+<tr class="text-yellow-400">
+<th class="text-left px-2">Field</th>
+<th>Type</th>
+</tr>
+${rows.join("")}
+</table>`
+
+}
+
+function renderGraph(data){
+
+const svg=d3.select("#graph");
+svg.selectAll("*").remove();
+
+const width=800;
+const height=500;
+
+const root=d3.hierarchy(convert(data));
+
+const tree=d3.tree().size([height,width-200]);
+
+tree(root);
+
+const g=svg.append("g").attr("transform","translate(80,0)");
+
+g.selectAll(".link")
+.data(root.links())
+.enter()
+.append("path")
+.attr("class","link")
+.attr("d",d3.linkHorizontal()
+.x(d=>d.y)
+.y(d=>d.x)
+);
+
+const node=g.selectAll(".node")
+.data(root.descendants())
+.enter()
+.append("g")
+.attr("transform",d=>`translate(${d.y},${d.x})`);
+
+node.append("rect")
+.attr("width",120)
+.attr("height",20)
+.attr("rx",4);
+
+node.append("text")
+.attr("dx",5)
+.attr("dy",14)
+.text(d=>d.data.name);
+
+}
+
+function convert(obj){
+
+if(typeof obj!=="object"||obj==null){
+
+return {name:String(obj)}
+
+}
+
+return{
+
+name:"object",
+children:Object.keys(obj).map(k=>({
+
+name:k,
+children:[convert(obj[k])]
+
+}))
+
+}
+
+}
+
+function runDiff(){
+
+let a=document.getElementById("jsonInput").value
+let b=document.getElementById("jsonInput2").value
+
+let diff=Diff.diffLines(a,b)
+
+let html=""
+
+diff.forEach(part=>{
+
+let color=part.added?"#22c55e":
+part.removed?"#ef4444":"#94a3b8"
+
+html+=`<span style="color:${color}">${part.value}</span>`
+
+})
+
+document.getElementById("diffResult").innerHTML=html
+
+}
+
+function detectOpenAPI(json){
+
+let text=""
+
+if(json.openapi){
+
+text+=`<p class="text-green-400">OpenAPI schema detected</p>`
+
+if(json.paths){
+
+text+=`<p>Endpoints detected: ${Object.keys(json.paths).length}</p>`
+
+}
+
+}
+
+else{
+
+text+="Standard JSON structure"
+
+}
+
+document.getElementById("aiExplain").innerHTML=text
+
+}
+
+</script>
+
+</body>
+</html>
