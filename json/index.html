@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JSON Explorer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+:root{
+    --bg:#0f172a;
+    --panel:#1e293b;
+    --border:#334155;
+    --text:#e2e8f0;
+    --accent:#38bdf8;
+    --key:#f59e0b;
+    --string:#22c55e;
+    --number:#a78bfa;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:system-ui;
+}
+
+header{
+    padding:16px;
+    border-bottom:1px solid var(--border);
+    font-size:20px;
+    font-weight:600;
+}
+
+.container{
+    padding:16px;
+}
+
+textarea{
+    width:100%;
+    height:180px;
+    background:var(--panel);
+    color:var(--text);
+    border:1px solid var(--border);
+    padding:12px;
+    border-radius:8px;
+    font-family:monospace;
+}
+
+button{
+    margin-top:10px;
+    padding:8px 16px;
+    background:var(--accent);
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.tabs{
+    margin-top:20px;
+}
+
+.tab-buttons{
+    display:flex;
+    gap:10px;
+    margin-bottom:12px;
+}
+
+.tab{
+    padding:6px 12px;
+    border:1px solid var(--border);
+    cursor:pointer;
+}
+
+.active{
+    background:var(--accent);
+    color:black;
+}
+
+.panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    padding:16px;
+    border-radius:8px;
+}
+
+.node{
+    margin-left:18px;
+    font-family:monospace;
+}
+
+.key{
+    color:var(--key);
+}
+
+.string{
+    color:var(--string);
+}
+
+.number{
+    color:var(--number);
+}
+
+.toggle{
+    cursor:pointer;
+    margin-right:6px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid var(--border);
+    padding:8px;
+}
+
+th{
+    background:#020617;
+}
+
+.path{
+    font-family:monospace;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<header>
+JSON Explorer
+</header>
+
+<div class="container">
+
+<textarea id="jsonInput" placeholder="Paste JSON here"></textarea>
+
+<br>
+
+<button onclick="renderJSON()">View JSON</button>
+<button onclick="generateSchema()">Generate Schema</button>
+
+<div class="tabs">
+
+<div class="tab-buttons">
+<div class="tab active" onclick="switchTab('viewer')">JSON Viewer</div>
+<div class="tab" onclick="switchTab('schema')">Schema</div>
+</div>
+
+<div id="viewer" class="panel"></div>
+
+<div id="schema" class="panel" style="display:none"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+function switchTab(tab){
+
+document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
+event.target.classList.add("active")
+
+document.getElementById("viewer").style.display = tab==="viewer" ? "block":"none"
+document.getElementById("schema").style.display = tab==="schema" ? "block":"none"
+
+}
+
+
+
+function getType(val){
+
+if(Array.isArray(val)) return "array"
+if(val===null) return "null"
+return typeof val
+
+}
+
+
+
+function createNode(key,val,path){
+
+let type=getType(val)
+
+let container=document.createElement("div")
+container.className="node"
+
+let label=document.createElement("span")
+label.innerHTML=`<span class="key">${key}</span>: `
+
+container.appendChild(label)
+
+
+if(type==="object"||type==="array"){
+
+let toggle=document.createElement("span")
+toggle.className="toggle"
+toggle.innerHTML="▶"
+
+label.prepend(toggle)
+
+let child=document.createElement("div")
+child.style.display="none"
+
+toggle.onclick=()=>{
+child.style.display=child.style.display==="none"?"block":"none"
+toggle.innerHTML=child.style.display==="none"?"▶":"▼"
+}
+
+let entries= type==="array"?val:Object.entries(val)
+
+if(type==="array"){
+val.forEach((v,i)=>{
+child.appendChild(createNode(i,v,path+"."+i))
+})
+}
+else{
+entries.forEach(([k,v])=>{
+child.appendChild(createNode(k,v,path+"."+k))
+})
+}
+
+container.appendChild(child)
+
+}else{
+
+let value=document.createElement("span")
+
+value.className=type
+
+value.textContent=JSON.stringify(val)
+
+container.appendChild(value)
+
+}
+
+return container
+
+}
+
+
+
+function renderJSON(){
+
+let input=document.getElementById("jsonInput").value
+
+try{
+
+let json=JSON.parse(input)
+
+let viewer=document.getElementById("viewer")
+
+viewer.innerHTML=""
+
+viewer.appendChild(createNode("root",json,"root"))
+
+}catch(e){
+
+alert("Invalid JSON")
+
+}
+
+}
+
+
+
+function generateSchema(){
+
+let input=document.getElementById("jsonInput").value
+
+let json
+
+try{
+
+json=JSON.parse(input)
+
+}catch{
+
+alert("Invalid JSON")
+
+return
+
+}
+
+let rows=[]
+
+function walk(obj,path){
+
+let type=getType(obj)
+
+rows.push({
+path:path,
+type:type
+})
+
+if(type==="object"){
+
+Object.entries(obj).forEach(([k,v])=>{
+walk(v,path+"."+k)
+})
+
+}
+
+if(type==="array" && obj.length>0){
+
+walk(obj[0],path+"[]")
+
+}
+
+}
+
+walk(json,"root")
+
+let html=`<table>
+<tr>
+<th>Path</th>
+<th>Type</th>
+</tr>`
+
+rows.forEach(r=>{
+html+=`<tr>
+<td class="path">${r.path}</td>
+<td>${r.type}</td>
+</tr>`
+})
+
+html+="</table>"
+
+document.getElementById("schema").innerHTML=html
+
+}
+
+</script>
+
+</body>
+</html>
