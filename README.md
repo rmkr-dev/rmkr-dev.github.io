@@ -14,6 +14,8 @@ python3 -m http.server 8080
 
 Then visit `http://localhost:8080`.
 
+Skillbook and Promptbook load JSON over `fetch`, so use a local server (opening the HTML file via `file://` will not load the catalogs).
+
 ## Tools
 
 ### Transform
@@ -63,8 +65,39 @@ Then visit `http://localhost:8080`.
 - **Number Base**
 - **Local Stats** (counts stored only in this browser)
 
+### AI
+
+Instruction packs and prompts for **GitHub Copilot**, **Claude Code**, and **Codex** only (no other agent runtimes are documented here).
+
+- **Skillbook** (`skillbook/`) — browsable, searchable skills with when-to-use, tool targets, format notes, and a working Copy button. Data: `skillbook/skills.json`.
+- **Promptbook** (`promptbook/`) — same UX for task prompts. Data: `promptbook/prompts.json`.
+- **AI hub** (`ai/`) — thin landing page linking both.
+
+#### How to add a skill or prompt
+
+1. Append an object to the `skills` array in `skillbook/skills.json` or the `prompts` array in `promptbook/prompts.json`.
+2. Required fields: `id` (unique kebab-case), `title`, `whenToUse`, `tools` (subset of `copilot` | `claude-code` | `codex`), `tags` (string array), `formatNotes`, `body` (the pasteable text).
+3. Keep bodies original and practical. Note where each tool expects the text:
+   - Copilot → `.github/copilot-instructions.md` or path-scoped `*.instructions.md`
+   - Claude Code → `CLAUDE.md` for short facts; `.claude/skills/<name>/SKILL.md` for procedures
+   - Codex → `AGENTS.md` (nested / override files as needed)
+4. Run `node scripts/site-check.mjs` before opening a PR.
+
+## Site checks
+
+GitHub Actions workflow `.github/workflows/site-checks.yml` runs on pull requests and pushes to `main`:
+
+- Validates Skillbook / Promptbook JSON shape
+- Ensures every tool path listed in `assets/site.js` has a matching `index.html`
+- Basic HTML well-formedness for tool pages
+
+```bash
+node scripts/site-check.mjs
+```
+
 ## Notes
 
 - Shared chrome lives in `assets/site.css` and `assets/site.js`.
 - Small libraries used by a few tools are vendored under `assets/vendor/`.
 - Existing tool URLs (`/md`, `/jwt`, `/transform`, and the rest) are unchanged.
+- New pages set `data-root` and `data-tool` so the shared nav/footer inject correctly.
