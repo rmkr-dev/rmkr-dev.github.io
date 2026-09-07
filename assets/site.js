@@ -1,5 +1,5 @@
 (function () {
-  var CATS = ["Transform", "Security", "Time", "Data", "Design", "Dev helpers"];
+  var CATS = ["Transform", "Security", "Time", "Data", "Design", "Dev helpers", "AI"];
 
   var TOOLS = [
     { id: "transform", path: "transform/", name: "Payload Knife", blurb: "Pretty/minify JSON, JSON to CSV, and cURL to fetch.", cat: "Transform" },
@@ -33,7 +33,9 @@
     { id: "roadmap", path: "roadmap/", name: "Roadmap Planner", blurb: "Plan quarters and keep the board in this browser.", cat: "Dev helpers" },
     { id: "collab", path: "collab/", name: "Collab Pad", blurb: "Peer-to-peer scratch pad for a shared session.", cat: "Dev helpers" },
     { id: "base", path: "base/", name: "Number Base", blurb: "Convert between binary, octal, decimal, and hex.", cat: "Dev helpers" },
-    { id: "stats", path: "stats/", name: "Local Stats", blurb: "See tool opens stored only in this browser.", cat: "Dev helpers" }
+    { id: "stats", path: "stats/", name: "Local Stats", blurb: "See tool opens stored only in this browser.", cat: "Dev helpers" },
+    { id: "skillbook", path: "skillbook/", name: "Skillbook", blurb: "Reusable skills for Copilot, Claude Code, and Codex.", cat: "AI" },
+    { id: "promptbook", path: "promptbook/", name: "Promptbook", blurb: "Ready-to-paste prompts for the same three tools.", cat: "AI" }
   ];
 
   function rootPrefix() {
