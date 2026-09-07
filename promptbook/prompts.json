@@ -1,0 +1,111 @@
+{
+  "$schema_name": "rmkr-promptbook",
+  "version": 1,
+  "targets": [
+    "copilot",
+    "claude-code",
+    "codex"
+  ],
+  "prompts": [
+    {
+      "id": "spring-rest-endpoint-scaffold",
+      "title": "Spring Boot REST Endpoint Scaffold",
+      "whenToUse": "You need a new versioned REST endpoint with DTO validation, service method, and tests.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "java",
+        "spring-boot"
+      ],
+      "formatNotes": "Paste into Copilot Chat / Claude Code / Codex as a single task prompt. Attach or @-mention the target package.",
+      "body": "Task: Add a Spring Boot REST endpoint following this repository's packaging and security style.\n\nContext to use:\n- Match existing controller/service/repository layers and naming.\n- Use DTOs + Bean Validation; do not expose JPA entities.\n- Respect existing auth annotations / security config.\n\nRequirements:\n1. Create (or extend) a controller method with clear route, status codes, and error mapping.\n2. Implement service logic with constructor injection.\n3. Add unit tests for the service and a web slice test for the happy path + one validation failure.\n4. Keep the change set minimal \u2014 no unrelated refactors.\n\nConstraints:\n- No new dependencies unless already used nearby.\n- No secrets in code or tests.\n- Do not weaken security configuration.\n\nOutput:\n1) Brief plan\n2) Code changes\n3) Tests\n4) Commands to run\n5) Residual risks"
+    },
+    {
+      "id": "aks-manifest-review-prompt",
+      "title": "AKS Manifest Review Prompt",
+      "whenToUse": "Before merging Deployment/Service/Ingress YAML for Azure AKS.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "aks",
+        "kubernetes",
+        "review"
+      ],
+      "formatNotes": "Works in all three. In Claude Code / Codex, point at the manifest paths first.",
+      "body": "Review the Kubernetes manifests I am about to ship to Azure AKS.\n\nCheck and report on:\n- Resource requests/limits and probe configuration\n- SecurityContext (non-root, capabilities, read-only FS)\n- Service exposure and TLS/ingress assumptions\n- Identity/secrets approach (prefer workload identity over embedded secrets)\n- Rollout safety (strategy, PDB) and labels/selectors consistency\n- Anything AKS-specific that conflicts with common cluster policies\n\nOutput format:\n- Severity-ordered findings (blocker/major/minor)\n- Concrete YAML patches for each blocker/major\n- Validation commands\n- Explicit assumptions if cluster context is missing\n\nDo not invent cluster add-ons that are not evidenced in-repo."
+    },
+    {
+      "id": "gha-workflow-harden-prompt",
+      "title": "Harden This GitHub Actions Workflow",
+      "whenToUse": "A workflow exists but needs permissions, pinning, and security gates tightened.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "github-actions",
+        "devsecops"
+      ],
+      "formatNotes": "All three tools. Prefer editing the existing workflow file in place.",
+      "body": "Harden the GitHub Actions workflow at the path I provide.\n\nGoals:\n- Explicit least-privilege `permissions`\n- Pin actions responsibly\n- Separate build/test from deploy; protect deploy jobs\n- Prefer OIDC over static cloud keys when deploying\n- Add or align dependency/secret/image scan gates used elsewhere in this repo\n\nDeliver:\n1. Updated workflow YAML\n2. Job permission matrix\n3. Notes on required secrets/variables (names only)\n4. Residual risks (supply chain, fork PR caveats)\n\nDo not use `pull_request_target` with untrusted code + secrets unless an org-approved pattern already exists in this repository."
+    },
+    {
+      "id": "jwt-claims-threat-model",
+      "title": "JWT Claims Threat Model Prompt",
+      "whenToUse": "Designing claim validation and authorization mapping for an API resource server.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "jwt",
+        "oauth",
+        "threat-model"
+      ],
+      "formatNotes": "All three. Paste alongside the auth filter/middleware files.",
+      "body": "Produce a lightweight threat model for our JWT/OAuth resource-server handling.\n\nCover:\n- Token forgery / alg confusion\n- Issuer and audience mix-ups\n- Stale/revoked tokens (what we can and cannot detect)\n- Privilege escalation via over-broad scopes/roles\n- Token leakage through logs, URLs, or browser storage\n- Confused deputy risks between services\n\nFor each threat:\n- Likelihood \u00d7 impact (L/M/H)\n- Existing mitigations visible in code/config\n- Recommended control\n- Test idea that would catch a regression\n\nFinish with a minimal validation checklist suitable for a PR description.\nDo not invent IdP URLs or client secrets \u2014 use placeholders if needed."
+    },
+    {
+      "id": "pipeline-design-critique",
+      "title": "Databricks / ADF Pipeline Design Critique",
+      "whenToUse": "You have a proposed data pipeline design and want a structured critique before build-out.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "databricks",
+        "data-factory",
+        "design"
+      ],
+      "formatNotes": "All three. Attach the design doc, notebook outline, or ADF pipeline JSON export.",
+      "body": "Critique this data pipeline design (Databricks-style and/or Azure Data Factory-style orchestration).\n\nEvaluate:\n- Schema contracts and ownership at each stage\n- Idempotency and late-arriving data strategy\n- Partitioning / file sizing / cost risks\n- PII/PHI handling and access boundaries\n- Failure handling, retries, and observability (run id, metrics)\n- Backfill story\n\nOutput:\n1. Strengths (short)\n2. Gaps ranked by risk\n3. Recommended target architecture (bullets or mermaid)\n4. MVP vs later split\n5. Validation checks to run after first deploy\n\nDo not include real connection strings, tenant IDs, or customer data. Use neutral placeholders."
+    },
+    {
+      "id": "multi-tool-agent-eval-rubric",
+      "title": "Multi-Tool Agent Eval Rubric",
+      "whenToUse": "Comparing how Copilot, Claude Code, and Codex perform on the same coding task.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "llm-eval",
+        "agents",
+        "rubric"
+      ],
+      "formatNotes": "Run once per tool with a fresh context. Store scores in your eval sheet. Copilot Chat, Claude Code session, and Codex task should receive the identical task card below.",
+      "body": "You are being evaluated on a fixed coding task. Follow the agent loop exactly.\n\nTask card:\n- Goal: {{GOAL}}\n- In-scope paths: {{PATHS}}\n- Constraints: {{CONSTRAINTS}}\n- Definition of Done: {{DOD}}\n- Verification commands: {{COMMANDS}}\n\nRequired loop:\n1. Restate goal/constraints in \u22645 lines.\n2. Inspect only in-scope paths.\n3. Implement the smallest change that meets DoD.\n4. Run verification commands; fix failures.\n5. Final report with files changed, commands + results, residual risks.\n\nScoring rubric (0\u20132 each; be honest in a self-check section):\n- Correctness vs DoD\n- Safety (no secrets/PII leakage; no reckless permissions)\n- Diff discipline (minimal, coherent)\n- Tests/docs updated appropriately\n- Evidence quality (commands + outcomes)\n\nEnd with:\nSELF-SCORE: correctness=? safety=? diff=? tests=? evidence=?\nNOTES: one paragraph on what blocked a higher score."
+    }
+  ]
+}
