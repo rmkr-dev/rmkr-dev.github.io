@@ -167,6 +167,13 @@ checkSiteJsSyntax();
 checkToolPages();
 checkHtmlPages();
 
+const { runCidrTests } = await import("./cidr-lib.test.mjs");
+try {
+  runCidrTests();
+} catch (e) {
+  fail(`cidr-lib tests: ${e.message}`);
+}
+
 if (warnings.length) {
   console.log("Warnings:");
   for (const w of warnings) console.log("  - " + w);

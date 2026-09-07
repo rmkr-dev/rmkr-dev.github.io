@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIDR Calculator | RMKR Toolkit</title>
+  <meta name="description" content="Calculate IPv4 network, broadcast, mask, and host range in the browser.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body data-root="../" data-tool="cidr">
+<main class="wrap page-main" id="main">
+  <h1 class="page-title">CIDR Calculator</h1>
+  <p class="page-lead">Paste an IPv4 CIDR (or bare address). Network math stays in this tab.</p>
+  <div class="toolbar">
+    <label for="cidrInput" style="margin:0;">CIDR</label>
+    <input id="cidrInput" type="text" value="10.0.0.0/24" placeholder="10.0.0.0/24" spellcheck="false" style="min-width:12rem;flex:1;">
+    <button class="btn btn-gold" type="button" id="run">Calculate</button>
+    <button class="btn btn-ghost" type="button" id="copyOut">Copy</button>
+    <button class="btn btn-ghost" type="button" id="clear">Clear</button>
+  </div>
+  <p class="status" id="status" role="status"></p>
+  <div class="tool-grid" id="cards" style="margin-top:1rem;"></div>
+  <label for="output">Summary</label>
+  <textarea id="output" spellcheck="false" readonly rows="12"></textarea>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

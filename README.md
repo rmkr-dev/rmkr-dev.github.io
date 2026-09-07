@@ -33,6 +33,7 @@ Skillbook and Promptbook load JSON over `fetch`, so use a local server (opening 
 - **Hash Lab** — SHA-256, SHA-1, MD5
 - **UUID Generator**
 - **PEM / SSH Viewer**
+- **CIDR Calculator** — IPv4 network, broadcast, mask, host range
 
 ### Time
 
