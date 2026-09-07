@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI | RMKR Toolkit</title>
+  <meta name="description" content="Skillbook and Promptbook for Copilot, Claude Code, and Codex.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body data-root="../" data-tool="ai">
+<main class="wrap page-main" id="main">
+  <h1 class="page-title">AI</h1>
+  <p class="page-lead">Instruction packs and prompts for developer agents. Content targets <strong>GitHub Copilot</strong>, <strong>Claude Code</strong>, and <strong>Codex</strong> only.</p>
+
+  <div class="hub-grid">
+    <a class="tool-card ai-card-accent" href="../skillbook/">
+      <h3>Skillbook</h3>
+      <p>Reusable skills with when-to-use notes, tool targets, and a one-click copy body for instruction files.</p>
+    </a>
+    <a class="tool-card ai-card-accent" href="../promptbook/">
+      <h3>Promptbook</h3>
+      <p>Ready-to-paste task prompts for Spring, AKS, Actions, JWT/OAuth, data pipelines, and LLM evals.</p>
+    </a>
+  </div>
+
+  <h2 class="section-title">Where content goes</h2>
+  <div class="card">
+    <ul>
+      <li><strong>Copilot</strong> — <code>.github/copilot-instructions.md</code> and path-scoped <code>*.instructions.md</code></li>
+      <li><strong>Claude Code</strong> — short facts in <code>CLAUDE.md</code>; procedures in <code>.claude/skills/&lt;name&gt;/SKILL.md</code></li>
+      <li><strong>Codex</strong> — <code>AGENTS.md</code> (and nested / override files); link out when the main file grows</li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>

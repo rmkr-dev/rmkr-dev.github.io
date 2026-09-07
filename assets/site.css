@@ -444,3 +444,141 @@ body[data-tool="collab"] .site-footer { display: none; }
     animation: none !important;
   }
 }
+
+
+/* --- AI book pages (Skillbook / Promptbook) --- */
+.book-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+.book-toolbar .search-field {
+  flex: 1 1 220px;
+  min-width: 180px;
+}
+.book-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 1.1rem;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid var(--color-line);
+  background: var(--color-card);
+  color: var(--color-muted);
+  border-radius: 999px;
+  padding: 0.32rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.chip:hover { color: var(--color-accent); border-color: var(--color-accent); }
+.chip.is-active {
+  background: rgba(255, 195, 0, 0.12);
+  color: var(--color-accent);
+  border-color: rgba(255, 195, 0, 0.45);
+}
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.9rem;
+}
+.book-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  padding: 1.1rem 1.15rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-height: 220px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.book-card:hover {
+  border-color: rgba(255, 195, 0, 0.55);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+.book-card h3 {
+  margin: 0;
+  font-size: 1.02rem;
+  letter-spacing: -0.02em;
+}
+.book-when {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+}
+.book-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.tool-pill {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  color: var(--color-muted);
+  background: rgba(8, 14, 26, 0.55);
+}
+.tool-pill.copilot { border-color: rgba(255, 195, 0, 0.35); color: var(--color-accent); }
+.tool-pill.claude-code { border-color: rgba(74, 222, 128, 0.35); color: var(--color-ok); }
+.tool-pill.codex { border-color: rgba(96, 165, 250, 0.4); color: #60a5fa; }
+.tool-pill.all { border-color: rgba(255, 195, 0, 0.45); color: var(--color-accent); }
+.book-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
+.book-detail {
+  margin-top: 1.25rem;
+}
+.book-detail[hidden] { display: none !important; }
+.book-detail .format-notes {
+  margin: 0 0 0.85rem;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+}
+.book-body {
+  background: var(--color-input);
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  padding: 1rem 1.05rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: min(55vh, 520px);
+  overflow: auto;
+}
+.btn-copy.is-copied {
+  background: rgba(74, 222, 128, 0.15);
+  border-color: rgba(74, 222, 128, 0.45);
+  color: var(--color-ok);
+}
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+.empty-state {
+  color: var(--color-muted);
+  padding: 1.5rem 0.25rem;
+  font-size: 0.9rem;
+}
+.ai-card-accent {
+  border-color: rgba(255, 195, 0, 0.35);
+}

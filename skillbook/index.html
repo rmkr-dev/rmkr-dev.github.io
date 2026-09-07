@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skillbook | RMKR Toolkit</title>
+  <meta name="description" content="Browsable skills for GitHub Copilot, Claude Code, and Codex.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body data-root="../" data-tool="skillbook">
+<main class="wrap page-main" id="main">
+  <h1 class="page-title">Skillbook</h1>
+  <p class="page-lead">Reusable skills for <strong>GitHub Copilot</strong>, <strong>Claude Code</strong>, and <strong>Codex</strong>. Filter by tool, open an entry, then copy the body into the matching instruction file.</p>
+
+  <div class="book-toolbar">
+    <div class="search-field">
+      <label for="book-search">Search</label>
+      <input type="search" id="book-search" placeholder="Title, tag, when-to-use…" autocomplete="off">
+    </div>
+    <p class="muted" style="margin:0 0 0.35rem;font-size:0.8rem;"><span id="book-count">0</span> shown · <a href="../promptbook/">Promptbook</a> · <a href="../ai/">AI hub</a></p>
+  </div>
+  <div class="book-chips" id="book-chips" aria-label="Filter by tool"></div>
+  <p class="status" id="book-status" role="status"></p>
+
+  <div id="book-list" class="book-grid" aria-live="polite"></div>
+
+  <section class="card book-detail" id="book-detail" hidden>
+    <div class="toolbar" style="justify-content:space-between;">
+      <h2 class="page-title" id="detail-title" style="font-size:1.25rem;margin:0;"></h2>
+      <div class="toolbar" style="margin:0;">
+        <button type="button" class="btn btn-gold btn-copy" id="detail-copy">Copy</button>
+        <button type="button" class="btn btn-ghost" id="detail-close">Close</button>
+      </div>
+    </div>
+    <p class="format-notes" id="detail-notes"></p>
+    <pre class="book-body" id="detail-body"></pre>
+  </section>
+</main>
+<script>
+  window.BOOK_CONFIG = {
+    dataUrl: 'skills.json',
+    listKey: 'skills',
+    noun: 'skills'
+  };
+</script>
+<script>
+
+(function () {
+  const cfg = window.BOOK_CONFIG;
+  if (!cfg) return;
+
+  const listEl = document.getElementById('book-list');
+  const detailEl = document.getElementById('book-detail');
+  const detailTitle = document.getElementById('detail-title');
+  const detailNotes = document.getElementById('detail-notes');
+  const detailBody = document.getElementById('detail-body');
+  const detailCopy = document.getElementById('detail-copy');
+  const detailClose = document.getElementById('detail-close');
+  const searchEl = document.getElementById('book-search');
+  const chipsEl = document.getElementById('book-chips');
+  const countEl = document.getElementById('book-count');
+  const statusEl = document.getElementById('book-status');
+
+  let items = [];
+  let toolFilter = 'all';
+  let activeId = null;
+
+  const TOOL_LABELS = {
+    'copilot': 'Copilot',
+    'claude-code': 'Claude Code',
+    'codex': 'Codex',
+    'all': 'All tools'
+  };
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function toolPills(tools) {
+    const t = tools && tools.length ? tools : ['copilot', 'claude-code', 'codex'];
+    if (t.length === 3 && t.includes('copilot') && t.includes('claude-code') && t.includes('codex')) {
+      return '<span class="tool-pill all">All three</span>';
+    }
+    return t.map(function (x) {
+      return '<span class="tool-pill ' + escapeHtml(x) + '">' + escapeHtml(TOOL_LABELS[x] || x) + '</span>';
+    }).join('');
+  }
+
+  function matches(item, q, tool) {
+    if (tool && tool !== 'all') {
+      const tools = item.tools || [];
+      if (tools.length && tools.indexOf(tool) === -1) return false;
+    }
+    if (!q) return true;
+    const hay = [
+      item.title || '',
+      item.whenToUse || '',
+      item.formatNotes || '',
+      (item.tags || []).join(' '),
+      (item.tools || []).join(' '),
+      item.body || ''
+    ].join(' ').toLowerCase();
+    return hay.indexOf(q) !== -1;
+  }
+
+  function filtered() {
+    const q = (searchEl.value || '').trim().toLowerCase();
+    return items.filter(function (it) { return matches(it, q, toolFilter); });
+  }
+
+  function flash(btn) {
+    if (!btn) return;
+    btn.classList.add('is-copied');
+    const prev = btn.textContent;
+    btn.textContent = 'Copied';
+    setTimeout(function () {
+      btn.classList.remove('is-copied');
+      btn.textContent = prev;
+    }, 1200);
+  }
+
+  function copyText(text, btn) {
+    if (!text) {
+      RMKR.setStatus(statusEl, 'Nothing to copy.', 'err');
+      return;
+    }
+    RMKR.copy(text).then(function () {
+      flash(btn);
+      RMKR.setStatus(statusEl, 'Copied to clipboard.', 'ok');
+    }).catch(function () {
+      RMKR.setStatus(statusEl, 'Copy failed — select the body and copy manually.', 'err');
+    });
+  }
+
+  function openDetail(item) {
+    activeId = item.id;
+    detailTitle.textContent = item.title;
+    detailNotes.textContent = item.formatNotes || '';
+    detailBody.textContent = item.body || '';
+    detailEl.hidden = false;
+    detailEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    render();
+  }
+
+  function closeDetail() {
+    activeId = null;
+    detailEl.hidden = true;
+    render();
+  }
+
+  function render() {
+    const rows = filtered();
+    countEl.textContent = rows.length + ' of ' + items.length;
+    if (!rows.length) {
+      listEl.innerHTML = '<p class="empty-state">No entries match this filter. Clear search or pick another tool.</p>';
+      return;
+    }
+    listEl.innerHTML = rows.map(function (item) {
+      const active = item.id === activeId ? ' ai-card-accent' : '';
+      const tags = (item.tags || []).map(function (t) {
+        return '<span class="badge">' + escapeHtml(t) + '</span>';
+      }).join('');
+      return (
+        '<article class="book-card' + active + '" data-id="' + escapeHtml(item.id) + '">' +
+          '<h3>' + escapeHtml(item.title) + '</h3>' +
+          '<p class="book-when"><strong>When to use:</strong> ' + escapeHtml(item.whenToUse || '') + '</p>' +
+          '<div class="book-tags">' + toolPills(item.tools) + tags + '</div>' +
+          '<div class="book-card-actions">' +
+            '<button type="button" class="btn btn-gold btn-open">Open</button>' +
+            '<button type="button" class="btn btn-ghost btn-copy-card">Copy</button>' +
+          '</div>' +
+        '</article>'
+      );
+    }).join('');
+
+    listEl.querySelectorAll('.book-card').forEach(function (card) {
+      const id = card.getAttribute('data-id');
+      const item = items.find(function (x) { return x.id === id; });
+      if (!item) return;
+      card.querySelector('.btn-open').addEventListener('click', function () { openDetail(item); });
+      card.querySelector('.btn-copy-card').addEventListener('click', function (e) {
+        copyText(item.body, e.currentTarget);
+      });
+    });
+  }
+
+  function buildChips() {
+    const opts = [
+      { id: 'all', label: 'All tools' },
+      { id: 'copilot', label: 'Copilot' },
+      { id: 'claude-code', label: 'Claude Code' },
+      { id: 'codex', label: 'Codex' }
+    ];
+    chipsEl.innerHTML = opts.map(function (o) {
+      const on = o.id === toolFilter ? ' is-active' : '';
+      return '<button type="button" class="chip' + on + '" data-tool="' + o.id + '">' + o.label + '</button>';
+    }).join('');
+    chipsEl.querySelectorAll('.chip').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        toolFilter = btn.getAttribute('data-tool');
+        buildChips();
+        render();
+      });
+    });
+  }
+
+  detailCopy.addEventListener('click', function () {
+    copyText(detailBody.textContent, detailCopy);
+  });
+  detailClose.addEventListener('click', closeDetail);
+  searchEl.addEventListener('input', render);
+
+  fetch(cfg.dataUrl)
+    .then(function (r) {
+      if (!r.ok) throw new Error('Failed to load ' + cfg.dataUrl + ' (' + r.status + ')');
+      return r.json();
+    })
+    .then(function (data) {
+      items = data[cfg.listKey] || [];
+      buildChips();
+      render();
+      RMKR.setStatus(statusEl, 'Loaded ' + items.length + ' ' + cfg.noun + '.', 'ok');
+      const hash = (location.hash || '').replace(/^#/, '');
+      if (hash) {
+        const hit = items.find(function (x) { return x.id === hash; });
+        if (hit) openDetail(hit);
+      }
+    })
+    .catch(function (e) {
+      listEl.innerHTML = '<p class="empty-state">Could not load data. Serve this folder over HTTP so JSON can be fetched.</p>';
+      RMKR.setStatus(statusEl, e.message || String(e), 'err');
+    });
+})();
+
+</script>
+</body>
+</html>
