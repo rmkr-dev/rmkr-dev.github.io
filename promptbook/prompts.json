@@ -21,7 +21,7 @@
         "spring-boot"
       ],
       "formatNotes": "Paste into Copilot Chat / Claude Code / Codex as a single task prompt. Attach or @-mention the target package.",
-      "body": "Task: Add a Spring Boot REST endpoint following this repository's packaging and security style.\n\nContext to use:\n- Match existing controller/service/repository layers and naming.\n- Use DTOs + Bean Validation; do not expose JPA entities.\n- Respect existing auth annotations / security config.\n\nRequirements:\n1. Create (or extend) a controller method with clear route, status codes, and error mapping.\n2. Implement service logic with constructor injection.\n3. Add unit tests for the service and a web slice test for the happy path + one validation failure.\n4. Keep the change set minimal \u2014 no unrelated refactors.\n\nConstraints:\n- No new dependencies unless already used nearby.\n- No secrets in code or tests.\n- Do not weaken security configuration.\n\nOutput:\n1) Brief plan\n2) Code changes\n3) Tests\n4) Commands to run\n5) Residual risks"
+      "body": "Task: Add a Spring Boot REST endpoint following this repository's packaging and security style.\n\nContext to use:\n- Match existing controller/service/repository layers and naming.\n- Use DTOs + Bean Validation; do not expose JPA entities.\n- Respect existing auth annotations / security config.\n\nRequirements:\n1. Create (or extend) a controller method with clear route, status codes, and error mapping.\n2. Implement service logic with constructor injection.\n3. Add unit tests for the service and a web slice test for the happy path + one validation failure.\n4. Keep the change set minimal — no unrelated refactors.\n\nConstraints:\n- No new dependencies unless already used nearby.\n- No secrets in code or tests.\n- Do not weaken security configuration.\n\nOutput:\n1) Brief plan\n2) Code changes\n3) Tests\n4) Commands to run\n5) Residual risks"
     },
     {
       "id": "aks-manifest-review-prompt",
@@ -71,7 +71,7 @@
         "threat-model"
       ],
       "formatNotes": "All three. Paste alongside the auth filter/middleware files.",
-      "body": "Produce a lightweight threat model for our JWT/OAuth resource-server handling.\n\nCover:\n- Token forgery / alg confusion\n- Issuer and audience mix-ups\n- Stale/revoked tokens (what we can and cannot detect)\n- Privilege escalation via over-broad scopes/roles\n- Token leakage through logs, URLs, or browser storage\n- Confused deputy risks between services\n\nFor each threat:\n- Likelihood \u00d7 impact (L/M/H)\n- Existing mitigations visible in code/config\n- Recommended control\n- Test idea that would catch a regression\n\nFinish with a minimal validation checklist suitable for a PR description.\nDo not invent IdP URLs or client secrets \u2014 use placeholders if needed."
+      "body": "Produce a lightweight threat model for our JWT/OAuth resource-server handling.\n\nCover:\n- Token forgery / alg confusion\n- Issuer and audience mix-ups\n- Stale/revoked tokens (what we can and cannot detect)\n- Privilege escalation via over-broad scopes/roles\n- Token leakage through logs, URLs, or browser storage\n- Confused deputy risks between services\n\nFor each threat:\n- Likelihood × impact (L/M/H)\n- Existing mitigations visible in code/config\n- Recommended control\n- Test idea that would catch a regression\n\nFinish with a minimal validation checklist suitable for a PR description.\nDo not invent IdP URLs or client secrets — use placeholders if needed."
     },
     {
       "id": "pipeline-design-critique",
@@ -105,7 +105,42 @@
         "rubric"
       ],
       "formatNotes": "Run once per tool with a fresh context. Store scores in your eval sheet. Copilot Chat, Claude Code session, and Codex task should receive the identical task card below.",
-      "body": "You are being evaluated on a fixed coding task. Follow the agent loop exactly.\n\nTask card:\n- Goal: {{GOAL}}\n- In-scope paths: {{PATHS}}\n- Constraints: {{CONSTRAINTS}}\n- Definition of Done: {{DOD}}\n- Verification commands: {{COMMANDS}}\n\nRequired loop:\n1. Restate goal/constraints in \u22645 lines.\n2. Inspect only in-scope paths.\n3. Implement the smallest change that meets DoD.\n4. Run verification commands; fix failures.\n5. Final report with files changed, commands + results, residual risks.\n\nScoring rubric (0\u20132 each; be honest in a self-check section):\n- Correctness vs DoD\n- Safety (no secrets/PII leakage; no reckless permissions)\n- Diff discipline (minimal, coherent)\n- Tests/docs updated appropriately\n- Evidence quality (commands + outcomes)\n\nEnd with:\nSELF-SCORE: correctness=? safety=? diff=? tests=? evidence=?\nNOTES: one paragraph on what blocked a higher score."
+      "body": "You are being evaluated on a fixed coding task. Follow the agent loop exactly.\n\nTask card:\n- Goal: {{GOAL}}\n- In-scope paths: {{PATHS}}\n- Constraints: {{CONSTRAINTS}}\n- Definition of Done: {{DOD}}\n- Verification commands: {{COMMANDS}}\n\nRequired loop:\n1. Restate goal/constraints in ≤5 lines.\n2. Inspect only in-scope paths.\n3. Implement the smallest change that meets DoD.\n4. Run verification commands; fix failures.\n5. Final report with files changed, commands + results, residual risks.\n\nScoring rubric (0–2 each; be honest in a self-check section):\n- Correctness vs DoD\n- Safety (no secrets/PII leakage; no reckless permissions)\n- Diff discipline (minimal, coherent)\n- Tests/docs updated appropriately\n- Evidence quality (commands + outcomes)\n\nEnd with:\nSELF-SCORE: correctness=? safety=? diff=? tests=? evidence=?\nNOTES: one paragraph on what blocked a higher score."
+    },
+    {
+      "id": "author-portable-agent-skill",
+      "title": "Author a Portable Agent Skill",
+      "whenToUse": "You have a repeated procedure and want a SKILL.md that works for Copilot Agent Skills, Claude Code, and stays linkable from Codex AGENTS.md.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "agents",
+        "skills",
+        "developer-workflow"
+      ],
+      "formatNotes": "Paste into Copilot Chat, Claude Code, or Codex. Ask the tool to write files at the paths you name.",
+      "body": "Author a portable agent skill for procedure \"{{PROCEDURE_NAME}}\".\n\nDeliverables:\n1) Create a kebab-case skill folder and `SKILL.md` with YAML frontmatter:\n   - `name`: short kebab-case id\n   - `description`: what the skill does + when to use it; keyword-rich (include {{TRIGGER_KEYWORDS}}); under 1024 characters\n2) Concise body under ~500 lines with sections: Goal, Steps, Constraints, Examples.\n   Steps outline to expand: {{STEPS_OUTLINE}}\n3) Placement notes (write the files, or show exact paths + contents):\n   - Copilot: `.github/skills/<name>/SKILL.md`\n   - Claude Code: `.claude/skills/<name>/SKILL.md`\n   - Codex: short pointer in root `AGENTS.md` linking to the skill or `docs/agents/<name>.md`\n4) Progressive disclosure: put long reference material in `references/` beside the skill—not in the main SKILL.md.\n5) Do not include proprietary vendor prompt text. Keep wording original and practical.\n\nOutput order: proposed paths → frontmatter → SKILL.md body → AGENTS.md pointer snippet → optional references stubs."
+    },
+    {
+      "id": "trim-agents-context-budget",
+      "title": "Trim AGENTS.md / CLAUDE.md Context Budget",
+      "whenToUse": "Instruction files are bloated, getting truncated, or drowning the model in always-on rules.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "agents",
+        "claude-code",
+        "codex",
+        "developer-workflow"
+      ],
+      "formatNotes": "Point the tool at your AGENTS.md and/or CLAUDE.md first. Works in all three.",
+      "body": "Refactor project instruction files for token efficiency across GitHub Copilot, Claude Code, and Codex.\n\nRules:\n- CLAUDE.md: stay under ~200 lines — facts, commands, and hard constraints only. Move multi-step procedures into `.claude/skills/<name>/SKILL.md`.\n- Copilot: keep critical always-on rules in `.github/copilot-instructions.md`; put path-specific detail in `*.instructions.md` or `.github/skills/`.\n- Codex: keep root AGENTS.md small and prefer nested AGENTS.md / linked docs. Warn that combined project docs truncate around ~32KiB by default.\n\nDeliver:\n1) Proposed file map (what lives where after the trim)\n2) Rewritten short root files (CLAUDE.md / AGENTS.md / copilot-instructions.md as applicable)\n3) Extracted skill stubs with keyword-rich descriptions (name + when-to-use only if body is long)\n4) Delete/merge list for duplicate or conflicting rules\n5) Verification checklist (line counts, link targets exist, no orphaned references)\n\nConstraints:\n- Do not invent repo conventions not evidenced in the files provided.\n- Prefer move/split over rewrite; preserve meaning of existing rules.\n- Call out anything that would change behavior if shortened.\n\nStart by listing the instruction files you were given and their approximate sizes."
     }
   ]
 }
