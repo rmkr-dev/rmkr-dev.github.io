@@ -16,6 +16,7 @@
     { id: "uuid", path: "uuid/", name: "UUID Generator", blurb: "Create v4 UUIDs in bulk and copy them.", cat: "Security" },
     { id: "cert", path: "cert/", name: "PEM / SSH Viewer", blurb: "Inspect PEM blocks and SSH key fingerprints.", cat: "Security" },
     { id: "cidr", path: "cidr/", name: "CIDR Calculator", blurb: "Network, broadcast, mask, and host range from an IPv4 CIDR.", cat: "Security" },
+    { id: "azure-id", path: "azure-id/", name: "Azure Resource ID", blurb: "Split subscription, resource group, type, and name from an ARM ID.", cat: "Security" },
     { id: "time", path: "time/", name: "Time Overlay", blurb: "Compare working hours across time zones.", cat: "Time" },
     { id: "timestamp", path: "timestamp/", name: "Unix Timestamp", blurb: "Convert Unix time to human dates and back.", cat: "Time" },
     { id: "cron", path: "cron/", name: "Cron Explainer", blurb: "Read cron expressions and preview next runs.", cat: "Time" },
