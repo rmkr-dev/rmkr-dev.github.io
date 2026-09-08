@@ -34,6 +34,7 @@ Skillbook and Promptbook load JSON over `fetch`, so use a local server (opening 
 - **UUID Generator**
 - **PEM / SSH Viewer**
 - **CIDR Calculator** — IPv4 network, broadcast, mask, host range
+- **Azure Resource ID** — parse ARM IDs into subscription, RG, type, name
 
 ### Time
 

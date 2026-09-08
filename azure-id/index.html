@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azure Resource ID | RMKR Toolkit</title>
+  <meta name="description" content="Parse Azure ARM resource IDs into subscription, resource group, type, and name — locally in the browser.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body data-root="../" data-tool="azure-id">
+<main class="wrap page-main" id="main">
+  <h1 class="page-title">Azure Resource ID</h1>
+  <p class="page-lead">Paste an ARM resource ID. Split subscription, resource group, provider, type, and name without leaving this tab.</p>
+  <div class="toolbar">
+    <label for="idInput" style="margin:0;">Resource ID</label>
+    <input id="idInput" type="text" value="/subscriptions/11111111-1111-1111-1111-111111111111/resourceGroups/demo-rg/providers/Microsoft.Compute/virtualMachines/web-01" placeholder="/subscriptions/{guid}/resourceGroups/{rg}/providers/..." spellcheck="false" style="min-width:12rem;flex:1;">
+    <button class="btn btn-gold" type="button" id="run">Parse</button>
+    <button class="btn btn-ghost" type="button" id="copyOut">Copy</button>
+    <button class="btn btn-ghost" type="button" id="clear">Clear</button>
+  </div>
+  <p class="status" id="status" role="status"></p>
+  <div class="tool-grid" id="cards" style="margin-top:1rem;"></div>
+  <label for="output">Summary</label>
+  <textarea id="output" spellcheck="false" readonly rows="14"></textarea>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

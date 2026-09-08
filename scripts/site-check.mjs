@@ -174,6 +174,13 @@ try {
   fail(`cidr-lib tests: ${e.message}`);
 }
 
+const { runAzureIdTests } = await import("./azure-id-lib.test.mjs");
+try {
+  runAzureIdTests();
+} catch (e) {
+  fail(`azure-id-lib tests: ${e.message}`);
+}
+
 if (warnings.length) {
   console.log("Warnings:");
   for (const w of warnings) console.log("  - " + w);
