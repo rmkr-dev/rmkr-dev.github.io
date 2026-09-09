@@ -141,6 +141,25 @@
       ],
       "formatNotes": "Point the tool at your AGENTS.md and/or CLAUDE.md first. Works in all three.",
       "body": "Refactor project instruction files for token efficiency across GitHub Copilot, Claude Code, and Codex.\n\nRules:\n- CLAUDE.md: stay under ~200 lines — facts, commands, and hard constraints only. Move multi-step procedures into `.claude/skills/<name>/SKILL.md`.\n- Copilot: keep critical always-on rules in `.github/copilot-instructions.md`; put path-specific detail in `*.instructions.md` or `.github/skills/`.\n- Codex: keep root AGENTS.md small and prefer nested AGENTS.md / linked docs. Warn that combined project docs truncate around ~32KiB by default.\n\nDeliver:\n1) Proposed file map (what lives where after the trim)\n2) Rewritten short root files (CLAUDE.md / AGENTS.md / copilot-instructions.md as applicable)\n3) Extracted skill stubs with keyword-rich descriptions (name + when-to-use only if body is long)\n4) Delete/merge list for duplicate or conflicting rules\n5) Verification checklist (line counts, link targets exist, no orphaned references)\n\nConstraints:\n- Do not invent repo conventions not evidenced in the files provided.\n- Prefer move/split over rewrite; preserve meaning of existing rules.\n- Call out anything that would change behavior if shortened.\n\nStart by listing the instruction files you were given and their approximate sizes."
+    },
+    {
+      "id": "scaffold-instruction-layers",
+      "title": "Scaffold Copilot / Claude / Codex Instruction Layers",
+      "whenToUse": "Greenfield or thin repos that need a clean split between always-on instructions and on-demand skills for Copilot, Claude Code, and Codex.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "agents",
+        "copilot",
+        "claude-code",
+        "codex",
+        "developer-workflow"
+      ],
+      "formatNotes": "Paste into Copilot Chat, Claude Code, or Codex with the repo open. Ask the tool to write the files (not just describe them).",
+      "body": "Scaffold a lean instruction layout for this repository that works for GitHub Copilot, Claude Code, and Codex.\n\nCreate (or propose exact paths + full file contents):\n\n1) Copilot\n- `.github/copilot-instructions.md` — short always-on house style (stack, tests, boundaries). Keep under ~150 lines.\n- Optional path-scoped `.github/instructions/<topic>.instructions.md` with YAML frontmatter `applyTo` globs only where rules differ by path.\n\n2) Claude Code\n- `CLAUDE.md` — facts, commands, and hard constraints only (target under ~200 lines).\n- Move any multi-step procedure into `.claude/skills/<kebab-name>/SKILL.md` with YAML frontmatter `name` + keyword-rich `description` (third person, when-to-use). Keep SKILL.md body lean; put long reference material under `references/`.\n\n3) Codex\n- Root `AGENTS.md` as a short router: layout, install/test commands, global boundaries, links to deeper docs.\n- For packages/areas with different commands, add nested `AGENTS.md` closer to that code (Codex walks root→cwd; nearer files override). Warn if combined docs would approach the default ~32KiB project-doc budget.\n- Do not commit `AGENTS.override.md` unless the user asks for a local-only override.\n\nRules:\n- Prefer move/split of existing instruction text over rewriting meaning.\n- No proprietary vendor prompt dumps; original practical wording only.\n- No secrets, tokens, or personal data.\n- Explicit \"never touch\" boundaries (secrets, generated/, vendor/).\n\nOutput order:\n1) File map\n2) Full contents for each new/changed file\n3) What was left out and why\n4) Verification checklist (line counts, links resolve, no duplicate conflicting rules)"
     }
   ]
 }
