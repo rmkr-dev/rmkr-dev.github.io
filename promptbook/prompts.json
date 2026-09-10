@@ -160,6 +160,24 @@
       ],
       "formatNotes": "Paste into Copilot Chat, Claude Code, or Codex with the repo open. Ask the tool to write the files (not just describe them).",
       "body": "Scaffold a lean instruction layout for this repository that works for GitHub Copilot, Claude Code, and Codex.\n\nCreate (or propose exact paths + full file contents):\n\n1) Copilot\n- `.github/copilot-instructions.md` — short always-on house style (stack, tests, boundaries). Keep under ~150 lines.\n- Optional path-scoped `.github/instructions/<topic>.instructions.md` with YAML frontmatter `applyTo` globs only where rules differ by path.\n\n2) Claude Code\n- `CLAUDE.md` — facts, commands, and hard constraints only (target under ~200 lines).\n- Move any multi-step procedure into `.claude/skills/<kebab-name>/SKILL.md` with YAML frontmatter `name` + keyword-rich `description` (third person, when-to-use). Keep SKILL.md body lean; put long reference material under `references/`.\n\n3) Codex\n- Root `AGENTS.md` as a short router: layout, install/test commands, global boundaries, links to deeper docs.\n- For packages/areas with different commands, add nested `AGENTS.md` closer to that code (Codex walks root→cwd; nearer files override). Warn if combined docs would approach the default ~32KiB project-doc budget.\n- Do not commit `AGENTS.override.md` unless the user asks for a local-only override.\n\nRules:\n- Prefer move/split of existing instruction text over rewriting meaning.\n- No proprietary vendor prompt dumps; original practical wording only.\n- No secrets, tokens, or personal data.\n- Explicit \"never touch\" boundaries (secrets, generated/, vendor/).\n\nOutput order:\n1) File map\n2) Full contents for each new/changed file\n3) What was left out and why\n4) Verification checklist (line counts, links resolve, no duplicate conflicting rules)"
+    },
+    {
+      "id": "characterization-tests-before-refactor",
+      "title": "Characterization Tests Before Refactor",
+      "whenToUse": "About to refactor messy code and need lock-in tests so behavior does not silently change.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "testing",
+        "refactor",
+        "developer-workflow",
+        "java"
+      ],
+      "formatNotes": "Paste into Copilot Chat, Claude Code, or Codex with the target files open. Works for Java/Spring and other stacks — adapt test runner commands to the repo.",
+      "body": "I need to refactor {{TARGET}} safely. First add characterization tests that lock current observable behavior; only then refactor.\n\nPhase 1 — Characterize (no behavior change)\n1. Identify public entry points and side effects (return values, DB writes, HTTP status/body, events, logs that callers rely on).\n2. Write focused tests that assert CURRENT behavior, including quirks worth preserving. Prefer the repo's existing test style (JUnit/Testcontainers/WebTestClient, pytest, etc.).\n3. Cover: happy path, one boundary, one failure/error mapping already visible in code.\n4. Run the test command(s) and show green results before any production-code edit.\n\nPhase 2 — Refactor\n1. Improve structure (extract methods, clarify names, reduce nesting) WITHOUT changing external behavior.\n2. Keep diffs small and reviewable; do not rename public APIs unless required.\n3. Re-run the same tests after each coherent step.\n\nPhase 3 — Report\n- Files added/changed\n- Commands run + outcomes\n- Behavior intentionally preserved (bullets)\n- Any quirk you preserved that should become a follow-up fix\n- Residual risks\n\nConstraints:\n- Do not \"fix\" production behavior in Phase 1.\n- No secrets, real PII, or production connection strings in fixtures.\n- Prefer fixtures/builders already in the repo.\n\nTarget details:\n- Paths: {{PATHS}}\n- Test command: {{TEST_COMMAND}}\n- Invariants that must hold: {{INVARIANTS}}"
     }
   ]
 }
