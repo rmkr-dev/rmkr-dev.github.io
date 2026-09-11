@@ -178,6 +178,25 @@
       ],
       "formatNotes": "Paste into Copilot Chat, Claude Code, or Codex with the target files open. Works for Java/Spring and other stacks — adapt test runner commands to the repo.",
       "body": "I need to refactor {{TARGET}} safely. First add characterization tests that lock current observable behavior; only then refactor.\n\nPhase 1 — Characterize (no behavior change)\n1. Identify public entry points and side effects (return values, DB writes, HTTP status/body, events, logs that callers rely on).\n2. Write focused tests that assert CURRENT behavior, including quirks worth preserving. Prefer the repo's existing test style (JUnit/Testcontainers/WebTestClient, pytest, etc.).\n3. Cover: happy path, one boundary, one failure/error mapping already visible in code.\n4. Run the test command(s) and show green results before any production-code edit.\n\nPhase 2 — Refactor\n1. Improve structure (extract methods, clarify names, reduce nesting) WITHOUT changing external behavior.\n2. Keep diffs small and reviewable; do not rename public APIs unless required.\n3. Re-run the same tests after each coherent step.\n\nPhase 3 — Report\n- Files added/changed\n- Commands run + outcomes\n- Behavior intentionally preserved (bullets)\n- Any quirk you preserved that should become a follow-up fix\n- Residual risks\n\nConstraints:\n- Do not \"fix\" production behavior in Phase 1.\n- No secrets, real PII, or production connection strings in fixtures.\n- Prefer fixtures/builders already in the repo.\n\nTarget details:\n- Paths: {{PATHS}}\n- Test command: {{TEST_COMMAND}}\n- Invariants that must hold: {{INVARIANTS}}"
+    },
+    {
+      "id": "migrate-secrets-into-key-vault",
+      "title": "Migrate Secrets Into Key Vault",
+      "whenToUse": "You found credentials in config, manifests, or code and want a safe, reviewable migration into Azure Key Vault.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "azure",
+        "key-vault",
+        "secrets",
+        "security",
+        "migration"
+      ],
+      "formatNotes": "Paste into Copilot Chat / Claude Code / Codex. Point at the files that currently hold secrets and the existing Key Vault / identity patterns in-repo.",
+      "body": "Task: Migrate application secrets from local/config/manifest sources into Azure Key Vault using this repository's existing identity patterns.\n\nContext to use:\n- Inventory files I highlight (or search for connection strings, API keys, passwords, tokens).\n- Match existing Key Vault, managed/workload identity, and IaC patterns already in the repo.\n- Prefer references over copying secret values into new locations.\n\nRequirements:\n1. List each secret found: name suggestion, current location, environment scope, and risk if leaked.\n2. Propose Key Vault secret names and access (which identity gets get/list).\n3. Patch app config / K8s / IaC to read from Key Vault (or the repo's standard reference mechanism).\n4. Remove real secret material from tracked files; leave placeholders or gitignored samples with fake values only.\n5. Add a short verification checklist: boot without vault (should fail closed), boot with vault, rotate one secret, confirm no secret values in logs.\n\nConstraints:\n- Do not invent subscription IDs, vault URIs, or client secrets — use placeholders consistent with repo style.\n- Do not print actual secret values in the response or in new files.\n- Keep the diff minimal; no unrelated refactors.\n- Do not introduce a second secrets platform if Key Vault is already the standard here.\n\nOutput:\n1) Inventory table (names only for values)\n2) Plan (ordered steps, including dual-read if needed)\n3) Code/IaC/config changes\n4) RBAC / identity notes\n5) Verification commands and residual risks"
     }
   ]
 }
