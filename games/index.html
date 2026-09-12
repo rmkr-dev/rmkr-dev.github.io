@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Games | RMKR Toolkit</title>
+  <meta name="description" content="Simple browser focus games — memory, sequence, number slide, and word scramble. No accounts, works offline after load.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body data-root="../" data-tool="games">
+<main class="wrap page-main" id="main">
+  <h1 class="page-title">Focus Games</h1>
+  <p class="page-lead">Short, simple brain games that stay in your browser. Large tap targets, offline after first load, and best scores saved only in localStorage. No sound effects in this wave.</p>
+
+  <div class="hub-grid">
+    <a class="tool-card ai-card-accent" href="memory/">
+      <h3>Memory Match</h3>
+      <p>Flip cards on a 4×4 board and find matching pairs. Beat your best move count.</p>
+    </a>
+    <a class="tool-card ai-card-accent" href="sequence/">
+      <h3>Sequence Recall</h3>
+      <p>Watch the pads light up, then tap the same pattern back. Climb as far as you can.</p>
+    </a>
+    <a class="tool-card ai-card-accent" href="numbers/">
+      <h3>Number Slide</h3>
+      <p>Classic 15-puzzle on a 4×4 grid. Slide tiles into order with as few moves as possible.</p>
+    </a>
+    <a class="tool-card ai-card-accent" href="words/">
+      <h3>Word Scramble</h3>
+      <p>Unscramble a common English word, then hit Next for another. Keep a streak going.</p>
+    </a>
+  </div>
+
+  <h2 class="section-title">How it works</h2>
+  <div class="card">
+    <ul>
+      <li>Everything runs client-side — nothing is uploaded.</li>
+      <li>Best score / streak values use <code>localStorage</code> keys prefixed with <code>rmkr-game-</code>.</li>
+      <li>No ads, accounts, or external game CDNs.</li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>

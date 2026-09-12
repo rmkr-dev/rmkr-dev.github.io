@@ -114,6 +114,7 @@ function checkToolPages() {
   }
   // Optional hub
   if (!exists("ai/index.html")) warn("Optional ai/index.html not found");
+  if (!exists("games/index.html")) warn("Optional games/index.html not found");
 }
 
 function basicHtmlCheck(rel) {
@@ -134,7 +135,7 @@ function basicHtmlCheck(rel) {
 
 function checkHtmlPages() {
   const tools = extractToolsFromSiteJs();
-  const pages = new Set(["index.html", "profile.html", "ai/index.html", "skillbook/index.html", "promptbook/index.html"]);
+  const pages = new Set(["index.html", "profile.html", "ai/index.html", "games/index.html", "skillbook/index.html", "promptbook/index.html"]);
   for (const t of tools) {
     pages.add(path.posix.join(t.path.replace(/\/?$/, "/"), "index.html"));
   }

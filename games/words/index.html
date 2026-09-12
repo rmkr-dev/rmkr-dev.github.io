@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Scramble | RMKR Toolkit</title>
+  <meta name="description" content="Unscramble common English words. Streak and best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="words">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Word Scramble</h1>
+  <p class="page-lead">Unscramble the letters into a common English word. Case does not matter.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best streak: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-ghost" id="skipBtn">Skip</button>
+      <button type="button" class="btn btn-gold" id="nextBtn">Next word</button>
+    </div>
+  </div>
+
+  <div class="card scramble-card">
+    <p class="muted" style="margin:0;font-size:0.75rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;">Scrambled</p>
+    <p class="scramble-word" id="scrambled" aria-live="polite">————</p>
+    <label for="guess">Your guess</label>
+    <input class="scramble-input" id="guess" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="Type the word">
+    <div class="scramble-actions">
+      <button type="button" class="btn btn-gold" id="checkBtn">Check</button>
+      <button type="button" class="btn btn-ghost" id="hintBtn">Hint</button>
+    </div>
+    <p class="game-note" id="note" role="status"></p>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY_BEST = "rmkr-game-words-best";
+  var WORDS = [
+    "apple","bread","chair","cloud","dance","earth","flame","grape","house","input",
+    "jelly","knife","lemon","music","night","ocean","plant","queen","river","stone",
+    "table","unity","value","water","xenon","youth","zebra","brave","crisp","dream",
+    "eagle","frost","giant","happy","ivory","jolly","karma","light","mango","noble",
+    "orbit","piano","quiet","rusty","sunny","tiger","ultra","vivid","wheat","yield"
+  ];
+  var word = "";
+  var scrambled = "";
+  var streak = 0;
+  var solved = false;
+  var recent = [];
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY_BEST) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY_BEST, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+    document.getElementById("streak").textContent = String(streak);
+  }
+  function scramble(w) {
+    var chars = w.split("");
+    var out;
+    var guard = 0;
+    do {
+      for (var i = chars.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = chars[i]; chars[i] = chars[j]; chars[j] = t;
+      }
+      out = chars.join("");
+      guard++;
+    } while (out === w && guard < 20);
+    return out;
+  }
+  function pickWord() {
+    var pool = WORDS.filter(function (w) { return recent.indexOf(w) === -1; });
+    if (!pool.length) { recent = []; pool = WORDS.slice(); }
+    var w = pool[Math.floor(Math.random() * pool.length)];
+    recent.push(w);
+    if (recent.length > 12) recent.shift();
+    return w;
+  }
+  function nextWord(resetStreak) {
+    if (resetStreak) streak = 0;
+    word = pickWord();
+    scrambled = scramble(word);
+    solved = false;
+    document.getElementById("scrambled").textContent = scrambled.toUpperCase();
+    var input = document.getElementById("guess");
+    input.value = "";
+    input.disabled = false;
+    input.focus();
+    setNote("Unscramble the letters.");
+    renderBest();
+  }
+  function check() {
+    if (solved) return;
+    var g = (document.getElementById("guess").value || "").trim().toLowerCase();
+    if (!g) {
+      setNote("Type a guess first.");
+      return;
+    }
+    if (g === word) {
+      solved = true;
+      streak += 1;
+      var best = saveBest(streak);
+      renderBest();
+      document.getElementById("guess").disabled = true;
+      setNote("Correct! Streak " + streak + " (best " + best + ").", "ok");
+    } else {
+      streak = 0;
+      renderBest();
+      setNote("Not quite — try again.", "err");
+    }
+  }
+  function hint() {
+    if (solved) return;
+    setNote("Starts with \"" + word.charAt(0).toUpperCase() + "\" and has " + word.length + " letters.");
+  }
+  function skip() {
+    streak = 0;
+    setNote("Skipped. The word was \"" + word + "\".", "err");
+    nextWord(true);
+  }
+
+  document.getElementById("checkBtn").addEventListener("click", check);
+  document.getElementById("hintBtn").addEventListener("click", hint);
+  document.getElementById("nextBtn").addEventListener("click", function () {
+    if (!solved) streak = 0;
+    nextWord(!solved);
+  });
+  document.getElementById("skipBtn").addEventListener("click", skip);
+  document.getElementById("guess").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") check();
+  });
+  nextWord(false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Slide | RMKR Toolkit</title>
+  <meta name="description" content="15-puzzle number slide on a 4x4 board. Best move count saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="numbers">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Number Slide</h1>
+  <p class="page-lead">Slide numbered tiles into the empty space. Goal: 1–15 in order, blank at the end.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Moves: <strong id="moves">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="newGame">Shuffle</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status"></p>
+  <div class="game-board-wrap">
+    <div class="slide-grid" id="board" aria-label="Number slide board"></div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-numbers-best";
+  var SIZE = 4;
+  var tiles = [];
+  var moves = 0;
+  var won = false;
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n < cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function blankIndex() {
+    return tiles.indexOf(0);
+  }
+  function isSolved() {
+    for (var i = 0; i < 15; i++) if (tiles[i] !== i + 1) return false;
+    return tiles[15] === 0;
+  }
+  function inversions(arr) {
+    var inv = 0;
+    for (var i = 0; i < arr.length; i++) {
+      if (!arr[i]) continue;
+      for (var j = i + 1; j < arr.length; j++) {
+        if (arr[j] && arr[i] > arr[j]) inv++;
+      }
+    }
+    return inv;
+  }
+  function isSolvable(arr) {
+    var inv = inversions(arr);
+    var blankRowFromBottom = SIZE - Math.floor(arr.indexOf(0) / SIZE);
+    if (SIZE % 2 === 1) return inv % 2 === 0;
+    if (blankRowFromBottom % 2 === 0) return inv % 2 === 1;
+    return inv % 2 === 0;
+  }
+  function shuffleSolvable() {
+    var arr;
+    do {
+      arr = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0];
+      for (var i = arr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+      }
+    } while (!isSolvable(arr) || (arr.every(function (v, i) {
+      return i < 15 ? v === i + 1 : v === 0;
+    })));
+    return arr;
+  }
+  function neighbors(idx) {
+    var r = Math.floor(idx / SIZE), c = idx % SIZE;
+    var out = [];
+    if (r > 0) out.push(idx - SIZE);
+    if (r < SIZE - 1) out.push(idx + SIZE);
+    if (c > 0) out.push(idx - 1);
+    if (c < SIZE - 1) out.push(idx + 1);
+    return out;
+  }
+  function render() {
+    var board = document.getElementById("board");
+    board.innerHTML = "";
+    tiles.forEach(function (val, idx) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "slide-tile" + (val === 0 ? " is-empty" : "");
+      if (val !== 0 && val === idx + 1) btn.classList.add("is-home");
+      btn.textContent = val === 0 ? "" : String(val);
+      btn.setAttribute("aria-label", val === 0 ? "Empty" : "Tile " + val);
+      if (val === 0) btn.disabled = true;
+      else {
+        btn.addEventListener("click", function () { tryMove(idx); });
+      }
+      board.appendChild(btn);
+    });
+    document.getElementById("moves").textContent = String(moves);
+  }
+  function tryMove(idx) {
+    if (won) return;
+    var b = blankIndex();
+    if (neighbors(idx).indexOf(b) === -1) return;
+    tiles[b] = tiles[idx];
+    tiles[idx] = 0;
+    moves += 1;
+    render();
+    if (isSolved()) {
+      won = true;
+      var best = saveBest(moves);
+      renderBest();
+      setNote("Solved in " + moves + " moves. Best: " + best + ".", "ok");
+    } else {
+      setNote("");
+    }
+  }
+  function newGame() {
+    tiles = shuffleSolvable();
+    moves = 0;
+    won = false;
+    renderBest();
+    setNote("Tap a tile next to the empty space.");
+    render();
+  }
+  document.getElementById("newGame").addEventListener("click", newGame);
+  newGame();
+})();
+</script>
+</body>
+</html>

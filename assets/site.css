@@ -582,3 +582,218 @@ body[data-tool="collab"] .site-footer { display: none; }
 .ai-card-accent {
   border-color: rgba(255, 195, 0, 0.35);
 }
+
+/* —— Focus Games —— */
+.game-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+}
+.game-hud-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.game-hud-stats span strong {
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+}
+.game-hud-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+.game-board-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem 0 1rem;
+}
+.game-note {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  min-height: 1.4rem;
+  margin: 0.35rem 0 0.75rem;
+}
+.game-note.ok { color: var(--color-ok); }
+.game-note.err { color: var(--color-error); }
+.game-back {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Memory Match */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(64px, 88px));
+  gap: 0.55rem;
+  width: max-content;
+  max-width: 100%;
+}
+.memory-card {
+  aspect-ratio: 1;
+  min-width: 64px;
+  min-height: 64px;
+  border-radius: 12px;
+  border: 1px solid var(--color-line);
+  background: var(--color-input);
+  color: var(--color-text);
+  font-size: 1.55rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+}
+.memory-card:hover:not(:disabled) {
+  border-color: rgba(255, 195, 0, 0.55);
+}
+.memory-card:disabled { cursor: default; }
+.memory-card.is-back {
+  background: linear-gradient(145deg, #1c2844, #121a2c);
+  color: transparent;
+}
+.memory-card.is-back::after {
+  content: "?";
+  color: var(--color-accent);
+  font-size: 1.35rem;
+  opacity: 0.85;
+}
+.memory-card.is-matched {
+  border-color: rgba(74, 222, 128, 0.45);
+  background: rgba(74, 222, 128, 0.12);
+  cursor: default;
+}
+
+/* Sequence Recall */
+.sequence-pads {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(110px, 140px));
+  gap: 0.75rem;
+}
+.seq-pad {
+  aspect-ratio: 1;
+  min-height: 110px;
+  border-radius: 18px;
+  border: 2px solid var(--color-line);
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--color-text);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: filter 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
+}
+.seq-pad:active:not(:disabled),
+.seq-pad.is-lit {
+  filter: brightness(1.35);
+  transform: scale(0.97);
+  box-shadow: 0 0 0 3px rgba(255, 195, 0, 0.35);
+}
+.seq-pad:disabled { cursor: wait; opacity: 0.9; }
+.seq-pad[data-pad="0"] { background: #1e3a5f; }
+.seq-pad[data-pad="1"] { background: #3d2a12; }
+.seq-pad[data-pad="2"] { background: #1f3d2e; }
+.seq-pad[data-pad="3"] { background: #3a1f3d; }
+
+/* Number Slide */
+.slide-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(64px, 80px));
+  gap: 0.45rem;
+  width: max-content;
+}
+.slide-tile {
+  aspect-ratio: 1;
+  min-width: 64px;
+  min-height: 64px;
+  border-radius: 12px;
+  border: 1px solid var(--color-line);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-size: 1.35rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.slide-tile:hover:not(.is-empty):not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.slide-tile.is-empty {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+.slide-tile.is-home {
+  color: var(--color-accent);
+}
+
+/* Word Scramble */
+.scramble-card {
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: center;
+}
+.scramble-word {
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  color: var(--color-accent);
+  margin: 0.5rem 0 1.1rem;
+  font-family: var(--mono);
+  word-break: break-all;
+}
+.scramble-input {
+  font-size: 1.05rem !important;
+  text-align: center;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  margin-bottom: 0.85rem;
+}
+.scramble-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+@media (max-width: 420px) {
+  .memory-grid,
+  .slide-grid {
+    grid-template-columns: repeat(4, minmax(56px, 1fr));
+    width: 100%;
+  }
+  .memory-card,
+  .slide-tile {
+    min-width: 0;
+    min-height: 56px;
+    font-size: 1.2rem;
+  }
+  .sequence-pads {
+    grid-template-columns: repeat(2, minmax(96px, 1fr));
+    width: 100%;
+  }
+  .seq-pad { min-height: 96px; }
+}
