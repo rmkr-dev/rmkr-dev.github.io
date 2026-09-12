@@ -42,7 +42,8 @@
     { id: "memory", path: "games/memory/", name: "Memory Match", blurb: "Flip cards and find matching pairs.", cat: "Focus Games" },
     { id: "sequence", path: "games/sequence/", name: "Sequence Recall", blurb: "Watch the taps, then repeat the pattern.", cat: "Focus Games" },
     { id: "numbers", path: "games/numbers/", name: "Number Slide", blurb: "Slide tiles to sort 1–15 on a 4×4 board.", cat: "Focus Games" },
-    { id: "words", path: "games/words/", name: "Word Scramble", blurb: "Unscramble a common word, then try the next one.", cat: "Focus Games" }
+    { id: "words", path: "games/words/", name: "Word Scramble", blurb: "Unscramble a common word, then try the next one.", cat: "Focus Games" },
+    { id: "reaction", path: "games/reaction/", name: "Reaction Tap", blurb: "Wait for gold, then tap as fast as you can.", cat: "Focus Games" }
   ];
 
   function rootPrefix() {

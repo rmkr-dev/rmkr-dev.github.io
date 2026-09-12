@@ -780,6 +780,42 @@ body[data-tool="collab"] .site-footer { display: none; }
 }
 
 @media (max-width: 420px) {
+
+/* Reaction Tap */
+.reaction-pad {
+  width: min(100%, 320px);
+  min-height: 220px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 195, 0, 0.35);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  color: var(--color-text);
+  transition: background 0.15s ease, transform 0.08s ease, border-color 0.15s ease;
+}
+.reaction-pad:disabled { cursor: default; }
+.reaction-pad.is-idle {
+  background: linear-gradient(145deg, #1c2844, #121a2c);
+}
+.reaction-pad.is-wait {
+  background: linear-gradient(145deg, #3a1f24, #2a1218);
+  border-color: rgba(248, 113, 113, 0.45);
+}
+.reaction-pad.is-go {
+  background: linear-gradient(145deg, #c9a000, #ffc300);
+  color: #12161f;
+  border-color: #ffc300;
+  transform: scale(1.02);
+}
+.reaction-pad.is-early {
+  background: linear-gradient(145deg, #4a2030, #2a1218);
+  border-color: rgba(248, 113, 113, 0.7);
+}
+.reaction-pad:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
   .memory-grid,
   .slide-grid {
     grid-template-columns: repeat(4, minmax(56px, 1fr));
