@@ -1,5 +1,5 @@
 (function () {
-  var CATS = ["Transform", "Security", "Time", "Data", "Design", "Dev helpers", "AI"];
+  var CATS = ["Transform", "Security", "Time", "Data", "Design", "Dev helpers", "AI", "Focus Games"];
 
   var TOOLS = [
     { id: "transform", path: "transform/", name: "Payload Knife", blurb: "Pretty/minify JSON, JSON to CSV, and cURL to fetch.", cat: "Transform" },
@@ -37,7 +37,12 @@
     { id: "base", path: "base/", name: "Number Base", blurb: "Convert between binary, octal, decimal, and hex.", cat: "Dev helpers" },
     { id: "stats", path: "stats/", name: "Local Stats", blurb: "See tool opens stored only in this browser.", cat: "Dev helpers" },
     { id: "skillbook", path: "skillbook/", name: "Skillbook", blurb: "Reusable skills for Copilot, Claude Code, and Codex.", cat: "AI" },
-    { id: "promptbook", path: "promptbook/", name: "Promptbook", blurb: "Ready-to-paste prompts for the same three tools.", cat: "AI" }
+    { id: "promptbook", path: "promptbook/", name: "Promptbook", blurb: "Ready-to-paste prompts for the same three tools.", cat: "AI" },
+    { id: "games", path: "games/", name: "Games Hub", blurb: "Simple focus games that run fully in your browser.", cat: "Focus Games" },
+    { id: "memory", path: "games/memory/", name: "Memory Match", blurb: "Flip cards and find matching pairs.", cat: "Focus Games" },
+    { id: "sequence", path: "games/sequence/", name: "Sequence Recall", blurb: "Watch the taps, then repeat the pattern.", cat: "Focus Games" },
+    { id: "numbers", path: "games/numbers/", name: "Number Slide", blurb: "Slide tiles to sort 1–15 on a 4×4 board.", cat: "Focus Games" },
+    { id: "words", path: "games/words/", name: "Word Scramble", blurb: "Unscramble a common word, then try the next one.", cat: "Focus Games" }
   ];
 
   function rootPrefix() {
@@ -46,11 +51,11 @@
       return body.getAttribute("data-root");
     }
     var path = (location.pathname || "").replace(/\\/g, "/");
-    if (/\/[a-z0-9-]+\/?(index\.html)?$/i.test(path) && path !== "/" && !/index\.html$/.test(path.replace(/\/[a-z0-9-]+\/?$/, "/"))) {
-      return "../";
-    }
-    if (/\/[a-z0-9-]+\/index\.html$/i.test(path)) return "../";
-    return "";
+    path = path.replace(/\/index\.html$/i, "/").replace(/\/+$/, "") || "/";
+    if (path === "/" || path === "") return "";
+    var parts = path.split("/").filter(Boolean);
+    if (!parts.length) return "";
+    return new Array(parts.length + 1).join("../");
   }
 
   function currentTool() {

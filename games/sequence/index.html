@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sequence Recall | RMKR Toolkit</title>
+  <meta name="description" content="Simon-style sequence recall. Watch the pads, then repeat. Best level saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="sequence">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Sequence Recall</h1>
+  <p class="page-lead">Watch the pads light up, then tap the same order. Each round adds one step.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Level: <strong id="level">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start when ready.</p>
+  <div class="game-board-wrap">
+    <div class="sequence-pads" id="pads" aria-label="Sequence pads">
+      <button type="button" class="seq-pad" data-pad="0" aria-label="Pad 1" disabled>1</button>
+      <button type="button" class="seq-pad" data-pad="1" aria-label="Pad 2" disabled>2</button>
+      <button type="button" class="seq-pad" data-pad="2" aria-label="Pad 3" disabled>3</button>
+      <button type="button" class="seq-pad" data-pad="3" aria-label="Pad 4" disabled>4</button>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-sequence-best";
+  var seq = [];
+  var step = 0;
+  var playing = false;
+  var accepting = false;
+  var pads = Array.prototype.slice.call(document.querySelectorAll(".seq-pad"));
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return Math.max(n, cur || 0);
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function setPadsEnabled(on) {
+    pads.forEach(function (p) { p.disabled = !on; });
+  }
+  function sleep(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  }
+  function light(pad, ms) {
+    return new Promise(function (resolve) {
+      pad.classList.add("is-lit");
+      setTimeout(function () {
+        pad.classList.remove("is-lit");
+        resolve();
+      }, ms);
+    });
+  }
+  async function playback() {
+    accepting = false;
+    setPadsEnabled(false);
+    setNote("Watch…");
+    await sleep(450);
+    for (var i = 0; i < seq.length; i++) {
+      await light(pads[seq[i]], 420);
+      await sleep(180);
+    }
+    step = 0;
+    accepting = true;
+    setPadsEnabled(true);
+    setNote("Your turn — repeat the sequence.");
+  }
+  async function nextRound() {
+    seq.push(Math.floor(Math.random() * 4));
+    document.getElementById("level").textContent = String(seq.length);
+    await playback();
+  }
+  function fail() {
+    accepting = false;
+    playing = false;
+    setPadsEnabled(false);
+    var best = saveBest(Math.max(0, seq.length - 1));
+    renderBest();
+    setNote("Missed it at level " + seq.length + ". Best: " + (best == null ? "—" : best) + ". Press Start to try again.", "err");
+    document.getElementById("startBtn").textContent = "Start";
+  }
+  function onPad(e) {
+    if (!accepting || !playing) return;
+    var i = parseInt(e.currentTarget.getAttribute("data-pad"), 10);
+    light(e.currentTarget, 180);
+    if (i !== seq[step]) {
+      fail();
+      return;
+    }
+    step += 1;
+    if (step >= seq.length) {
+      accepting = false;
+      setPadsEnabled(false);
+      var best = saveBest(seq.length);
+      renderBest();
+      setNote("Nice — level " + seq.length + " cleared.", "ok");
+      setTimeout(function () { nextRound(); }, 700);
+    }
+  }
+  function start() {
+    seq = [];
+    step = 0;
+    playing = true;
+    document.getElementById("level").textContent = "0";
+    document.getElementById("startBtn").textContent = "Restart";
+    setNote("Get ready…");
+    nextRound();
+  }
+  pads.forEach(function (p) { p.addEventListener("click", onPad); });
+  document.getElementById("startBtn").addEventListener("click", start);
+  renderBest();
+})();
+</script>
+</body>
+</html>

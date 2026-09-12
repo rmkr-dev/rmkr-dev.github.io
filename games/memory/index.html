@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Match | RMKR Toolkit</title>
+  <meta name="description" content="Flip cards and match pairs. Client-side memory game with local best score.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="memory">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Memory Match</h1>
+  <p class="page-lead">Flip two cards at a time. Match all eight pairs. Lower moves is better.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Moves: <strong id="moves">0</strong></span>
+      <span>Matched: <strong id="matched">0</strong>/8</span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="newGame">New game</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status"></p>
+  <div class="game-board-wrap">
+    <div class="memory-grid" id="board" aria-label="Memory board"></div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-memory-best";
+  var SYMBOLS = ["★", "◆", "●", "▲", "■", "✦", "❖", "◉"];
+  var deck = [];
+  var open = [];
+  var lock = false;
+  var moves = 0;
+  var matched = 0;
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n < cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function updateHud() {
+    document.getElementById("moves").textContent = String(moves);
+    document.getElementById("matched").textContent = String(matched);
+  }
+  function build() {
+    deck = shuffle(SYMBOLS.concat(SYMBOLS).map(function (s, i) {
+      return { id: i, sym: s, matched: false };
+    }));
+    open = [];
+    lock = false;
+    moves = 0;
+    matched = 0;
+    updateHud();
+    renderBest();
+    setNote("Tap a card to start.");
+    var board = document.getElementById("board");
+    board.innerHTML = "";
+    deck.forEach(function (card, idx) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "memory-card is-back";
+      btn.setAttribute("aria-label", "Card " + (idx + 1) + ", face down");
+      btn.dataset.idx = String(idx);
+      btn.addEventListener("click", onFlip);
+      board.appendChild(btn);
+    });
+  }
+  function faceUp(btn, card) {
+    btn.classList.remove("is-back");
+    btn.textContent = card.sym;
+    btn.setAttribute("aria-label", "Card showing " + card.sym);
+  }
+  function faceDown(btn) {
+    btn.classList.add("is-back");
+    btn.textContent = "";
+    btn.setAttribute("aria-label", "Card face down");
+  }
+  function onFlip(e) {
+    if (lock) return;
+    var btn = e.currentTarget;
+    var idx = parseInt(btn.dataset.idx, 10);
+    var card = deck[idx];
+    if (!card || card.matched) return;
+    if (open.indexOf(idx) !== -1) return;
+    faceUp(btn, card);
+    open.push(idx);
+    if (open.length < 2) return;
+    moves += 1;
+    updateHud();
+    var a = open[0], b = open[1];
+    if (deck[a].sym === deck[b].sym) {
+      deck[a].matched = deck[b].matched = true;
+      matched += 1;
+      document.getElementById("board").children[a].classList.add("is-matched");
+      document.getElementById("board").children[a].disabled = true;
+      document.getElementById("board").children[b].classList.add("is-matched");
+      document.getElementById("board").children[b].disabled = true;
+      open = [];
+      updateHud();
+      if (matched === 8) {
+        var best = saveBest(moves);
+        renderBest();
+        setNote("Cleared in " + moves + " moves. Best: " + best + ".", "ok");
+      } else {
+        setNote("Match!");
+      }
+    } else {
+      lock = true;
+      setNote("No match — try again.");
+      setTimeout(function () {
+        faceDown(document.getElementById("board").children[a]);
+        faceDown(document.getElementById("board").children[b]);
+        open = [];
+        lock = false;
+      }, 650);
+    }
+  }
+  document.getElementById("newGame").addEventListener("click", build);
+  build();
+})();
+</script>
+</body>
+</html>
