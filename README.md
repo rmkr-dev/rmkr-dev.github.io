@@ -70,13 +70,14 @@ Skillbook and Promptbook load JSON over `fetch`, so use a local server (opening 
 
 ### Focus Games
 
-Lightweight browser games for a quick break. No accounts, no ads, and scores stay in `localStorage` only. No sound effects in this first wave.
+Lightweight browser games for a quick break. No accounts, no ads, and scores stay in `localStorage` only. No sound effects by default.
 
 - **Games Hub** (`games/`) — landing page with links and short descriptions
 - **Memory Match** (`games/memory/`) — flip cards, find pairs; best move count
 - **Sequence Recall** (`games/sequence/`) — Simon-lite pads; best level reached
 - **Number Slide** (`games/numbers/`) — 15-puzzle on a 4×4 board; best move count
 - **Word Scramble** (`games/words/`) — unscramble a common word; best streak
+- **Reaction Tap** (`games/reaction/`) — wait for gold, then tap; best average ms
 
 ### AI
 

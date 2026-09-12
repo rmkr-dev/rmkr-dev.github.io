@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reaction Tap | RMKR Toolkit</title>
+  <meta name="description" content="Wait for the pad to turn gold, then tap. Best reaction time saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="reaction">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Reaction Tap</h1>
+  <p class="page-lead">Wait for the pad to turn gold, then tap as fast as you can. Early taps count as a miss.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Last: <strong id="last">—</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+      <span>Round: <strong id="round">0</strong>/5</span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, then wait for gold.</p>
+  <div class="game-board-wrap">
+    <button type="button" class="reaction-pad is-idle" id="pad" aria-label="Reaction pad" disabled>Ready</button>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-reaction-best";
+  var TOTAL = 5;
+  var state = "idle"; // idle | wait | go | done
+  var waitTimer = null;
+  var goAt = 0;
+  var round = 0;
+  var times = [];
+  var pad = document.getElementById("pad");
+  var startBtn = document.getElementById("startBtn");
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n < cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : b + " ms";
+  }
+  function setPad(cls, label, enabled) {
+    pad.className = "reaction-pad " + cls;
+    pad.textContent = label;
+    pad.disabled = !enabled;
+  }
+  function clearWait() {
+    if (waitTimer) {
+      clearTimeout(waitTimer);
+      waitTimer = null;
+    }
+  }
+  function avg(arr) {
+    if (!arr.length) return null;
+    var s = 0;
+    for (var i = 0; i < arr.length; i++) s += arr[i];
+    return Math.round(s / arr.length);
+  }
+  function armWait() {
+    state = "wait";
+    setPad("is-wait", "Wait…", true);
+    setNote("Don't tap yet — wait for gold.");
+    var delay = 1200 + Math.floor(Math.random() * 2800);
+    waitTimer = setTimeout(function () {
+      waitTimer = null;
+      state = "go";
+      goAt = performance.now();
+      setPad("is-go", "TAP!", true);
+      setNote("Go!");
+    }, delay);
+  }
+  function finishSet() {
+    state = "done";
+    clearWait();
+    var a = avg(times);
+    var best = a == null ? loadBest() : saveBest(a);
+    renderBest();
+    setPad("is-idle", "Done", false);
+    document.getElementById("last").textContent = a == null ? "—" : a + " ms avg";
+    setNote(
+      "Set complete. Average " + (a == null ? "—" : a + " ms") +
+      ". Best average: " + (best == null ? "—" : best + " ms") + ".",
+      "ok"
+    );
+    startBtn.textContent = "Play again";
+    startBtn.disabled = false;
+  }
+  function startSet() {
+    clearWait();
+    round = 0;
+    times = [];
+    document.getElementById("round").textContent = "0";
+    document.getElementById("last").textContent = "—";
+    renderBest();
+    startBtn.disabled = true;
+    startBtn.textContent = "In progress";
+    document.getElementById("round").textContent = "0/" + TOTAL;
+    armWait();
+  }
+  function nextOrFinish() {
+    if (round >= TOTAL) {
+      finishSet();
+      return;
+    }
+    setTimeout(armWait, 650);
+  }
+  function onPad() {
+    if (state === "wait") {
+      clearWait();
+      state = "idle";
+      setPad("is-early", "Too soon", false);
+      setNote("Too early — that round is void. Stay ready.", "err");
+      setTimeout(function () {
+        if (round >= TOTAL) {
+          finishSet();
+        } else {
+          armWait();
+        }
+      }, 900);
+      return;
+    }
+    if (state !== "go") return;
+    var ms = Math.max(1, Math.round(performance.now() - goAt));
+    times.push(ms);
+    round += 1;
+    document.getElementById("round").textContent = String(round) + "/" + TOTAL;
+    document.getElementById("last").textContent = ms + " ms";
+    state = "idle";
+    setPad("is-idle", ms + " ms", false);
+    setNote("Nice — " + ms + " ms.");
+    if (round >= TOTAL) {
+      setTimeout(finishSet, 500);
+    } else {
+      nextOrFinish();
+    }
+  }
+  startBtn.addEventListener("click", startSet);
+  pad.addEventListener("click", onPad);
+  renderBest();
+})();
+</script>
+</body>
+</html>
