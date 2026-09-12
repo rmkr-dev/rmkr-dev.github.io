@@ -197,6 +197,24 @@
       ],
       "formatNotes": "Paste into Copilot Chat / Claude Code / Codex. Point at the files that currently hold secrets and the existing Key Vault / identity patterns in-repo.",
       "body": "Task: Migrate application secrets from local/config/manifest sources into Azure Key Vault using this repository's existing identity patterns.\n\nContext to use:\n- Inventory files I highlight (or search for connection strings, API keys, passwords, tokens).\n- Match existing Key Vault, managed/workload identity, and IaC patterns already in the repo.\n- Prefer references over copying secret values into new locations.\n\nRequirements:\n1. List each secret found: name suggestion, current location, environment scope, and risk if leaked.\n2. Propose Key Vault secret names and access (which identity gets get/list).\n3. Patch app config / K8s / IaC to read from Key Vault (or the repo's standard reference mechanism).\n4. Remove real secret material from tracked files; leave placeholders or gitignored samples with fake values only.\n5. Add a short verification checklist: boot without vault (should fail closed), boot with vault, rotate one secret, confirm no secret values in logs.\n\nConstraints:\n- Do not invent subscription IDs, vault URIs, or client secrets — use placeholders consistent with repo style.\n- Do not print actual secret values in the response or in new files.\n- Keep the diff minimal; no unrelated refactors.\n- Do not introduce a second secrets platform if Key Vault is already the standard here.\n\nOutput:\n1) Inventory table (names only for values)\n2) Plan (ordered steps, including dual-read if needed)\n3) Code/IaC/config changes\n4) RBAC / identity notes\n5) Verification commands and residual risks"
+    },
+    {
+      "id": "add-spring-resilience-patterns",
+      "title": "Add Spring Resilience Patterns",
+      "whenToUse": "You have an outbound HTTP/DB/messaging call in a Spring Boot service and want reviewable Resilience4j (or equivalent) protection.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "java",
+        "spring-boot",
+        "resilience",
+        "microservices"
+      ],
+      "formatNotes": "Paste into Copilot Chat / Claude Code / Codex. Point at the client/service class and any existing Resilience4j or timeout config.",
+      "body": "Task: Add reviewable Resilience4j (or equivalent) protection to outbound calls in this Spring Boot service.\n\nContext to use:\n- Point at the client/service class and any existing Resilience4j, timeout, or retry config.\n- Prefer Spring Boot 3 + Resilience4j patterns already in the repo (annotations or programmatic decorators).\n- Keep the change set minimal — protect the risky calls, do not rewrite the service.\n\nRequirements:\n1. Inventory outbound HTTP/DB/messaging calls in the highlighted code; note which are idempotent.\n2. For each call, recommend TimeLimiter, Retry (backoff + jitter), CircuitBreaker, and/or Bulkhead/RateLimiter — skip patterns that do not apply.\n3. Add named config in application.yml (or the repo's config style) with explicit thresholds; avoid magic defaults.\n4. Implement fallbacks or typed error mapping; never swallow exceptions. Document fail-fast vs fail-open per dependency.\n5. Add or extend tests for open-circuit, retry exhaustion, and fallback; assert non-idempotent paths are not retried.\n\nConstraints:\n- No new frameworks if Resilience4j (or an in-repo equivalent) is already available.\n- Do not weaken timeouts \"to make tests pass.\"\n- No secrets in config or tests; keep diffs small and reviewable.\n\nOutput:\n1) Inventory table (call → patterns → idempotent?)\n2) Code + YAML changes\n3) Tests for open-circuit / fallback\n4) Verification checklist (boot, breaker force-open, metrics/health)\n5) Residual risks"
     }
   ]
 }
