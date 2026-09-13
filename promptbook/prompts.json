@@ -215,6 +215,24 @@
       ],
       "formatNotes": "Paste into Copilot Chat / Claude Code / Codex. Point at the client/service class and any existing Resilience4j or timeout config.",
       "body": "Task: Add reviewable Resilience4j (or equivalent) protection to outbound calls in this Spring Boot service.\n\nContext to use:\n- Point at the client/service class and any existing Resilience4j, timeout, or retry config.\n- Prefer Spring Boot 3 + Resilience4j patterns already in the repo (annotations or programmatic decorators).\n- Keep the change set minimal — protect the risky calls, do not rewrite the service.\n\nRequirements:\n1. Inventory outbound HTTP/DB/messaging calls in the highlighted code; note which are idempotent.\n2. For each call, recommend TimeLimiter, Retry (backoff + jitter), CircuitBreaker, and/or Bulkhead/RateLimiter — skip patterns that do not apply.\n3. Add named config in application.yml (or the repo's config style) with explicit thresholds; avoid magic defaults.\n4. Implement fallbacks or typed error mapping; never swallow exceptions. Document fail-fast vs fail-open per dependency.\n5. Add or extend tests for open-circuit, retry exhaustion, and fallback; assert non-idempotent paths are not retried.\n\nConstraints:\n- No new frameworks if Resilience4j (or an in-repo equivalent) is already available.\n- Do not weaken timeouts \"to make tests pass.\"\n- No secrets in config or tests; keep diffs small and reviewable.\n\nOutput:\n1) Inventory table (call → patterns → idempotent?)\n2) Code + YAML changes\n3) Tests for open-circuit / fallback\n4) Verification checklist (boot, breaker force-open, metrics/health)\n5) Residual risks"
+    },
+    {
+      "id": "review-helm-chart-aks",
+      "title": "Review This Helm Chart for AKS",
+      "whenToUse": "You have a Helm chart (or PR diff) and want a structured AKS-oriented review before merge.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "azure",
+        "aks",
+        "helm",
+        "review"
+      ],
+      "formatNotes": "All three. Point the tool at the chart directory or PR files first. Prefer editing templates/values in place.",
+      "body": "Review the Helm chart at the path I provide for Azure AKS production readiness.\n\nCheck and report on:\n- values.yaml / schema: safe defaults, documented keys, no committed secrets\n- Image pinning (no latest), resource requests/limits, probes\n- securityContext (non-root, capabilities, read-only FS, privilege escalation)\n- ServiceAccount / RBAC least privilege\n- AKS identity and secrets approach (Workload Identity, Key Vault CSI, external secrets vs embedded kube secrets)\n- Ingress/Service exposure and TLS assumptions\n- Rollout safety (strategy, PDB, config checksum restarts)\n- Template correctness (helpers, labels/selectors, required checks)\n\nOutput format:\n1. Severity-ordered findings (blocker / major / minor)\n2. Concrete patches (values or template snippets) for each blocker/major\n3. Validation commands (`helm lint`, `helm template` overlays)\n4. Explicit assumptions if cluster add-ons are not evidenced in-repo\n\nDo not invent operators or ingress controllers that are not present in the repository."
     }
   ]
 }
