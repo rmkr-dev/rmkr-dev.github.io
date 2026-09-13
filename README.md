@@ -79,6 +79,7 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **Number Slide** (`games/numbers/`) — 15-puzzle on a 4×4 board; best move count
 - **Word Scramble** (`games/words/`) — unscramble a common word; best streak
 - **Reaction Tap** (`games/reaction/`) — wait for gold, tap fast; best average ms
+- **Tap Order** (`games/order/`) — tap 1–9 in order on a 3×3 grid; best time
 
 ### AI
 
