@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casual Quiz | RMKR Toolkit</title>
+  <meta name="description" content="Casual multiple-choice quiz. Switch topics and levels anytime. Marks stay in this browser. Questions live in a JSON file.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="quiz">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title" id="quizTitle">Casual Quiz</h1>
+  <p class="page-lead" id="quizLead">Easy multiple-choice questions to pass the time. Switch topic or level whenever you like. Marks stay in this browser only.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Session: <strong id="sessionScore">0</strong></span>
+      <span>Lifetime: <strong id="lifetime">0</strong></span>
+      <span>Best session: <strong id="bestSession">—</strong></span>
+      <span>This round: <strong id="roundStat">0/0</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-ghost" id="resetSession">New session</button>
+    </div>
+  </div>
+
+  <div class="quiz-pickers">
+    <div class="quiz-picker-row">
+      <p class="label">Topic</p>
+      <div class="book-chips" id="topicChips" role="tablist" aria-label="Quiz topic"></div>
+    </div>
+    <div class="quiz-picker-row">
+      <p class="label">Level</p>
+      <div class="book-chips" id="levelChips" role="tablist" aria-label="Quiz level"></div>
+    </div>
+  </div>
+
+  <p class="game-note" id="note" role="status">Loading questions…</p>
+
+  <div class="card quiz-card" id="quizCard" hidden>
+    <p class="quiz-meta" id="quizMeta"></p>
+    <h2 class="quiz-question" id="questionText"></h2>
+    <div class="quiz-options" id="options" role="group" aria-label="Answer choices"></div>
+    <div class="quiz-actions">
+      <button type="button" class="btn btn-ghost" id="hintBtn">Hint</button>
+      <button type="button" class="btn btn-ghost" id="skipBtn">Skip</button>
+      <button type="button" class="btn btn-gold" id="nextBtn">Next</button>
+    </div>
+    <p class="quiz-help" id="help" hidden></p>
+  </div>
+</main>
+<script>
+(function () {
+  var DATA_URL = "questions.json";
+  var PREF_KEY = "rmkr-game-quiz-pref";
+  var data = null;
+  var marks = { lifetime: 0, answered: 0, correct: 0, bestSession: 0, byTopic: {} };
+  var storageKey = "rmkr-game-quiz-marks";
+  var topicId = "general";
+  var levelId = "easy";
+  var current = null;
+  var shuffledOpts = [];
+  var answered = false;
+  var hinted = false;
+  var sessionScore = 0;
+  var sessionCorrect = 0;
+  var sessionAsked = 0;
+  var recent = [];
+
+  function byId(id) { return document.getElementById(id); }
+
+  function setNote(msg, kind) {
+    var el = byId("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+
+  function setHelp(msg, kind) {
+    var el = byId("help");
+    if (!msg) {
+      el.hidden = true;
+      el.textContent = "";
+      el.className = "quiz-help";
+      return;
+    }
+    el.hidden = false;
+    el.textContent = msg;
+    el.className = "quiz-help" + (kind ? " " + kind : "");
+  }
+
+  function topicById(id) {
+    var list = data.topics || [];
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return null;
+  }
+
+  function levelById(id) {
+    var list = data.levels || [];
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return null;
+  }
+
+  function isMix(topic) {
+    return !!(topic && (topic.mix === true || topic.combine === true));
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function loadMarks() {
+    try {
+      var raw = localStorage.getItem(storageKey);
+      if (!raw) return;
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return;
+      marks.lifetime = parseInt(parsed.lifetime, 10) || 0;
+      marks.answered = parseInt(parsed.answered, 10) || 0;
+      marks.correct = parseInt(parsed.correct, 10) || 0;
+      marks.bestSession = parseInt(parsed.bestSession, 10) || 0;
+      marks.byTopic = parsed.byTopic && typeof parsed.byTopic === "object" ? parsed.byTopic : {};
+    } catch (e) { /* private mode */ }
+  }
+
+  function saveMarks() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(marks));
+    } catch (e) { /* private mode */ }
+  }
+
+  function loadPref() {
+    try {
+      var raw = localStorage.getItem(PREF_KEY);
+      if (!raw) return;
+      var parsed = JSON.parse(raw);
+      if (parsed && parsed.topic) topicId = parsed.topic;
+      if (parsed && parsed.level) levelId = parsed.level;
+    } catch (e) { /* ignore */ }
+  }
+
+  function savePref() {
+    try {
+      localStorage.setItem(PREF_KEY, JSON.stringify({ topic: topicId, level: levelId }));
+    } catch (e) { /* ignore */ }
+  }
+
+  function renderHud() {
+    byId("sessionScore").textContent = String(sessionScore);
+    byId("lifetime").textContent = String(marks.lifetime);
+    byId("bestSession").textContent = marks.bestSession > 0 ? String(marks.bestSession) : "—";
+    byId("roundStat").textContent = sessionCorrect + "/" + sessionAsked;
+  }
+
+  function bumpBest() {
+    if (sessionScore > marks.bestSession) {
+      marks.bestSession = sessionScore;
+      saveMarks();
+    }
+  }
+
+  function pool() {
+    var qs = data.questions || [];
+    var topic = topicById(topicId);
+    var mix = isMix(topic);
+    var out = [];
+    for (var i = 0; i < qs.length; i++) {
+      var q = qs[i];
+      if (q.level !== levelId) continue;
+      if (mix) {
+        var src = topicById(q.topic);
+        if (src && isMix(src)) continue;
+        out.push(q);
+      } else if (q.topic === topicId) {
+        out.push(q);
+      }
+    }
+    return out;
+  }
+
+  function pickQuestion() {
+    var all = pool();
+    if (!all.length) return null;
+    var fresh = all.filter(function (q) { return recent.indexOf(q.id) === -1; });
+    if (!fresh.length) {
+      recent = [];
+      fresh = all;
+    }
+    var q = fresh[Math.floor(Math.random() * fresh.length)];
+    recent.push(q.id);
+    if (recent.length > 24) recent.shift();
+    return q;
+  }
+
+  function renderChips(container, items, selected, onPick, nameKey) {
+    container.innerHTML = "";
+    items.forEach(function (item) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip" + (item.id === selected ? " is-active" : "");
+      btn.textContent = item[nameKey] || item.name;
+      btn.setAttribute("role", "tab");
+      btn.setAttribute("aria-selected", item.id === selected ? "true" : "false");
+      btn.title = item.blurb || item.name;
+      btn.addEventListener("click", function () { onPick(item.id); });
+      container.appendChild(btn);
+    });
+  }
+
+  function renderPickers() {
+    renderChips(byId("topicChips"), data.topics || [], topicId, function (id) {
+      if (id === topicId) return;
+      topicId = id;
+      savePref();
+      renderPickers();
+      nextQuestion(true);
+    }, "name");
+    renderChips(byId("levelChips"), data.levels || [], levelId, function (id) {
+      if (id === levelId) return;
+      levelId = id;
+      savePref();
+      renderPickers();
+      nextQuestion(true);
+    }, "name");
+  }
+
+  function optionLetter(i) {
+    return String.fromCharCode(65 + i);
+  }
+
+  function lockOptions() {
+    var btns = byId("options").querySelectorAll("button");
+    for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+  }
+
+  function reveal(chosen) {
+    var btns = byId("options").querySelectorAll("button");
+    for (var i = 0; i < btns.length; i++) {
+      var val = btns[i].getAttribute("data-value");
+      if (val === current.answer) btns[i].classList.add("is-correct");
+      else if (val === chosen && chosen !== current.answer) btns[i].classList.add("is-wrong");
+    }
+  }
+
+  function pointsFor(q) {
+    if (q && typeof q.points === "number" && q.points >= 0) return q.points;
+    var lv = levelById(levelId);
+    return lv && typeof lv.points === "number" ? lv.points : 1;
+  }
+
+  function topicName(id) {
+    var t = topicById(id);
+    return t ? t.name : id;
+  }
+
+  function levelName(id) {
+    var lv = levelById(id);
+    return lv ? lv.name : id;
+  }
+
+  function onChoose(value) {
+    if (answered || !current) return;
+    answered = true;
+    sessionAsked += 1;
+    lockOptions();
+    reveal(value);
+    var ok = value === current.answer;
+    var pts = pointsFor(current);
+    if (ok) {
+      sessionScore += pts;
+      sessionCorrect += 1;
+      marks.lifetime += pts;
+      marks.correct += 1;
+      marks.answered += 1;
+      var bucket = current.topic;
+      marks.byTopic[bucket] = (marks.byTopic[bucket] || 0) + pts;
+      bumpBest();
+      saveMarks();
+      renderHud();
+      setNote("Nice — that's right. +" + pts + " mark" + (pts === 1 ? "" : "s") + ".", "ok");
+      setHelp(current.explain || ("The answer is " + current.answer + "."), "ok");
+    } else {
+      marks.answered += 1;
+      saveMarks();
+      renderHud();
+      setNote("Not this one. The right answer is highlighted.", "err");
+      setHelp("Answer: " + current.answer + ". " + (current.explain || "Have another go on the next question."), "err");
+    }
+    byId("nextBtn").focus();
+  }
+
+  function showHint() {
+    if (!current) return;
+    hinted = true;
+    if (answered) {
+      setHelp(current.explain || ("Answer: " + current.answer), answered ? "ok" : "");
+      return;
+    }
+    setHelp("Hint: " + (current.hint || "Look at the options and pick the one that feels familiar."), "");
+  }
+
+  function skipQuestion() {
+    if (!current || answered) {
+      nextQuestion(false);
+      return;
+    }
+    answered = true;
+    sessionAsked += 1;
+    marks.answered += 1;
+    saveMarks();
+    renderHud();
+    lockOptions();
+    reveal(null);
+    setNote("Skipped — no marks this round.", "err");
+    setHelp("Answer: " + current.answer + ". " + (current.explain || ""), "err");
+  }
+
+  function nextQuestion(switched) {
+    current = pickQuestion();
+    answered = false;
+    hinted = false;
+    setHelp("");
+    var card = byId("quizCard");
+    if (!current) {
+      card.hidden = true;
+      setNote("No questions for this topic and level yet. Add some in questions.json.", "err");
+      return;
+    }
+    card.hidden = false;
+    shuffledOpts = shuffle(current.options || []);
+    var topicLabel = isMix(topicById(topicId)) ? topicName(current.topic) : topicName(topicId);
+    byId("quizMeta").textContent = topicLabel + " · " + levelName(levelId) + " · " + pointsFor(current) + " mark" + (pointsFor(current) === 1 ? "" : "s");
+    byId("questionText").textContent = current.question;
+    var box = byId("options");
+    box.innerHTML = "";
+    shuffledOpts.forEach(function (opt, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "quiz-option";
+      btn.setAttribute("data-value", opt);
+      btn.innerHTML = '<span class="quiz-option-key">' + optionLetter(i) + "</span><span>" + escapeHtml(opt) + "</span>";
+      btn.addEventListener("click", function () { onChoose(opt); });
+      box.appendChild(btn);
+    });
+    if (switched) {
+      setNote("Switched to " + topicName(topicId) + " · " + levelName(levelId) + ". Pick an answer when you like.");
+    } else {
+      setNote("Pick an answer. Use Hint if you want a nudge — this is just to pass the time.");
+    }
+    renderHud();
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function resetSession() {
+    bumpBest();
+    sessionScore = 0;
+    sessionCorrect = 0;
+    sessionAsked = 0;
+    recent = [];
+    renderHud();
+    nextQuestion(false);
+    setNote("New session. Marks from earlier stay in lifetime total.");
+  }
+
+  function onKey(e) {
+    if (!current || answered) {
+      if ((e.key === "Enter" || e.key === "n" || e.key === "N") && answered) {
+        e.preventDefault();
+        nextQuestion(false);
+      }
+      return;
+    }
+    var t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT")) return;
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= shuffledOpts.length) {
+      e.preventDefault();
+      onChoose(shuffledOpts[n - 1]);
+      return;
+    }
+    var letter = e.key && e.key.length === 1 ? e.key.toUpperCase() : "";
+    var idx = letter.charCodeAt(0) - 65;
+    if (idx >= 0 && idx < shuffledOpts.length) {
+      e.preventDefault();
+      onChoose(shuffledOpts[idx]);
+    }
+  }
+
+  function applyCatalog() {
+    if (data.title) {
+      byId("quizTitle").textContent = data.title;
+      document.title = data.title + " | RMKR Toolkit";
+    }
+    if (data.lead) byId("quizLead").textContent = data.lead;
+    if (data.storageKey) storageKey = data.storageKey;
+    loadMarks();
+    loadPref();
+    if (!topicById(topicId)) topicId = data.defaultTopic || (data.topics[0] && data.topics[0].id);
+    if (!levelById(levelId)) levelId = data.defaultLevel || (data.levels[0] && data.levels[0].id);
+    renderPickers();
+    renderHud();
+    nextQuestion(false);
+  }
+
+  byId("hintBtn").addEventListener("click", showHint);
+  byId("skipBtn").addEventListener("click", skipQuestion);
+  byId("nextBtn").addEventListener("click", function () { nextQuestion(false); });
+  byId("resetSession").addEventListener("click", resetSession);
+  document.addEventListener("keydown", onKey);
+
+  fetch(DATA_URL)
+    .then(function (res) {
+      if (!res.ok) throw new Error("Could not load " + DATA_URL);
+      return res.json();
+    })
+    .then(function (json) {
+      data = json;
+      if (!data || !Array.isArray(data.questions)) throw new Error("questions.json needs a questions array");
+      applyCatalog();
+    })
+    .catch(function (err) {
+      setNote((err && err.message) || "Could not load questions.json. Serve the site over http (not file://).", "err");
+    });
+})();
+</script>
+</body>
+</html>

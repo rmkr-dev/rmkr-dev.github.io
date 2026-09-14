@@ -1,0 +1,3062 @@
+{
+  "$schema_name": "rmkr-quiz",
+  "version": 1,
+  "title": "Casual Quiz",
+  "lead": "Easy multiple-choice questions to pass the time. Switch topic or level whenever you like. Marks stay in this browser only.",
+  "storageKey": "rmkr-game-quiz-marks",
+  "howToAdd": "Add objects to topics, levels, or questions. A topic with mix:true (General) automatically includes every other topic. answer must match one options string exactly. id must be unique kebab-case. The page reads this file only — no code changes needed.",
+  "defaultTopic": "general",
+  "defaultLevel": "easy",
+  "topics": [
+    {
+      "id": "general",
+      "name": "General",
+      "blurb": "A mix of every topic, shuffled.",
+      "mix": true
+    },
+    {
+      "id": "india",
+      "name": "India",
+      "blurb": "Places, people, and everyday facts."
+    },
+    {
+      "id": "tamil-nadu",
+      "name": "Tamil Nadu",
+      "blurb": "Language, food, temples, and coastline."
+    },
+    {
+      "id": "science",
+      "name": "Science",
+      "blurb": "Everyday science you already know."
+    },
+    {
+      "id": "technology",
+      "name": "Technology",
+      "blurb": "Phones, web, and simple computing."
+    },
+    {
+      "id": "history",
+      "name": "History",
+      "blurb": "Familiar people, dates, and places."
+    },
+    {
+      "id": "geography",
+      "name": "Geography",
+      "blurb": "Maps, oceans, and landmarks."
+    },
+    {
+      "id": "sports",
+      "name": "Sports",
+      "blurb": "Cricket, Olympics, and games."
+    },
+    {
+      "id": "food",
+      "name": "Food",
+      "blurb": "Dishes, spices, and kitchen facts."
+    },
+    {
+      "id": "nature",
+      "name": "Nature",
+      "blurb": "Animals, plants, and the outdoors."
+    },
+    {
+      "id": "cinema",
+      "name": "Cinema",
+      "blurb": "Films from Kollywood to the world."
+    },
+    {
+      "id": "space",
+      "name": "Space",
+      "blurb": "Planets, stars, and missions."
+    }
+  ],
+  "levels": [
+    {
+      "id": "easy",
+      "name": "Easy",
+      "points": 1
+    },
+    {
+      "id": "medium",
+      "name": "Medium",
+      "points": 2
+    },
+    {
+      "id": "hard",
+      "name": "Hard",
+      "points": 3
+    }
+  ],
+  "questions": [
+    {
+      "id": "india-easy-01",
+      "topic": "india",
+      "level": "easy",
+      "question": "What is the capital of India?",
+      "options": [
+        "Mumbai",
+        "New Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "answer": "New Delhi",
+      "hint": "Parliament and Rashtrapati Bhavan are here.",
+      "explain": "New Delhi is the capital of India."
+    },
+    {
+      "id": "india-easy-02",
+      "topic": "india",
+      "level": "easy",
+      "question": "What is the currency of India?",
+      "options": [
+        "Rupee",
+        "Dollar",
+        "Yen",
+        "Taka"
+      ],
+      "answer": "Rupee",
+      "hint": "Its symbol looks like a mix of R and the Latin letter.",
+      "explain": "India uses the Indian Rupee (INR)."
+    },
+    {
+      "id": "india-easy-03",
+      "topic": "india",
+      "level": "easy",
+      "question": "The Taj Mahal is in which city?",
+      "options": [
+        "Jaipur",
+        "Agra",
+        "Lucknow",
+        "Varanasi"
+      ],
+      "answer": "Agra",
+      "hint": "It sits on the banks of the Yamuna in Uttar Pradesh.",
+      "explain": "The Taj Mahal is in Agra."
+    },
+    {
+      "id": "india-easy-04",
+      "topic": "india",
+      "level": "easy",
+      "question": "What is the national animal of India?",
+      "options": [
+        "Lion",
+        "Elephant",
+        "Tiger",
+        "Peacock"
+      ],
+      "answer": "Tiger",
+      "hint": "It is a striped big cat.",
+      "explain": "The Bengal tiger is India's national animal."
+    },
+    {
+      "id": "india-easy-05",
+      "topic": "india",
+      "level": "easy",
+      "question": "In which year did India become independent?",
+      "options": [
+        "1942",
+        "1947",
+        "1950",
+        "1962"
+      ],
+      "answer": "1947",
+      "hint": "It is 15 August of this year.",
+      "explain": "India gained independence on 15 August 1947."
+    },
+    {
+      "id": "india-easy-06",
+      "topic": "india",
+      "level": "easy",
+      "question": "Which ocean lies to the south of India?",
+      "options": [
+        "Atlantic Ocean",
+        "Arctic Ocean",
+        "Pacific Ocean",
+        "Indian Ocean"
+      ],
+      "answer": "Indian Ocean",
+      "hint": "It shares the country's name.",
+      "explain": "The Indian Ocean borders India to the south."
+    },
+    {
+      "id": "india-medium-01",
+      "topic": "india",
+      "level": "medium",
+      "question": "Who was the first Prime Minister of independent India?",
+      "options": [
+        "Sardar Patel",
+        "Jawaharlal Nehru",
+        "Rajendra Prasad",
+        "Lal Bahadur Shastri"
+      ],
+      "answer": "Jawaharlal Nehru",
+      "hint": "He is often called Chacha Nehru.",
+      "explain": "Jawaharlal Nehru was the first Prime Minister."
+    },
+    {
+      "id": "india-medium-02",
+      "topic": "india",
+      "level": "medium",
+      "question": "How many states does India have (as commonly counted today)?",
+      "options": [
+        "22",
+        "25",
+        "28",
+        "31"
+      ],
+      "answer": "28",
+      "hint": "Union territories are counted separately.",
+      "explain": "India currently has 28 states and 8 union territories."
+    },
+    {
+      "id": "india-medium-03",
+      "topic": "india",
+      "level": "medium",
+      "question": "Which river is widely known as India's longest?",
+      "options": [
+        "Yamuna",
+        "Godavari",
+        "Ganga",
+        "Narmada"
+      ],
+      "answer": "Ganga",
+      "hint": "It is also called the Ganges.",
+      "explain": "The Ganga is commonly named India's longest river."
+    },
+    {
+      "id": "india-medium-04",
+      "topic": "india",
+      "level": "medium",
+      "question": "Which city is often called the Silicon Valley of India?",
+      "options": [
+        "Hyderabad",
+        "Pune",
+        "Bengaluru",
+        "Noida"
+      ],
+      "answer": "Bengaluru",
+      "hint": "It is the capital of Karnataka.",
+      "explain": "Bengaluru is widely called India's Silicon Valley."
+    },
+    {
+      "id": "india-medium-05",
+      "topic": "india",
+      "level": "medium",
+      "question": "What is the national flower of India?",
+      "options": [
+        "Rose",
+        "Lotus",
+        "Jasmine",
+        "Marigold"
+      ],
+      "answer": "Lotus",
+      "hint": "It grows in ponds and is used in many temple offerings.",
+      "explain": "The lotus is India's national flower."
+    },
+    {
+      "id": "india-medium-06",
+      "topic": "india",
+      "level": "medium",
+      "question": "Which is the highest mountain peak in India?",
+      "options": [
+        "Nanda Devi",
+        "Kangchenjunga",
+        "Mount Everest",
+        "Anamudi"
+      ],
+      "answer": "Kangchenjunga",
+      "hint": "It stands on the India–Nepal border in Sikkim.",
+      "explain": "Kangchenjunga is the highest peak wholly in India (Everest is in Nepal/China)."
+    },
+    {
+      "id": "india-hard-01",
+      "topic": "india",
+      "level": "hard",
+      "question": "Who wrote India's national anthem, Jana Gana Mana?",
+      "options": [
+        "Bankim Chandra Chatterjee",
+        "Rabindranath Tagore",
+        "Sarojini Naidu",
+        "Subramania Bharati"
+      ],
+      "answer": "Rabindranath Tagore",
+      "hint": "He also wrote Bangladesh's national anthem.",
+      "explain": "Rabindranath Tagore wrote Jana Gana Mana."
+    },
+    {
+      "id": "india-hard-02",
+      "topic": "india",
+      "level": "hard",
+      "question": "India's first satellite was named after which ancient astronomer?",
+      "options": [
+        "Bhaskara",
+        "Aryabhata",
+        "Varahamihira",
+        "Brahmagupta"
+      ],
+      "answer": "Aryabhata",
+      "hint": "It launched in 1975.",
+      "explain": "Aryabhata was India's first satellite."
+    },
+    {
+      "id": "india-hard-03",
+      "topic": "india",
+      "level": "hard",
+      "question": "In which year did Goa become part of India?",
+      "options": [
+        "1947",
+        "1956",
+        "1961",
+        "1975"
+      ],
+      "answer": "1961",
+      "hint": "It followed the end of Portuguese rule.",
+      "explain": "Goa was integrated into India in 1961."
+    },
+    {
+      "id": "india-hard-04",
+      "topic": "india",
+      "level": "hard",
+      "question": "The Charminar is a landmark of which city?",
+      "options": [
+        "Lucknow",
+        "Hyderabad",
+        "Ahmedabad",
+        "Bhopal"
+      ],
+      "answer": "Hyderabad",
+      "hint": "The monument has four minarets.",
+      "explain": "The Charminar stands in Hyderabad."
+    },
+    {
+      "id": "india-hard-05",
+      "topic": "india",
+      "level": "hard",
+      "question": "Which state is often called the Spice Garden of India?",
+      "options": [
+        "Kerala",
+        "Goa",
+        "Assam",
+        "Sikkim"
+      ],
+      "answer": "Kerala",
+      "hint": "Cardamom hills and pepper vines are a clue.",
+      "explain": "Kerala is widely known as the Spice Garden of India."
+    },
+    {
+      "id": "india-hard-06",
+      "topic": "india",
+      "level": "hard",
+      "question": "Who is known as the Missile Man of India?",
+      "options": [
+        "Vikram Sarabhai",
+        "Homi Bhabha",
+        "A. P. J. Abdul Kalam",
+        "Satish Dhawan"
+      ],
+      "answer": "A. P. J. Abdul Kalam",
+      "hint": "He later became President of India.",
+      "explain": "A. P. J. Abdul Kalam is called the Missile Man of India."
+    },
+    {
+      "id": "tamil-nadu-easy-01",
+      "topic": "tamil-nadu",
+      "level": "easy",
+      "question": "What is the capital of Tamil Nadu?",
+      "options": [
+        "Madurai",
+        "Coimbatore",
+        "Chennai",
+        "Tiruchirappalli"
+      ],
+      "answer": "Chennai",
+      "hint": "It was earlier called Madras.",
+      "explain": "Chennai is the capital of Tamil Nadu."
+    },
+    {
+      "id": "tamil-nadu-easy-02",
+      "topic": "tamil-nadu",
+      "level": "easy",
+      "question": "Which language is widely spoken in Tamil Nadu?",
+      "options": [
+        "Telugu",
+        "Kannada",
+        "Malayalam",
+        "Tamil"
+      ],
+      "answer": "Tamil",
+      "hint": "The state's name starts with it.",
+      "explain": "Tamil is the official language of Tamil Nadu."
+    },
+    {
+      "id": "tamil-nadu-easy-03",
+      "topic": "tamil-nadu",
+      "level": "easy",
+      "question": "Bharatanatyam is a classical dance of which state?",
+      "options": [
+        "Kerala",
+        "Tamil Nadu",
+        "Odisha",
+        "Manipur"
+      ],
+      "answer": "Tamil Nadu",
+      "hint": "It is often performed to Carnatic music.",
+      "explain": "Bharatanatyam originated in Tamil Nadu."
+    },
+    {
+      "id": "tamil-nadu-easy-04",
+      "topic": "tamil-nadu",
+      "level": "easy",
+      "question": "Marina Beach is in which city?",
+      "options": [
+        "Pondicherry",
+        "Chennai",
+        "Rameswaram",
+        "Nagapattinam"
+      ],
+      "answer": "Chennai",
+      "hint": "It is one of the longest urban beaches in India.",
+      "explain": "Marina Beach is in Chennai."
+    },
+    {
+      "id": "tamil-nadu-easy-05",
+      "topic": "tamil-nadu",
+      "level": "easy",
+      "question": "Pongal is mainly a festival of which state?",
+      "options": [
+        "Kerala",
+        "Andhra Pradesh",
+        "Tamil Nadu",
+        "Karnataka"
+      ],
+      "answer": "Tamil Nadu",
+      "hint": "It is a harvest festival in January.",
+      "explain": "Pongal is Tamil Nadu's harvest festival."
+    },
+    {
+      "id": "tamil-nadu-easy-06",
+      "topic": "tamil-nadu",
+      "level": "easy",
+      "question": "Filter coffee is a popular drink in which Indian state?",
+      "options": [
+        "Punjab",
+        "Rajasthan",
+        "Tamil Nadu",
+        "Gujarat"
+      ],
+      "answer": "Tamil Nadu",
+      "hint": "It is often served in a steel tumbler and dabarah.",
+      "explain": "Filter coffee is a Tamil Nadu favourite."
+    },
+    {
+      "id": "tamil-nadu-medium-01",
+      "topic": "tamil-nadu",
+      "level": "medium",
+      "question": "The Meenakshi Amman Temple is in which city?",
+      "options": [
+        "Madurai",
+        "Kanchipuram",
+        "Thanjavur",
+        "Salem"
+      ],
+      "answer": "Madurai",
+      "hint": "The city is often called the temple city of Tamil Nadu.",
+      "explain": "Meenakshi Amman Temple is in Madurai."
+    },
+    {
+      "id": "tamil-nadu-medium-02",
+      "topic": "tamil-nadu",
+      "level": "medium",
+      "question": "Udhagamandalam is better known as which hill station?",
+      "options": [
+        "Kodaikanal",
+        "Ooty",
+        "Yercaud",
+        "Coonoor"
+      ],
+      "answer": "Ooty",
+      "hint": "It is in the Nilgiris.",
+      "explain": "Udhagamandalam is popularly called Ooty."
+    },
+    {
+      "id": "tamil-nadu-medium-03",
+      "topic": "tamil-nadu",
+      "level": "medium",
+      "question": "The Brihadeeswarar Temple stands in which town?",
+      "options": [
+        "Thanjavur",
+        "Chidambaram",
+        "Kumbakonam",
+        "Tirunelveli"
+      ],
+      "answer": "Thanjavur",
+      "hint": "It is a Chola-era UNESCO site.",
+      "explain": "Brihadeeswarar Temple is in Thanjavur."
+    },
+    {
+      "id": "tamil-nadu-medium-04",
+      "topic": "tamil-nadu",
+      "level": "medium",
+      "question": "Kanyakumari is at which tip of India?",
+      "options": [
+        "Northern",
+        "Eastern",
+        "Western",
+        "Southern"
+      ],
+      "answer": "Southern",
+      "hint": "Three seas meet near this town.",
+      "explain": "Kanyakumari is at the southern tip of mainland India."
+    },
+    {
+      "id": "tamil-nadu-medium-05",
+      "topic": "tamil-nadu",
+      "level": "medium",
+      "question": "Puthandu is the name of which occasion?",
+      "options": [
+        "Tamil New Year",
+        "Deepavali",
+        "Karthigai Deepam",
+        "Thai Poosam"
+      ],
+      "answer": "Tamil New Year",
+      "hint": "It usually falls in mid-April.",
+      "explain": "Puthandu is Tamil New Year."
+    },
+    {
+      "id": "tamil-nadu-medium-06",
+      "topic": "tamil-nadu",
+      "level": "medium",
+      "question": "Which range includes the Nilgiri hills of Tamil Nadu?",
+      "options": [
+        "Aravalli",
+        "Western Ghats",
+        "Vindhya",
+        "Satpura"
+      ],
+      "answer": "Western Ghats",
+      "hint": "They run along India's west coast.",
+      "explain": "The Nilgiris are part of the Western Ghats."
+    },
+    {
+      "id": "tamil-nadu-hard-01",
+      "topic": "tamil-nadu",
+      "level": "hard",
+      "question": "Who composed the Tirukkural?",
+      "options": [
+        "Kambar",
+        "Avvaiyar",
+        "Thiruvalluvar",
+        "Ilango Adigal"
+      ],
+      "answer": "Thiruvalluvar",
+      "hint": "A tall statue of the author stands at Kanyakumari.",
+      "explain": "Thiruvalluvar composed the Tirukkural."
+    },
+    {
+      "id": "tamil-nadu-hard-02",
+      "topic": "tamil-nadu",
+      "level": "hard",
+      "question": "The Shore Temple is at which coastal town?",
+      "options": [
+        "Rameswaram",
+        "Mahabalipuram",
+        "Tuticorin",
+        "Cuddalore"
+      ],
+      "answer": "Mahabalipuram",
+      "hint": "It is also called Mamallapuram.",
+      "explain": "The Shore Temple is in Mahabalipuram."
+    },
+    {
+      "id": "tamil-nadu-hard-03",
+      "topic": "tamil-nadu",
+      "level": "hard",
+      "question": "Which city is often called the Manchester of South India?",
+      "options": [
+        "Salem",
+        "Erode",
+        "Coimbatore",
+        "Karur"
+      ],
+      "answer": "Coimbatore",
+      "hint": "It is known for textiles and industry.",
+      "explain": "Coimbatore is called the Manchester of South India."
+    },
+    {
+      "id": "tamil-nadu-hard-04",
+      "topic": "tamil-nadu",
+      "level": "hard",
+      "question": "Carnatic music is the classical music tradition of which region?",
+      "options": [
+        "North India",
+        "South India",
+        "West India",
+        "Northeast India"
+      ],
+      "answer": "South India",
+      "hint": "Tamil Nadu is a major centre for it.",
+      "explain": "Carnatic music is the classical tradition of South India."
+    },
+    {
+      "id": "tamil-nadu-hard-05",
+      "topic": "tamil-nadu",
+      "level": "hard",
+      "question": "The Cauvery delta is often called a rice bowl of which region?",
+      "options": [
+        "North India",
+        "South India",
+        "Central India",
+        "East India"
+      ],
+      "answer": "South India",
+      "hint": "Thanjavur district is part of this fertile belt.",
+      "explain": "The Cauvery delta is known as a rice bowl of South India."
+    },
+    {
+      "id": "tamil-nadu-hard-06",
+      "topic": "tamil-nadu",
+      "level": "hard",
+      "question": "Tamil Nadu's state animal is which mountain goat?",
+      "options": [
+        "Markhor",
+        "Ibex",
+        "Nilgiri tahr",
+        "Himalayan tahr"
+      ],
+      "answer": "Nilgiri tahr",
+      "hint": "It lives in the Nilgiri hills.",
+      "explain": "The Nilgiri tahr is Tamil Nadu's state animal."
+    },
+    {
+      "id": "science-easy-01",
+      "topic": "science",
+      "level": "easy",
+      "question": "What is the chemical formula of water?",
+      "options": [
+        "CO2",
+        "H2O",
+        "O2",
+        "NaCl"
+      ],
+      "answer": "H2O",
+      "hint": "Two hydrogen atoms and one oxygen atom.",
+      "explain": "Water is H2O."
+    },
+    {
+      "id": "science-easy-02",
+      "topic": "science",
+      "level": "easy",
+      "question": "Which planet do we live on?",
+      "options": [
+        "Mars",
+        "Venus",
+        "Earth",
+        "Jupiter"
+      ],
+      "answer": "Earth",
+      "hint": "It is the third planet from the Sun.",
+      "explain": "We live on Earth."
+    },
+    {
+      "id": "science-easy-03",
+      "topic": "science",
+      "level": "easy",
+      "question": "Which gas do humans need to breathe in?",
+      "options": [
+        "Nitrogen",
+        "Oxygen",
+        "Carbon dioxide",
+        "Helium"
+      ],
+      "answer": "Oxygen",
+      "hint": "Trees release this gas.",
+      "explain": "Humans breathe in oxygen."
+    },
+    {
+      "id": "science-easy-04",
+      "topic": "science",
+      "level": "easy",
+      "question": "The Sun is best described as a…",
+      "options": [
+        "Planet",
+        "Moon",
+        "Star",
+        "Comet"
+      ],
+      "answer": "Star",
+      "hint": "It gives Earth heat and light.",
+      "explain": "The Sun is a star."
+    },
+    {
+      "id": "science-easy-05",
+      "topic": "science",
+      "level": "easy",
+      "question": "Ice melting into water is an example of a…",
+      "options": [
+        "Chemical change",
+        "Physical change",
+        "Nuclear reaction",
+        "Combustion"
+      ],
+      "answer": "Physical change",
+      "hint": "The substance stays H2O.",
+      "explain": "Melting is a physical change."
+    },
+    {
+      "id": "science-easy-06",
+      "topic": "science",
+      "level": "easy",
+      "question": "How many lungs does a typical human have?",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": "2",
+      "hint": "They sit in the chest, one on each side.",
+      "explain": "Humans typically have two lungs."
+    },
+    {
+      "id": "science-medium-01",
+      "topic": "science",
+      "level": "medium",
+      "question": "Photosynthesis in plants mainly happens in the…",
+      "options": [
+        "Roots",
+        "Flowers",
+        "Leaves",
+        "Seeds"
+      ],
+      "answer": "Leaves",
+      "hint": "Green chlorophyll is the clue.",
+      "explain": "Leaves are the main site of photosynthesis."
+    },
+    {
+      "id": "science-medium-02",
+      "topic": "science",
+      "level": "medium",
+      "question": "At sea level, water boils at about…",
+      "options": [
+        "0°C",
+        "50°C",
+        "100°C",
+        "212°C"
+      ],
+      "answer": "100°C",
+      "hint": "Think of a steaming kettle.",
+      "explain": "Water boils at about 100°C at sea level."
+    },
+    {
+      "id": "science-medium-03",
+      "topic": "science",
+      "level": "medium",
+      "question": "The centre of an atom is called the…",
+      "options": [
+        "Electron",
+        "Nucleus",
+        "Orbit",
+        "Shell"
+      ],
+      "answer": "Nucleus",
+      "hint": "Protons and neutrons sit there.",
+      "explain": "The nucleus is the centre of an atom."
+    },
+    {
+      "id": "science-medium-04",
+      "topic": "science",
+      "level": "medium",
+      "question": "Earth completes one trip around the Sun in about…",
+      "options": [
+        "24 hours",
+        "30 days",
+        "365 days",
+        "10 years"
+      ],
+      "answer": "365 days",
+      "hint": "That trip defines a year.",
+      "explain": "One orbit takes about 365 days."
+    },
+    {
+      "id": "science-medium-05",
+      "topic": "science",
+      "level": "medium",
+      "question": "Vitamin C is abundant in which fruits?",
+      "options": [
+        "Citrus fruits",
+        "Bananas only",
+        "Coconuts only",
+        "Dates only"
+      ],
+      "answer": "Citrus fruits",
+      "hint": "Oranges and lemons are examples.",
+      "explain": "Citrus fruits are rich in vitamin C."
+    },
+    {
+      "id": "science-medium-06",
+      "topic": "science",
+      "level": "medium",
+      "question": "Sound travels fastest through which of these?",
+      "options": [
+        "Air",
+        "Water",
+        "Steel",
+        "Outer space"
+      ],
+      "answer": "Steel",
+      "hint": "Solids usually carry sound better than liquids or gases.",
+      "explain": "Sound travels fastest through solids such as steel."
+    },
+    {
+      "id": "science-hard-01",
+      "topic": "science",
+      "level": "hard",
+      "question": "The SI unit of force is the…",
+      "options": [
+        "Joule",
+        "Watt",
+        "Newton",
+        "Pascal"
+      ],
+      "answer": "Newton",
+      "hint": "Named after a famous English scientist.",
+      "explain": "Force is measured in newtons."
+    },
+    {
+      "id": "science-hard-02",
+      "topic": "science",
+      "level": "hard",
+      "question": "DNA stands for…",
+      "options": [
+        "Deoxyribonucleic acid",
+        "Dynamic nuclear atom",
+        "Dual nitrogen acid",
+        "Direct neuron action"
+      ],
+      "answer": "Deoxyribonucleic acid",
+      "hint": "It carries genetic information.",
+      "explain": "DNA is deoxyribonucleic acid."
+    },
+    {
+      "id": "science-hard-03",
+      "topic": "science",
+      "level": "hard",
+      "question": "The pH of pure water is about…",
+      "options": [
+        "1",
+        "7",
+        "10",
+        "14"
+      ],
+      "answer": "7",
+      "hint": "It is neither acid nor base.",
+      "explain": "Pure water has a pH of about 7."
+    },
+    {
+      "id": "science-hard-04",
+      "topic": "science",
+      "level": "hard",
+      "question": "Sound cannot travel through a…",
+      "options": [
+        "Metal rod",
+        "Glass of water",
+        "Vacuum",
+        "Wooden door"
+      ],
+      "answer": "Vacuum",
+      "hint": "Space is nearly empty of air.",
+      "explain": "Sound needs a medium, so it cannot travel in a vacuum."
+    },
+    {
+      "id": "science-hard-05",
+      "topic": "science",
+      "level": "hard",
+      "question": "Which blood cells help the body fight infection?",
+      "options": [
+        "Red blood cells",
+        "White blood cells",
+        "Platelets",
+        "Plasma only"
+      ],
+      "answer": "White blood cells",
+      "hint": "They are part of the immune system.",
+      "explain": "White blood cells fight infection."
+    },
+    {
+      "id": "science-hard-06",
+      "topic": "science",
+      "level": "hard",
+      "question": "A magnet most strongly attracts which metal?",
+      "options": [
+        "Copper",
+        "Aluminium",
+        "Iron",
+        "Gold"
+      ],
+      "answer": "Iron",
+      "hint": "Steel fridge doors work for the same reason.",
+      "explain": "Iron (and steel) are strongly attracted to magnets."
+    },
+    {
+      "id": "technology-easy-01",
+      "topic": "technology",
+      "level": "easy",
+      "question": "WWW in a website address stands for…",
+      "options": [
+        "World Wide Web",
+        "Wide Wireless Wave",
+        "Web World Window",
+        "Western Web Wire"
+      ],
+      "answer": "World Wide Web",
+      "hint": "It is the system of linked pages on the internet.",
+      "explain": "WWW means World Wide Web."
+    },
+    {
+      "id": "technology-easy-02",
+      "topic": "technology",
+      "level": "easy",
+      "question": "Which company makes the iPhone?",
+      "options": [
+        "Google",
+        "Microsoft",
+        "Apple",
+        "Samsung"
+      ],
+      "answer": "Apple",
+      "hint": "Its logo is a fruit with a bite.",
+      "explain": "Apple makes the iPhone."
+    },
+    {
+      "id": "technology-easy-03",
+      "topic": "technology",
+      "level": "easy",
+      "question": "Binary code is made of which digits?",
+      "options": [
+        "0 and 1",
+        "1 and 2",
+        "A and B",
+        "5 and 9"
+      ],
+      "answer": "0 and 1",
+      "hint": "Computers count in base 2.",
+      "explain": "Binary uses only 0 and 1."
+    },
+    {
+      "id": "technology-easy-04",
+      "topic": "technology",
+      "level": "easy",
+      "question": "CPU stands for…",
+      "options": [
+        "Central Processing Unit",
+        "Computer Power Utility",
+        "Core Program Upload",
+        "Central Print Unit"
+      ],
+      "answer": "Central Processing Unit",
+      "hint": "It is often called the brain of a computer.",
+      "explain": "CPU means Central Processing Unit."
+    },
+    {
+      "id": "technology-easy-05",
+      "topic": "technology",
+      "level": "easy",
+      "question": "Wi-Fi is mainly used to…",
+      "options": [
+        "Cook food",
+        "Connect to a network without cables",
+        "Print paper money",
+        "Charge a car battery"
+      ],
+      "answer": "Connect to a network without cables",
+      "hint": "Phones join home internet this way.",
+      "explain": "Wi-Fi is wireless networking."
+    },
+    {
+      "id": "technology-easy-06",
+      "topic": "technology",
+      "level": "easy",
+      "question": "An @ symbol in an address usually means you are looking at…",
+      "options": [
+        "A street map",
+        "An email address",
+        "A phone number",
+        "A postal PIN"
+      ],
+      "answer": "An email address",
+      "hint": "It sits between the name and the domain.",
+      "explain": "The @ sign is used in email addresses."
+    },
+    {
+      "id": "technology-medium-01",
+      "topic": "technology",
+      "level": "medium",
+      "question": "HTTP is the protocol used to…",
+      "options": [
+        "Send paper mail",
+        "Load web pages",
+        "Tune FM radio",
+        "Focus a camera"
+      ],
+      "answer": "Load web pages",
+      "hint": "You see it at the start of many URLs.",
+      "explain": "HTTP is used to request and load web pages."
+    },
+    {
+      "id": "technology-medium-02",
+      "topic": "technology",
+      "level": "medium",
+      "question": "RAM in a computer is best described as…",
+      "options": [
+        "Long-term disk storage",
+        "Temporary working memory",
+        "A type of printer",
+        "A screen cable"
+      ],
+      "answer": "Temporary working memory",
+      "hint": "It clears when you switch the machine off.",
+      "explain": "RAM is fast, temporary working memory."
+    },
+    {
+      "id": "technology-medium-03",
+      "topic": "technology",
+      "level": "medium",
+      "question": "Git is a tool used for…",
+      "options": [
+        "Photo filters",
+        "Version control of code",
+        "Cooking timers",
+        "Battery charging"
+      ],
+      "answer": "Version control of code",
+      "hint": "GitHub hosts projects that use it.",
+      "explain": "Git tracks versions of source code."
+    },
+    {
+      "id": "technology-medium-04",
+      "topic": "technology",
+      "level": "medium",
+      "question": "AI commonly stands for…",
+      "options": [
+        "Automatic Ink",
+        "Artificial Intelligence",
+        "Analog Input",
+        "Apple Internet"
+      ],
+      "answer": "Artificial Intelligence",
+      "hint": "Chatbots and image tools use it.",
+      "explain": "AI means Artificial Intelligence."
+    },
+    {
+      "id": "technology-medium-05",
+      "topic": "technology",
+      "level": "medium",
+      "question": "USB stands for…",
+      "options": [
+        "Universal Serial Bus",
+        "Ultra Speed Battery",
+        "United System Board",
+        "User Screen Button"
+      ],
+      "answer": "Universal Serial Bus",
+      "hint": "It is the common port for pendrives and chargers.",
+      "explain": "USB means Universal Serial Bus."
+    },
+    {
+      "id": "technology-medium-06",
+      "topic": "technology",
+      "level": "medium",
+      "question": "A pixel is…",
+      "options": [
+        "A type of virus",
+        "The smallest dot on a digital image",
+        "A programming language",
+        "A Wi-Fi password"
+      ],
+      "answer": "The smallest dot on a digital image",
+      "hint": "Screens are grids of these tiny dots.",
+      "explain": "A pixel is a picture element — the smallest dot in an image."
+    },
+    {
+      "id": "technology-hard-01",
+      "topic": "technology",
+      "level": "hard",
+      "question": "HTML is mainly used to…",
+      "options": [
+        "Style printed books",
+        "Structure web pages",
+        "Compress videos",
+        "Charge phones"
+      ],
+      "answer": "Structure web pages",
+      "hint": "Browsers read tags like h1 and p.",
+      "explain": "HTML structures the content of web pages."
+    },
+    {
+      "id": "technology-hard-02",
+      "topic": "technology",
+      "level": "hard",
+      "question": "The extra S in HTTPS stands for…",
+      "options": [
+        "Speed",
+        "Simple",
+        "Secure",
+        "Server"
+      ],
+      "answer": "Secure",
+      "hint": "Look for a padlock in the browser.",
+      "explain": "HTTPS is HTTP with encryption (Secure)."
+    },
+    {
+      "id": "technology-hard-03",
+      "topic": "technology",
+      "level": "hard",
+      "question": "JSON is best described as…",
+      "options": [
+        "A photo format",
+        "A data-exchange format",
+        "A video codec",
+        "A type of keyboard"
+      ],
+      "answer": "A data-exchange format",
+      "hint": "It uses curly braces and key–value pairs.",
+      "explain": "JSON is a lightweight data-exchange format."
+    },
+    {
+      "id": "technology-hard-04",
+      "topic": "technology",
+      "level": "hard",
+      "question": "Linux is primarily a…",
+      "options": [
+        "Web browser",
+        "Operating system kernel",
+        "Search engine",
+        "Graphics card"
+      ],
+      "answer": "Operating system kernel",
+      "hint": "Android and many servers are built on it.",
+      "explain": "Linux is an operating system kernel."
+    },
+    {
+      "id": "technology-hard-05",
+      "topic": "technology",
+      "level": "hard",
+      "question": "A GPU is especially good at…",
+      "options": [
+        "Graphics and parallel computing",
+        "Cooling a fridge",
+        "Printing paper",
+        "Sending SMS"
+      ],
+      "answer": "Graphics and parallel computing",
+      "hint": "Games and AI models often use one.",
+      "explain": "GPUs handle graphics and highly parallel work."
+    },
+    {
+      "id": "technology-hard-06",
+      "topic": "technology",
+      "level": "hard",
+      "question": "Which of these looks like a typical IPv4 address?",
+      "options": [
+        "https://example.com",
+        "192.168.0.1",
+        "user@mail.com",
+        "#FFC300"
+      ],
+      "answer": "192.168.0.1",
+      "hint": "Four numbers separated by dots.",
+      "explain": "IPv4 addresses look like 192.168.0.1."
+    },
+    {
+      "id": "history-easy-01",
+      "topic": "history",
+      "level": "easy",
+      "question": "Who is called the Father of the Nation in India?",
+      "options": [
+        "Jawaharlal Nehru",
+        "Mahatma Gandhi",
+        "Bhagat Singh",
+        "Subhas Chandra Bose"
+      ],
+      "answer": "Mahatma Gandhi",
+      "hint": "His first name is Mohandas.",
+      "explain": "Mahatma Gandhi is called the Father of the Nation in India."
+    },
+    {
+      "id": "history-easy-02",
+      "topic": "history",
+      "level": "easy",
+      "question": "The ancient pyramids of Giza are in which country?",
+      "options": [
+        "Mexico",
+        "Egypt",
+        "India",
+        "Greece"
+      ],
+      "answer": "Egypt",
+      "hint": "The Nile river is nearby.",
+      "explain": "The Giza pyramids are in Egypt."
+    },
+    {
+      "id": "history-easy-03",
+      "topic": "history",
+      "level": "easy",
+      "question": "World War II ended in which year?",
+      "options": [
+        "1918",
+        "1939",
+        "1945",
+        "1965"
+      ],
+      "answer": "1945",
+      "hint": "It is the mid-1940s.",
+      "explain": "World War II ended in 1945."
+    },
+    {
+      "id": "history-easy-04",
+      "topic": "history",
+      "level": "easy",
+      "question": "The Great Wall is a famous landmark of which country?",
+      "options": [
+        "Japan",
+        "China",
+        "Mongolia",
+        "Korea"
+      ],
+      "answer": "China",
+      "hint": "It was built in many stages over centuries.",
+      "explain": "The Great Wall is in China."
+    },
+    {
+      "id": "history-easy-05",
+      "topic": "history",
+      "level": "easy",
+      "question": "Which European explorer reached Calicut by sea in 1498?",
+      "options": [
+        "Christopher Columbus",
+        "Marco Polo",
+        "Vasco da Gama",
+        "James Cook"
+      ],
+      "answer": "Vasco da Gama",
+      "hint": "He sailed for Portugal.",
+      "explain": "Vasco da Gama reached Calicut in 1498."
+    },
+    {
+      "id": "history-easy-06",
+      "topic": "history",
+      "level": "easy",
+      "question": "India's Republic Day is celebrated on…",
+      "options": [
+        "15 August",
+        "26 January",
+        "2 October",
+        "14 November"
+      ],
+      "answer": "26 January",
+      "hint": "The Constitution came into force on this date in 1950.",
+      "explain": "Republic Day is 26 January."
+    },
+    {
+      "id": "history-medium-01",
+      "topic": "history",
+      "level": "medium",
+      "question": "Emperor Ashoka belonged to which dynasty?",
+      "options": [
+        "Gupta",
+        "Maurya",
+        "Mughal",
+        "Chola"
+      ],
+      "answer": "Maurya",
+      "hint": "His grandfather was Chandragupta.",
+      "explain": "Ashoka was a Mauryan emperor."
+    },
+    {
+      "id": "history-medium-02",
+      "topic": "history",
+      "level": "medium",
+      "question": "The French Revolution is commonly dated from which year?",
+      "options": [
+        "1492",
+        "1776",
+        "1789",
+        "1917"
+      ],
+      "answer": "1789",
+      "hint": "The Bastille was stormed that year.",
+      "explain": "The French Revolution began in 1789."
+    },
+    {
+      "id": "history-medium-03",
+      "topic": "history",
+      "level": "medium",
+      "question": "Who was the first President of India?",
+      "options": [
+        "Rajendra Prasad",
+        "S. Radhakrishnan",
+        "Zakir Husain",
+        "V. V. Giri"
+      ],
+      "answer": "Rajendra Prasad",
+      "hint": "He was a lawyer from Bihar.",
+      "explain": "Dr. Rajendra Prasad was India's first President."
+    },
+    {
+      "id": "history-medium-04",
+      "topic": "history",
+      "level": "medium",
+      "question": "Harappa and Mohenjo-daro belong to which civilisation?",
+      "options": [
+        "Vedic",
+        "Indus Valley",
+        "Mauryan",
+        "Chola"
+      ],
+      "answer": "Indus Valley",
+      "hint": "It grew along a river now mostly in Pakistan.",
+      "explain": "They are Indus Valley (Harappan) cities."
+    },
+    {
+      "id": "history-medium-05",
+      "topic": "history",
+      "level": "medium",
+      "question": "The Quit India movement was launched in…",
+      "options": [
+        "1857",
+        "1919",
+        "1942",
+        "1947"
+      ],
+      "answer": "1942",
+      "hint": "Gandhi gave the slogan 'Do or Die'.",
+      "explain": "Quit India was launched in 1942."
+    },
+    {
+      "id": "history-medium-06",
+      "topic": "history",
+      "level": "medium",
+      "question": "Who founded the Mughal Empire in India?",
+      "options": [
+        "Akbar",
+        "Babur",
+        "Aurangzeb",
+        "Humayun"
+      ],
+      "answer": "Babur",
+      "hint": "He won the first Battle of Panipat.",
+      "explain": "Babur founded the Mughal Empire."
+    },
+    {
+      "id": "history-hard-01",
+      "topic": "history",
+      "level": "hard",
+      "question": "Magna Carta was sealed in which year?",
+      "options": [
+        "1066",
+        "1215",
+        "1492",
+        "1688"
+      ],
+      "answer": "1215",
+      "hint": "English barons forced King John to accept it.",
+      "explain": "Magna Carta was sealed in 1215."
+    },
+    {
+      "id": "history-hard-02",
+      "topic": "history",
+      "level": "hard",
+      "question": "Who built the Red Fort in Delhi?",
+      "options": [
+        "Akbar",
+        "Shah Jahan",
+        "Jahangir",
+        "Sher Shah"
+      ],
+      "answer": "Shah Jahan",
+      "hint": "He also commissioned the Taj Mahal.",
+      "explain": "Shah Jahan built the Red Fort in Delhi."
+    },
+    {
+      "id": "history-hard-03",
+      "topic": "history",
+      "level": "hard",
+      "question": "The Battle of Plassey was fought in…",
+      "options": [
+        "1526",
+        "1757",
+        "1857",
+        "1919"
+      ],
+      "answer": "1757",
+      "hint": "Robert Clive and Siraj-ud-Daulah are linked to it.",
+      "explain": "The Battle of Plassey was in 1757."
+    },
+    {
+      "id": "history-hard-04",
+      "topic": "history",
+      "level": "hard",
+      "question": "The League of Nations was formed after which war?",
+      "options": [
+        "World War I",
+        "World War II",
+        "Cold War",
+        "Opium War"
+      ],
+      "answer": "World War I",
+      "hint": "It was meant to keep peace after 1918.",
+      "explain": "The League of Nations followed World War I."
+    },
+    {
+      "id": "history-hard-05",
+      "topic": "history",
+      "level": "hard",
+      "question": "The Chola dynasty is especially remembered for…",
+      "options": [
+        "Himalayan forts",
+        "Temple architecture and a navy",
+        "The Taj Mahal",
+        "The Red Fort"
+      ],
+      "answer": "Temple architecture and a navy",
+      "hint": "Think of Thanjavur's big temple.",
+      "explain": "The Cholas are known for temples and a strong navy."
+    },
+    {
+      "id": "history-hard-06",
+      "topic": "history",
+      "level": "hard",
+      "question": "Jallianwala Bagh is in which city?",
+      "options": [
+        "Lahore",
+        "Amritsar",
+        "Delhi",
+        "Lucknow"
+      ],
+      "answer": "Amritsar",
+      "hint": "The 1919 massacre happened there.",
+      "explain": "Jallianwala Bagh is in Amritsar."
+    },
+    {
+      "id": "geography-easy-01",
+      "topic": "geography",
+      "level": "easy",
+      "question": "Which is the largest ocean on Earth?",
+      "options": [
+        "Atlantic",
+        "Indian",
+        "Arctic",
+        "Pacific"
+      ],
+      "answer": "Pacific",
+      "hint": "It lies between Asia and the Americas.",
+      "explain": "The Pacific is the largest ocean."
+    },
+    {
+      "id": "geography-easy-02",
+      "topic": "geography",
+      "level": "easy",
+      "question": "Mount Everest is in which mountain range?",
+      "options": [
+        "Alps",
+        "Andes",
+        "Himalayas",
+        "Rockies"
+      ],
+      "answer": "Himalayas",
+      "hint": "It sits on the Nepal–China border.",
+      "explain": "Everest is in the Himalayas."
+    },
+    {
+      "id": "geography-easy-03",
+      "topic": "geography",
+      "level": "easy",
+      "question": "The Sahara is a famous…",
+      "options": [
+        "Forest",
+        "Desert",
+        "Lake",
+        "Island"
+      ],
+      "answer": "Desert",
+      "hint": "It covers much of North Africa.",
+      "explain": "The Sahara is a desert."
+    },
+    {
+      "id": "geography-easy-04",
+      "topic": "geography",
+      "level": "easy",
+      "question": "The Nile is a famous…",
+      "options": [
+        "Mountain",
+        "Desert",
+        "River",
+        "Ocean"
+      ],
+      "answer": "River",
+      "hint": "It flows through Egypt.",
+      "explain": "The Nile is a river."
+    },
+    {
+      "id": "geography-easy-05",
+      "topic": "geography",
+      "level": "easy",
+      "question": "Earth's natural satellite is the…",
+      "options": [
+        "Sun",
+        "Mars",
+        "Moon",
+        "Venus"
+      ],
+      "answer": "Moon",
+      "hint": "We see it at night.",
+      "explain": "The Moon is Earth's natural satellite."
+    },
+    {
+      "id": "geography-easy-06",
+      "topic": "geography",
+      "level": "easy",
+      "question": "Which is the largest continent?",
+      "options": [
+        "Africa",
+        "Asia",
+        "Europe",
+        "Australia"
+      ],
+      "answer": "Asia",
+      "hint": "India is part of it.",
+      "explain": "Asia is the largest continent."
+    },
+    {
+      "id": "geography-medium-01",
+      "topic": "geography",
+      "level": "medium",
+      "question": "The Equator divides Earth into which two hemispheres?",
+      "options": [
+        "East and West",
+        "North and South",
+        "Land and sea",
+        "Inner and outer"
+      ],
+      "answer": "North and South",
+      "hint": "It is a line around the middle of the globe.",
+      "explain": "The Equator splits Earth into Northern and Southern hemispheres."
+    },
+    {
+      "id": "geography-medium-02",
+      "topic": "geography",
+      "level": "medium",
+      "question": "The Amazon rainforest is mainly in which continent?",
+      "options": [
+        "Africa",
+        "Asia",
+        "South America",
+        "Australia"
+      ],
+      "answer": "South America",
+      "hint": "Brazil holds the largest share.",
+      "explain": "The Amazon is in South America."
+    },
+    {
+      "id": "geography-medium-03",
+      "topic": "geography",
+      "level": "medium",
+      "question": "What is the capital of Japan?",
+      "options": [
+        "Kyoto",
+        "Osaka",
+        "Tokyo",
+        "Hiroshima"
+      ],
+      "answer": "Tokyo",
+      "hint": "It is on the island of Honshu.",
+      "explain": "Tokyo is the capital of Japan."
+    },
+    {
+      "id": "geography-medium-04",
+      "topic": "geography",
+      "level": "medium",
+      "question": "The Tropic of Cancer passes through which of these countries?",
+      "options": [
+        "India",
+        "Argentina",
+        "New Zealand",
+        "Norway"
+      ],
+      "answer": "India",
+      "hint": "It crosses Rajasthan, Madhya Pradesh, and more.",
+      "explain": "The Tropic of Cancer passes through India."
+    },
+    {
+      "id": "geography-medium-05",
+      "topic": "geography",
+      "level": "medium",
+      "question": "Which is the smallest continent by land area?",
+      "options": [
+        "Europe",
+        "Australia",
+        "Antarctica",
+        "South America"
+      ],
+      "answer": "Australia",
+      "hint": "It is also a country.",
+      "explain": "Australia is the smallest continent."
+    },
+    {
+      "id": "geography-medium-06",
+      "topic": "geography",
+      "level": "medium",
+      "question": "The Thar Desert is mainly in which Indian state?",
+      "options": [
+        "Kerala",
+        "Rajasthan",
+        "Assam",
+        "Goa"
+      ],
+      "answer": "Rajasthan",
+      "hint": "Jaipur is the state capital.",
+      "explain": "Most of the Thar Desert in India is in Rajasthan."
+    },
+    {
+      "id": "geography-hard-01",
+      "topic": "geography",
+      "level": "hard",
+      "question": "The deepest known ocean trench is the…",
+      "options": [
+        "Java Trench",
+        "Puerto Rico Trench",
+        "Mariana Trench",
+        "Tonga Trench"
+      ],
+      "answer": "Mariana Trench",
+      "hint": "It is in the western Pacific.",
+      "explain": "The Mariana Trench is the deepest."
+    },
+    {
+      "id": "geography-hard-02",
+      "topic": "geography",
+      "level": "hard",
+      "question": "What is the capital of Australia?",
+      "options": [
+        "Sydney",
+        "Melbourne",
+        "Canberra",
+        "Perth"
+      ],
+      "answer": "Canberra",
+      "hint": "It is not the largest city.",
+      "explain": "Canberra is Australia's capital."
+    },
+    {
+      "id": "geography-hard-03",
+      "topic": "geography",
+      "level": "hard",
+      "question": "The 0° longitude line is called the…",
+      "options": [
+        "Equator",
+        "Prime Meridian",
+        "Tropic of Capricorn",
+        "International Date Line"
+      ],
+      "answer": "Prime Meridian",
+      "hint": "It runs through Greenwich.",
+      "explain": "0° longitude is the Prime Meridian."
+    },
+    {
+      "id": "geography-hard-04",
+      "topic": "geography",
+      "level": "hard",
+      "question": "Lake Baikal is in which country?",
+      "options": [
+        "Canada",
+        "Russia",
+        "China",
+        "Finland"
+      ],
+      "answer": "Russia",
+      "hint": "It is the world's deepest freshwater lake.",
+      "explain": "Lake Baikal is in Russia."
+    },
+    {
+      "id": "geography-hard-05",
+      "topic": "geography",
+      "level": "hard",
+      "question": "The Palk Strait lies between India and…",
+      "options": [
+        "Maldives",
+        "Sri Lanka",
+        "Myanmar",
+        "Indonesia"
+      ],
+      "answer": "Sri Lanka",
+      "hint": "Rameswaram is nearby.",
+      "explain": "The Palk Strait separates India and Sri Lanka."
+    },
+    {
+      "id": "geography-hard-06",
+      "topic": "geography",
+      "level": "hard",
+      "question": "Which African river is the world's longest by the common school-book answer?",
+      "options": [
+        "Congo",
+        "Niger",
+        "Nile",
+        "Zambezi"
+      ],
+      "answer": "Nile",
+      "hint": "It flows north into the Mediterranean.",
+      "explain": "The Nile is commonly taught as the world's longest river."
+    },
+    {
+      "id": "sports-easy-01",
+      "topic": "sports",
+      "level": "easy",
+      "question": "How many players from one cricket team are on the field while batting side plays?",
+      "options": [
+        "9",
+        "11",
+        "15",
+        "7"
+      ],
+      "answer": "11",
+      "hint": "A football team has the same number.",
+      "explain": "A cricket side has 11 players."
+    },
+    {
+      "id": "sports-easy-02",
+      "topic": "sports",
+      "level": "easy",
+      "question": "The Olympic Games are held every how many years?",
+      "options": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "answer": "4",
+      "hint": "Summer and winter games each follow this gap.",
+      "explain": "The Olympics are held every four years."
+    },
+    {
+      "id": "sports-easy-03",
+      "topic": "sports",
+      "level": "easy",
+      "question": "Wimbledon is a famous tournament in which sport?",
+      "options": [
+        "Cricket",
+        "Tennis",
+        "Hockey",
+        "Golf"
+      ],
+      "answer": "Tennis",
+      "hint": "It is played on grass in London.",
+      "explain": "Wimbledon is a tennis tournament."
+    },
+    {
+      "id": "sports-easy-04",
+      "topic": "sports",
+      "level": "easy",
+      "question": "Football is also widely called…",
+      "options": [
+        "Hockey",
+        "Soccer",
+        "Rugby only",
+        "Polo"
+      ],
+      "answer": "Soccer",
+      "hint": "The name is common in the United States.",
+      "explain": "Football is also called soccer."
+    },
+    {
+      "id": "sports-easy-05",
+      "topic": "sports",
+      "level": "easy",
+      "question": "Sachin Tendulkar is a legend of which sport?",
+      "options": [
+        "Hockey",
+        "Cricket",
+        "Badminton",
+        "Tennis"
+      ],
+      "answer": "Cricket",
+      "hint": "He is called the Little Master.",
+      "explain": "Sachin Tendulkar is a cricket legend."
+    },
+    {
+      "id": "sports-easy-06",
+      "topic": "sports",
+      "level": "easy",
+      "question": "A basketball is put through a…",
+      "options": [
+        "Wicket",
+        "Hoop",
+        "Goal post only",
+        "Net on the ground"
+      ],
+      "answer": "Hoop",
+      "hint": "The hoop has a net hanging from it.",
+      "explain": "Basketball is scored by putting the ball through a hoop."
+    },
+    {
+      "id": "sports-medium-01",
+      "topic": "sports",
+      "level": "medium",
+      "question": "The FIFA World Cup is contested in which sport?",
+      "options": [
+        "Cricket",
+        "Football",
+        "Tennis",
+        "Athletics"
+      ],
+      "answer": "Football",
+      "hint": "FIFA governs that sport worldwide.",
+      "explain": "The FIFA World Cup is football."
+    },
+    {
+      "id": "sports-medium-02",
+      "topic": "sports",
+      "level": "medium",
+      "question": "How many squares are on a standard chessboard?",
+      "options": [
+        "32",
+        "48",
+        "64",
+        "100"
+      ],
+      "answer": "64",
+      "hint": "It is 8 by 8.",
+      "explain": "A chessboard has 64 squares."
+    },
+    {
+      "id": "sports-medium-03",
+      "topic": "sports",
+      "level": "medium",
+      "question": "A shuttlecock is used in which sport?",
+      "options": [
+        "Tennis",
+        "Badminton",
+        "Squash",
+        "Table tennis"
+      ],
+      "answer": "Badminton",
+      "hint": "It is also called a birdie.",
+      "explain": "Badminton is played with a shuttlecock."
+    },
+    {
+      "id": "sports-medium-04",
+      "topic": "sports",
+      "level": "medium",
+      "question": "A regular field-goal basket in basketball is worth how many points?",
+      "options": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "answer": "2",
+      "hint": "Free throws are worth less; long shots are worth more.",
+      "explain": "A regular basket is worth 2 points."
+    },
+    {
+      "id": "sports-medium-05",
+      "topic": "sports",
+      "level": "medium",
+      "question": "The sport of hockey in India is often played on…",
+      "options": [
+        "Ice only",
+        "A field or turf",
+        "A sand court",
+        "A swimming pool"
+      ],
+      "answer": "A field or turf",
+      "hint": "India's famous Olympic wins were in this version.",
+      "explain": "Field hockey is played on turf or grass."
+    },
+    {
+      "id": "sports-medium-06",
+      "topic": "sports",
+      "level": "medium",
+      "question": "A hat-trick usually means three successes in…",
+      "options": [
+        "Warm-up only",
+        "One game or spell",
+        "A whole career",
+        "Practice nets"
+      ],
+      "answer": "One game or spell",
+      "hint": "Think of three goals or three wickets.",
+      "explain": "A hat-trick is three goals or wickets in succession."
+    },
+    {
+      "id": "sports-hard-01",
+      "topic": "sports",
+      "level": "hard",
+      "question": "An Olympic marathon is how long?",
+      "options": [
+        "21.1 km",
+        "42.195 km",
+        "50 km",
+        "10 km"
+      ],
+      "answer": "42.195 km",
+      "hint": "It is a little over 26 miles.",
+      "explain": "The Olympic marathon is 42.195 km."
+    },
+    {
+      "id": "sports-hard-02",
+      "topic": "sports",
+      "level": "hard",
+      "question": "The Thomas Cup is a world team event in…",
+      "options": [
+        "Tennis",
+        "Badminton",
+        "Table tennis",
+        "Squash"
+      ],
+      "answer": "Badminton",
+      "hint": "The Uber Cup is the women's counterpart.",
+      "explain": "The Thomas Cup is men's team badminton."
+    },
+    {
+      "id": "sports-hard-03",
+      "topic": "sports",
+      "level": "hard",
+      "question": "The Ashes cricket series is played between England and…",
+      "options": [
+        "India",
+        "South Africa",
+        "Australia",
+        "New Zealand"
+      ],
+      "answer": "Australia",
+      "hint": "A tiny urn is the trophy.",
+      "explain": "The Ashes is England vs Australia."
+    },
+    {
+      "id": "sports-hard-04",
+      "topic": "sports",
+      "level": "hard",
+      "question": "India's men's hockey team has historically won many medals at which games?",
+      "options": [
+        "FIFA World Cup",
+        "Olympics",
+        "Wimbledon",
+        "Tour de France"
+      ],
+      "answer": "Olympics",
+      "hint": "Dhyan Chand is a famous name from those years.",
+      "explain": "Indian hockey's golden era was at the Olympics."
+    },
+    {
+      "id": "sports-hard-05",
+      "topic": "sports",
+      "level": "hard",
+      "question": "A standard football (soccer) match has how many halves?",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": "2",
+      "hint": "Each half is 45 minutes plus stoppage.",
+      "explain": "A football match has two halves."
+    },
+    {
+      "id": "sports-hard-06",
+      "topic": "sports",
+      "level": "hard",
+      "question": "P. V. Sindhu is an Olympic medallist in which sport?",
+      "options": [
+        "Tennis",
+        "Badminton",
+        "Boxing",
+        "Shooting"
+      ],
+      "answer": "Badminton",
+      "hint": "She plays singles with a racket and shuttle.",
+      "explain": "P. V. Sindhu is a badminton player."
+    },
+    {
+      "id": "food-easy-01",
+      "topic": "food",
+      "level": "easy",
+      "question": "Idli is mainly made from…",
+      "options": [
+        "Wheat only",
+        "Rice and urad dal",
+        "Corn flour",
+        "Potatoes only"
+      ],
+      "answer": "Rice and urad dal",
+      "hint": "The batter is fermented and steamed.",
+      "explain": "Idli batter is rice and urad dal."
+    },
+    {
+      "id": "food-easy-02",
+      "topic": "food",
+      "level": "easy",
+      "question": "Pizza is originally associated with which country?",
+      "options": [
+        "France",
+        "Italy",
+        "Mexico",
+        "Greece"
+      ],
+      "answer": "Italy",
+      "hint": "Naples is a famous home of it.",
+      "explain": "Pizza originated in Italy."
+    },
+    {
+      "id": "food-easy-03",
+      "topic": "food",
+      "level": "easy",
+      "question": "A banana is typically which colour when ripe?",
+      "options": [
+        "Blue",
+        "Yellow",
+        "Purple",
+        "Grey"
+      ],
+      "answer": "Yellow",
+      "hint": "It is a curved tropical fruit.",
+      "explain": "Ripe bananas are usually yellow."
+    },
+    {
+      "id": "food-easy-04",
+      "topic": "food",
+      "level": "easy",
+      "question": "Sambar is a dish from which part of India?",
+      "options": [
+        "North-east only",
+        "South India",
+        "Ladakh only",
+        "Rajasthan only"
+      ],
+      "answer": "South India",
+      "hint": "It is often served with idli and dosa.",
+      "explain": "Sambar is a South Indian staple."
+    },
+    {
+      "id": "food-easy-05",
+      "topic": "food",
+      "level": "easy",
+      "question": "Tea is a drink made from the leaves of a…",
+      "options": [
+        "Fungus",
+        "Plant",
+        "Mineral",
+        "Fish"
+      ],
+      "answer": "Plant",
+      "hint": "Assam and Darjeeling grow a lot of it.",
+      "explain": "Tea comes from a plant."
+    },
+    {
+      "id": "food-easy-06",
+      "topic": "food",
+      "level": "easy",
+      "question": "Dosa is typically served with…",
+      "options": [
+        "Ice cream only",
+        "Chutney and sambar",
+        "Soy sauce only",
+        "Mustard and ketchup only"
+      ],
+      "answer": "Chutney and sambar",
+      "hint": "Think of a breakfast plate in Chennai.",
+      "explain": "Dosa is usually served with chutney and sambar."
+    },
+    {
+      "id": "food-medium-01",
+      "topic": "food",
+      "level": "medium",
+      "question": "Paneer is best described as…",
+      "options": [
+        "A fruit",
+        "Indian cottage cheese",
+        "A type of rice",
+        "A spice mix"
+      ],
+      "answer": "Indian cottage cheese",
+      "hint": "Palak paneer uses cubes of it.",
+      "explain": "Paneer is Indian cottage cheese."
+    },
+    {
+      "id": "food-medium-02",
+      "topic": "food",
+      "level": "medium",
+      "question": "Sushi is most closely associated with which country?",
+      "options": [
+        "China",
+        "Thailand",
+        "Japan",
+        "Vietnam"
+      ],
+      "answer": "Japan",
+      "hint": "It often uses vinegared rice and seafood.",
+      "explain": "Sushi is a Japanese dish."
+    },
+    {
+      "id": "food-medium-03",
+      "topic": "food",
+      "level": "medium",
+      "question": "Biryani is based mainly on which grain?",
+      "options": [
+        "Wheat",
+        "Rice",
+        "Ragi only",
+        "Oats"
+      ],
+      "answer": "Rice",
+      "hint": "Long-grain basmati is common.",
+      "explain": "Biryani is a rice dish."
+    },
+    {
+      "id": "food-medium-04",
+      "topic": "food",
+      "level": "medium",
+      "question": "Citrus fruits are a good source of which vitamin?",
+      "options": [
+        "Vitamin A",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin K"
+      ],
+      "answer": "Vitamin C",
+      "hint": "Oranges are the classic example.",
+      "explain": "Citrus fruits provide vitamin C."
+    },
+    {
+      "id": "food-medium-05",
+      "topic": "food",
+      "level": "medium",
+      "question": "Ghee is made from…",
+      "options": [
+        "Coconut water",
+        "Clarified butter",
+        "Sugar syrup",
+        "Soy sauce"
+      ],
+      "answer": "Clarified butter",
+      "hint": "It is used in many Indian sweets and tadkas.",
+      "explain": "Ghee is clarified butter."
+    },
+    {
+      "id": "food-medium-06",
+      "topic": "food",
+      "level": "medium",
+      "question": "Rasam is best described as a…",
+      "options": [
+        "Fried bread",
+        "Tangy South Indian soup",
+        "Sweet dumpling",
+        "Dry spice powder only"
+      ],
+      "answer": "Tangy South Indian soup",
+      "hint": "Tamarind and pepper often flavour it.",
+      "explain": "Rasam is a tangy South Indian soup."
+    },
+    {
+      "id": "food-hard-01",
+      "topic": "food",
+      "level": "hard",
+      "question": "Which spice is among the most expensive by weight?",
+      "options": [
+        "Turmeric",
+        "Cumin",
+        "Saffron",
+        "Coriander"
+      ],
+      "answer": "Saffron",
+      "hint": "The threads come from crocus flowers.",
+      "explain": "Saffron is one of the costliest spices."
+    },
+    {
+      "id": "food-hard-02",
+      "topic": "food",
+      "level": "hard",
+      "question": "Kimchi is a fermented dish from which country?",
+      "options": [
+        "Japan",
+        "Korea",
+        "Thailand",
+        "Indonesia"
+      ],
+      "answer": "Korea",
+      "hint": "It is often made with cabbage and chilli.",
+      "explain": "Kimchi is Korean."
+    },
+    {
+      "id": "food-hard-03",
+      "topic": "food",
+      "level": "hard",
+      "question": "Appam is especially popular in which South Indian state?",
+      "options": [
+        "Punjab",
+        "Kerala",
+        "Rajasthan",
+        "Sikkim"
+      ],
+      "answer": "Kerala",
+      "hint": "It is a lacy rice pancake, often with stew.",
+      "explain": "Appam is popular in Kerala."
+    },
+    {
+      "id": "food-hard-04",
+      "topic": "food",
+      "level": "hard",
+      "question": "Gruyère is a type of…",
+      "options": [
+        "Tea",
+        "Cheese",
+        "Bread",
+        "Wine grape only"
+      ],
+      "answer": "Cheese",
+      "hint": "It melts well in fondues.",
+      "explain": "Gruyère is a Swiss cheese."
+    },
+    {
+      "id": "food-hard-05",
+      "topic": "food",
+      "level": "hard",
+      "question": "Jaggery is made mainly from…",
+      "options": [
+        "Salt water",
+        "Sugarcane or palm sap",
+        "Milk cream",
+        "Wheat husk"
+      ],
+      "answer": "Sugarcane or palm sap",
+      "hint": "It is an unrefined sweetener.",
+      "explain": "Jaggery is made from sugarcane or palm sap."
+    },
+    {
+      "id": "food-hard-06",
+      "topic": "food",
+      "level": "hard",
+      "question": "Which leaf is commonly used to steam South Indian kootanchoru or as a plate?",
+      "options": [
+        "Maple",
+        "Banana leaf",
+        "Pine needle",
+        "Cactus pad"
+      ],
+      "answer": "Banana leaf",
+      "hint": "Meals are often served on it in Tamil Nadu.",
+      "explain": "Banana leaves are used as plates and for steaming."
+    },
+    {
+      "id": "nature-easy-01",
+      "topic": "nature",
+      "level": "easy",
+      "question": "Bees are famous for making…",
+      "options": [
+        "Silk",
+        "Honey",
+        "Cotton",
+        "Rubber"
+      ],
+      "answer": "Honey",
+      "hint": "It is sweet and stored in a hive.",
+      "explain": "Bees make honey."
+    },
+    {
+      "id": "nature-easy-02",
+      "topic": "nature",
+      "level": "easy",
+      "question": "Which is the largest land animal alive today?",
+      "options": [
+        "Giraffe",
+        "Hippopotamus",
+        "Elephant",
+        "Rhino"
+      ],
+      "answer": "Elephant",
+      "hint": "It has a trunk.",
+      "explain": "The elephant is the largest land animal."
+    },
+    {
+      "id": "nature-easy-03",
+      "topic": "nature",
+      "level": "easy",
+      "question": "Trees help us by releasing which gas?",
+      "options": [
+        "Oxygen",
+        "Helium",
+        "Neon",
+        "Argon"
+      ],
+      "answer": "Oxygen",
+      "hint": "Photosynthesis produces it.",
+      "explain": "Trees release oxygen."
+    },
+    {
+      "id": "nature-easy-04",
+      "topic": "nature",
+      "level": "easy",
+      "question": "A tadpole grows into a…",
+      "options": [
+        "Fish",
+        "Frog",
+        "Snake",
+        "Bird"
+      ],
+      "answer": "Frog",
+      "hint": "It starts life in water.",
+      "explain": "A tadpole becomes a frog."
+    },
+    {
+      "id": "nature-easy-05",
+      "topic": "nature",
+      "level": "easy",
+      "question": "A cactus is most at home in a…",
+      "options": [
+        "Rainforest floor",
+        "Desert",
+        "Coral reef",
+        "Snowfield"
+      ],
+      "answer": "Desert",
+      "hint": "It stores water in thick stems.",
+      "explain": "Cacti grow in deserts."
+    },
+    {
+      "id": "nature-easy-06",
+      "topic": "nature",
+      "level": "easy",
+      "question": "India's national bird is the…",
+      "options": [
+        "Sparrow",
+        "Peacock",
+        "Crow",
+        "Parrot"
+      ],
+      "answer": "Peacock",
+      "hint": "The male has a colourful tail fan.",
+      "explain": "The Indian peacock is the national bird."
+    },
+    {
+      "id": "nature-medium-01",
+      "topic": "nature",
+      "level": "medium",
+      "question": "Bamboo is botanically a type of…",
+      "options": [
+        "Tree fern",
+        "Grass",
+        "Moss",
+        "Algae"
+      ],
+      "answer": "Grass",
+      "hint": "It is a giant member of that family.",
+      "explain": "Bamboo is a grass."
+    },
+    {
+      "id": "nature-medium-02",
+      "topic": "nature",
+      "level": "medium",
+      "question": "A group of lions is called a…",
+      "options": [
+        "Flock",
+        "Pride",
+        "School",
+        "Pack of cubs only"
+      ],
+      "answer": "Pride",
+      "hint": "The word also means being pleased with yourself.",
+      "explain": "Lions live in a pride."
+    },
+    {
+      "id": "nature-medium-03",
+      "topic": "nature",
+      "level": "medium",
+      "question": "The study of plants is called…",
+      "options": [
+        "Zoology",
+        "Botany",
+        "Geology",
+        "Astronomy"
+      ],
+      "answer": "Botany",
+      "hint": "It is the plant half of biology.",
+      "explain": "Botany is the study of plants."
+    },
+    {
+      "id": "nature-medium-04",
+      "topic": "nature",
+      "level": "medium",
+      "question": "Photosynthesis needs sunlight, water, and…",
+      "options": [
+        "Gold",
+        "Carbon dioxide",
+        "Plastic",
+        "Salt only"
+      ],
+      "answer": "Carbon dioxide",
+      "hint": "Plants take this gas from the air.",
+      "explain": "Photosynthesis uses carbon dioxide."
+    },
+    {
+      "id": "nature-medium-05",
+      "topic": "nature",
+      "level": "medium",
+      "question": "Which big cat is often called the king of the jungle?",
+      "options": [
+        "Cheetah",
+        "Leopard",
+        "Lion",
+        "Lynx"
+      ],
+      "answer": "Lion",
+      "hint": "It has a mane (in males).",
+      "explain": "The lion is called the king of the jungle."
+    },
+    {
+      "id": "nature-medium-06",
+      "topic": "nature",
+      "level": "medium",
+      "question": "Deciduous trees are the ones that…",
+      "options": [
+        "Never have leaves",
+        "Shed leaves in a season",
+        "Live only underwater",
+        "Produce no seeds"
+      ],
+      "answer": "Shed leaves in a season",
+      "hint": "Think of autumn in cooler places.",
+      "explain": "Deciduous trees shed their leaves seasonally."
+    },
+    {
+      "id": "nature-hard-01",
+      "topic": "nature",
+      "level": "hard",
+      "question": "Which mammal is famous for moving very slowly in trees?",
+      "options": [
+        "Cheetah",
+        "Sloth",
+        "Gazelle",
+        "Hare"
+      ],
+      "answer": "Sloth",
+      "hint": "It lives in Central and South American forests.",
+      "explain": "Sloths are known for being slow."
+    },
+    {
+      "id": "nature-hard-02",
+      "topic": "nature",
+      "level": "hard",
+      "question": "Coral reefs are built mainly by…",
+      "options": [
+        "Seaweed only",
+        "Coral polyps",
+        "Sharks",
+        "Turtles"
+      ],
+      "answer": "Coral polyps",
+      "hint": "They are tiny animals with a hard skeleton.",
+      "explain": "Coral polyps build reefs."
+    },
+    {
+      "id": "nature-hard-03",
+      "topic": "nature",
+      "level": "hard",
+      "question": "The Western Ghats are known as a…",
+      "options": [
+        "Desert belt",
+        "Biodiversity hotspot",
+        "Polar ice cap",
+        "Volcanic island chain"
+      ],
+      "answer": "Biodiversity hotspot",
+      "hint": "They run along India's west coast.",
+      "explain": "The Western Ghats are a biodiversity hotspot."
+    },
+    {
+      "id": "nature-hard-04",
+      "topic": "nature",
+      "level": "hard",
+      "question": "Which bird cannot fly but is an excellent swimmer?",
+      "options": [
+        "Eagle",
+        "Penguin",
+        "Sparrow",
+        "Parrot"
+      ],
+      "answer": "Penguin",
+      "hint": "It lives in the Southern Hemisphere, especially Antarctica.",
+      "explain": "Penguins swim rather than fly."
+    },
+    {
+      "id": "nature-hard-05",
+      "topic": "nature",
+      "level": "hard",
+      "question": "A mangrove forest typically grows…",
+      "options": [
+        "On high Himalayan ice",
+        "Along salty tropical coasts",
+        "Only in deserts",
+        "On the moon"
+      ],
+      "answer": "Along salty tropical coasts",
+      "hint": "The Sundarbans are a famous example.",
+      "explain": "Mangroves grow in coastal saline water."
+    },
+    {
+      "id": "nature-hard-06",
+      "topic": "nature",
+      "level": "hard",
+      "question": "Chlorophyll in plants is typically which colour?",
+      "options": [
+        "Red",
+        "Green",
+        "Blue",
+        "White"
+      ],
+      "answer": "Green",
+      "hint": "It is why most leaves look that way.",
+      "explain": "Chlorophyll is green."
+    },
+    {
+      "id": "cinema-easy-01",
+      "topic": "cinema",
+      "level": "easy",
+      "question": "Kollywood usually refers to cinema in which language?",
+      "options": [
+        "Hindi",
+        "Tamil",
+        "Telugu",
+        "Kannada"
+      ],
+      "answer": "Tamil",
+      "hint": "The name plays on Kodambakkam in Chennai.",
+      "explain": "Kollywood is Tamil cinema."
+    },
+    {
+      "id": "cinema-easy-02",
+      "topic": "cinema",
+      "level": "easy",
+      "question": "Bollywood films are mainly in which language?",
+      "options": [
+        "Tamil",
+        "Hindi",
+        "Bengali",
+        "Malayalam"
+      ],
+      "answer": "Hindi",
+      "hint": "The industry is based around Mumbai.",
+      "explain": "Bollywood is Hindi cinema."
+    },
+    {
+      "id": "cinema-easy-03",
+      "topic": "cinema",
+      "level": "easy",
+      "question": "The Oscar is an award for…",
+      "options": [
+        "Sports",
+        "Films",
+        "Cooking",
+        "Architecture"
+      ],
+      "answer": "Films",
+      "hint": "The statue is a golden figure.",
+      "explain": "Oscars honour films."
+    },
+    {
+      "id": "cinema-easy-04",
+      "topic": "cinema",
+      "level": "easy",
+      "question": "Rajinikanth is a superstar of which film industry?",
+      "options": [
+        "Hollywood only",
+        "Tamil cinema",
+        "French cinema",
+        "Korean cinema only"
+      ],
+      "answer": "Tamil cinema",
+      "hint": "Fans often call him Thalaivar.",
+      "explain": "Rajinikanth is a Tamil cinema superstar."
+    },
+    {
+      "id": "cinema-easy-05",
+      "topic": "cinema",
+      "level": "easy",
+      "question": "A movie is made of many still pictures called…",
+      "options": [
+        "Chapters of a novel",
+        "Frames",
+        "Spreadsheets",
+        "Recipes"
+      ],
+      "answer": "Frames",
+      "hint": "Played fast, they look like motion.",
+      "explain": "Films are sequences of frames."
+    },
+    {
+      "id": "cinema-easy-06",
+      "topic": "cinema",
+      "level": "easy",
+      "question": "Hollywood is a film hub in which country?",
+      "options": [
+        "UK",
+        "USA",
+        "Australia",
+        "Canada"
+      ],
+      "answer": "USA",
+      "hint": "Los Angeles is the city.",
+      "explain": "Hollywood is in the United States."
+    },
+    {
+      "id": "cinema-medium-01",
+      "topic": "cinema",
+      "level": "medium",
+      "question": "A. R. Rahman is best known as a…",
+      "options": [
+        "Cricketer",
+        "Music composer",
+        "Painter",
+        "Chef"
+      ],
+      "answer": "Music composer",
+      "hint": "He scored Roja and later won Oscars.",
+      "explain": "A. R. Rahman is a music composer."
+    },
+    {
+      "id": "cinema-medium-02",
+      "topic": "cinema",
+      "level": "medium",
+      "question": "Satyajit Ray was a famous…",
+      "options": [
+        "Filmmaker",
+        "Astronaut",
+        "Boxer",
+        "Banker"
+      ],
+      "answer": "Filmmaker",
+      "hint": "The Apu trilogy is his best-known work.",
+      "explain": "Satyajit Ray was a filmmaker."
+    },
+    {
+      "id": "cinema-medium-03",
+      "topic": "cinema",
+      "level": "medium",
+      "question": "Sivaji Ganesan was a legendary actor in which cinema?",
+      "options": [
+        "Tamil",
+        "Marathi only",
+        "Gujarati only",
+        "Punjabi only"
+      ],
+      "answer": "Tamil",
+      "hint": "He is often called Nadigar Thilagam.",
+      "explain": "Sivaji Ganesan was a Tamil film legend."
+    },
+    {
+      "id": "cinema-medium-04",
+      "topic": "cinema",
+      "level": "medium",
+      "question": "An animated film is created mainly with…",
+      "options": [
+        "Live animals only",
+        "Drawings or computer graphics",
+        "News footage only",
+        "Radio voices only"
+      ],
+      "answer": "Drawings or computer graphics",
+      "hint": "Think of cartoon features.",
+      "explain": "Animation uses drawings or CGI."
+    },
+    {
+      "id": "cinema-medium-05",
+      "topic": "cinema",
+      "level": "medium",
+      "question": "The Cannes Film Festival is held in which country?",
+      "options": [
+        "Italy",
+        "France",
+        "Spain",
+        "Germany"
+      ],
+      "answer": "France",
+      "hint": "It is on the French Riviera.",
+      "explain": "Cannes is in France."
+    },
+    {
+      "id": "cinema-medium-06",
+      "topic": "cinema",
+      "level": "medium",
+      "question": "Ilaiyaraaja is celebrated for…",
+      "options": [
+        "Film music",
+        "Sculpture",
+        "Architecture",
+        "Athletics"
+      ],
+      "answer": "Film music",
+      "hint": "He scored hundreds of South Indian films.",
+      "explain": "Ilaiyaraaja is a film-music composer."
+    },
+    {
+      "id": "cinema-hard-01",
+      "topic": "cinema",
+      "level": "hard",
+      "question": "Dadasaheb Phalke is remembered as the father of…",
+      "options": [
+        "Indian cricket",
+        "Indian cinema",
+        "Indian navy",
+        "Indian railways"
+      ],
+      "answer": "Indian cinema",
+      "hint": "Raja Harishchandra is linked to him.",
+      "explain": "Dadasaheb Phalke is the father of Indian cinema."
+    },
+    {
+      "id": "cinema-hard-02",
+      "topic": "cinema",
+      "level": "hard",
+      "question": "The film Nayakan is primarily in which language?",
+      "options": [
+        "Hindi",
+        "Tamil",
+        "Telugu",
+        "Kannada"
+      ],
+      "answer": "Tamil",
+      "hint": "Kamal Haasan starred in this Mani Ratnam classic.",
+      "explain": "Nayakan is a Tamil film."
+    },
+    {
+      "id": "cinema-hard-03",
+      "topic": "cinema",
+      "level": "hard",
+      "question": "Kodambakkam in Chennai is historically linked to…",
+      "options": [
+        "Ship building",
+        "Film studios",
+        "Tea auctions",
+        "Diamond mines"
+      ],
+      "answer": "Film studios",
+      "hint": "Kollywood's name comes from this area.",
+      "explain": "Kodambakkam is a historic film-studio neighbourhood."
+    },
+    {
+      "id": "cinema-hard-04",
+      "topic": "cinema",
+      "level": "hard",
+      "question": "Who directed the film Parasakthi (1952), a landmark Tamil drama?",
+      "options": [
+        "Mani Ratnam",
+        "Krishnan–Panju",
+        "Shankar",
+        "Balu Mahendra"
+      ],
+      "answer": "Krishnan–Panju",
+      "hint": "Sivaji Ganesan's debut, written by Karunanidhi.",
+      "explain": "Parasakthi was directed by Krishnan–Panju."
+    },
+    {
+      "id": "cinema-hard-05",
+      "topic": "cinema",
+      "level": "hard",
+      "question": "The Palme d'Or is the top prize at which festival?",
+      "options": [
+        "Oscars",
+        "Cannes",
+        "IIFA",
+        "Filmfare"
+      ],
+      "answer": "Cannes",
+      "hint": "The name is French for a golden palm.",
+      "explain": "The Palme d'Or is awarded at Cannes."
+    },
+    {
+      "id": "cinema-hard-06",
+      "topic": "cinema",
+      "level": "hard",
+      "question": "Kamal Haasan is known as a leading actor in which industry?",
+      "options": [
+        "Tamil cinema",
+        "Only Hollywood",
+        "Only Korean cinema",
+        "Only French cinema"
+      ],
+      "answer": "Tamil cinema",
+      "hint": "He has also worked in other Indian languages.",
+      "explain": "Kamal Haasan is a Tamil cinema star."
+    },
+    {
+      "id": "space-easy-01",
+      "topic": "space",
+      "level": "easy",
+      "question": "The Moon orbits which body?",
+      "options": [
+        "The Sun only",
+        "Earth",
+        "Mars",
+        "Jupiter"
+      ],
+      "answer": "Earth",
+      "hint": "We see phases each month.",
+      "explain": "The Moon orbits Earth."
+    },
+    {
+      "id": "space-easy-02",
+      "topic": "space",
+      "level": "easy",
+      "question": "Who was the first person to walk on the Moon?",
+      "options": [
+        "Yuri Gagarin",
+        "Neil Armstrong",
+        "Kalpana Chawla",
+        "Rakesh Sharma"
+      ],
+      "answer": "Neil Armstrong",
+      "hint": "The mission was Apollo 11.",
+      "explain": "Neil Armstrong was first on the Moon."
+    },
+    {
+      "id": "space-easy-03",
+      "topic": "space",
+      "level": "easy",
+      "question": "Our galaxy is called the…",
+      "options": [
+        "Andromeda only",
+        "Milky Way",
+        "Orion Belt",
+        "Southern Cross"
+      ],
+      "answer": "Milky Way",
+      "hint": "On a dark night it looks like a pale band.",
+      "explain": "We live in the Milky Way."
+    },
+    {
+      "id": "space-easy-04",
+      "topic": "space",
+      "level": "easy",
+      "question": "The closest star to Earth is the…",
+      "options": [
+        "Polaris",
+        "Sun",
+        "Sirius",
+        "Betelgeuse"
+      ],
+      "answer": "Sun",
+      "hint": "It lights our day.",
+      "explain": "The Sun is the closest star."
+    },
+    {
+      "id": "space-easy-05",
+      "topic": "space",
+      "level": "easy",
+      "question": "ISRO is the space agency of which country?",
+      "options": [
+        "USA",
+        "Russia",
+        "India",
+        "Japan"
+      ],
+      "answer": "India",
+      "hint": "Its headquarters are in Bengaluru.",
+      "explain": "ISRO is India's space agency."
+    },
+    {
+      "id": "space-easy-06",
+      "topic": "space",
+      "level": "easy",
+      "question": "Stars appear to shine because they…",
+      "options": [
+        "Reflect street lights",
+        "Give off their own light",
+        "Are holes in the sky",
+        "Are nearby aeroplanes"
+      ],
+      "answer": "Give off their own light",
+      "hint": "They are giant balls of hot gas.",
+      "explain": "Stars produce their own light."
+    },
+    {
+      "id": "space-medium-01",
+      "topic": "space",
+      "level": "medium",
+      "question": "Mars is often called the…",
+      "options": [
+        "Blue Planet",
+        "Red Planet",
+        "Green Planet",
+        "Ice Planet"
+      ],
+      "answer": "Red Planet",
+      "hint": "Iron-rich dust gives it colour.",
+      "explain": "Mars is the Red Planet."
+    },
+    {
+      "id": "space-medium-02",
+      "topic": "space",
+      "level": "medium",
+      "question": "Saturn is famous for its…",
+      "options": [
+        "Oceans",
+        "Rings",
+        "Forests",
+        "Cities"
+      ],
+      "answer": "Rings",
+      "hint": "A telescope shows them clearly.",
+      "explain": "Saturn is known for its rings."
+    },
+    {
+      "id": "space-medium-03",
+      "topic": "space",
+      "level": "medium",
+      "question": "Chandrayaan is India's programme to explore the…",
+      "options": [
+        "Sun",
+        "Moon",
+        "Jupiter",
+        "Asteroid belt only"
+      ],
+      "answer": "Moon",
+      "hint": "The name comes from Sanskrit for moon vehicle.",
+      "explain": "Chandrayaan is India's Moon programme."
+    },
+    {
+      "id": "space-medium-04",
+      "topic": "space",
+      "level": "medium",
+      "question": "A year on Earth is the time it takes to…",
+      "options": [
+        "Spin once",
+        "Orbit the Sun once",
+        "Reach Mars",
+        "Hide the Moon"
+      ],
+      "answer": "Orbit the Sun once",
+      "hint": "That trip is about 365 days.",
+      "explain": "A year is one orbit around the Sun."
+    },
+    {
+      "id": "space-medium-05",
+      "topic": "space",
+      "level": "medium",
+      "question": "Stars are made mostly of which gas?",
+      "options": [
+        "Oxygen",
+        "Hydrogen",
+        "Neon",
+        "Chlorine"
+      ],
+      "answer": "Hydrogen",
+      "hint": "Fusion in the core turns it into helium.",
+      "explain": "Stars are mostly hydrogen."
+    },
+    {
+      "id": "space-medium-06",
+      "topic": "space",
+      "level": "medium",
+      "question": "The International Space Station is…",
+      "options": [
+        "A hotel on the Moon",
+        "An orbiting laboratory",
+        "A mountain observatory only",
+        "A submarine"
+      ],
+      "answer": "An orbiting laboratory",
+      "hint": "Astronauts live there for months.",
+      "explain": "The ISS is a laboratory in orbit."
+    },
+    {
+      "id": "space-hard-01",
+      "topic": "space",
+      "level": "hard",
+      "question": "A light-year measures…",
+      "options": [
+        "Brightness",
+        "Distance",
+        "Temperature",
+        "Weight"
+      ],
+      "answer": "Distance",
+      "hint": "It is how far light travels in one year.",
+      "explain": "A light-year is a unit of distance."
+    },
+    {
+      "id": "space-hard-02",
+      "topic": "space",
+      "level": "hard",
+      "question": "Who was the first Indian in space?",
+      "options": [
+        "Kalpana Chawla",
+        "Rakesh Sharma",
+        "Sunita Williams",
+        "Vikram Sarabhai"
+      ],
+      "answer": "Rakesh Sharma",
+      "hint": "He flew on a Soviet mission in 1984.",
+      "explain": "Rakesh Sharma was the first Indian in space."
+    },
+    {
+      "id": "space-hard-03",
+      "topic": "space",
+      "level": "hard",
+      "question": "The Hubble instrument is a…",
+      "options": [
+        "Mars rover",
+        "Space telescope",
+        "Weather balloon",
+        "Submarine sonar"
+      ],
+      "answer": "Space telescope",
+      "hint": "It orbits Earth and photographs distant galaxies.",
+      "explain": "Hubble is a space telescope."
+    },
+    {
+      "id": "space-hard-04",
+      "topic": "space",
+      "level": "hard",
+      "question": "A black hole is known for its…",
+      "options": [
+        "Weak gravity",
+        "Very strong gravity",
+        "Bright green oceans",
+        "Breathable air"
+      ],
+      "answer": "Very strong gravity",
+      "hint": "Not even light can escape from inside it.",
+      "explain": "A black hole has extremely strong gravity."
+    },
+    {
+      "id": "space-hard-05",
+      "topic": "space",
+      "level": "hard",
+      "question": "Which planet is closest to the Sun?",
+      "options": [
+        "Venus",
+        "Mercury",
+        "Earth",
+        "Mars"
+      ],
+      "answer": "Mercury",
+      "hint": "It is the smallest planet as well.",
+      "explain": "Mercury is closest to the Sun."
+    },
+    {
+      "id": "space-hard-06",
+      "topic": "space",
+      "level": "hard",
+      "question": "Mangalyaan was India's mission to which planet?",
+      "options": [
+        "Venus",
+        "Mars",
+        "Jupiter",
+        "Saturn"
+      ],
+      "answer": "Mars",
+      "hint": "It is also called the Mars Orbiter Mission.",
+      "explain": "Mangalyaan went to Mars."
+    }
+  ]
+}

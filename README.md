@@ -80,6 +80,16 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **Word Scramble** (`games/words/`) — unscramble a common word; best streak
 - **Reaction Tap** (`games/reaction/`) — wait for gold, tap fast; best average ms
 - **Tap Order** (`games/order/`) — tap 1–9 in order on a 3×3 grid; best time
+- **Casual Quiz** (`games/quiz/`) — multiple-choice on India, Tamil Nadu, science, technology, and more, plus a General mix. Switch topic or level anytime. Marks stay in `localStorage`. Questions live only in `games/quiz/questions.json`.
+
+#### How to add or change quiz questions
+
+Edit `games/quiz/questions.json` only. The page reads topics, levels, and questions from that file.
+
+1. **New question** — append an object to `questions` with unique kebab-case `id`, existing `topic` and `level` ids, `question`, `options` (2+ strings), `answer` (must match one option exactly), `hint`, and `explain`.
+2. **New topic** — append `{ "id": "my-topic", "name": "My Topic", "blurb": "…" }` to `topics`, then add questions with `"topic": "my-topic"`. A topic with `"mix": true` (General) automatically includes every other topic — do not add questions to a mix topic.
+3. **New level** — append `{ "id": "expert", "name": "Expert", "points": 4 }` to `levels`, then tag questions with that `level`. Optional per-question `"points"` overrides the level value.
+4. Run `node scripts/site-check.mjs` before opening a PR.
 
 ### AI
 
@@ -103,7 +113,7 @@ Instruction packs and prompts for **GitHub Copilot**, **Claude Code**, and **Cod
 
 GitHub Actions workflow `.github/workflows/site-checks.yml` runs on pull requests and pushes to `main`:
 
-- Validates Skillbook / Promptbook JSON shape
+- Validates Skillbook / Promptbook / Casual Quiz JSON shape
 - Ensures every tool path listed in `assets/site.js` has a matching `index.html`
 - Basic HTML well-formedness for tool pages
 
