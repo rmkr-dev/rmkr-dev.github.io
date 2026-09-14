@@ -49,7 +49,7 @@
     <div class="quiz-actions">
       <button type="button" class="btn btn-ghost" id="hintBtn">Hint</button>
       <button type="button" class="btn btn-ghost" id="skipBtn">Skip</button>
-      <button type="button" class="btn btn-gold" id="nextBtn">Next</button>
+      <button type="button" class="btn btn-ghost" id="nextBtn">Next</button>
     </div>
     <p class="quiz-help" id="help" hidden></p>
   </div>
@@ -237,6 +237,10 @@
     return String.fromCharCode(65 + i);
   }
 
+  function setNextPrimary(on) {
+    byId("nextBtn").className = "btn " + (on ? "btn-gold" : "btn-ghost");
+  }
+
   function lockOptions() {
     var btns = byId("options").querySelectorAll("button");
     for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
@@ -295,6 +299,7 @@
       setNote("Not this one. The right answer is highlighted.", "err");
       setHelp("Answer: " + current.answer + ". " + (current.explain || "Have another go on the next question."), "err");
     }
+    setNextPrimary(true);
     byId("nextBtn").focus();
   }
 
@@ -322,6 +327,8 @@
     reveal(null);
     setNote("Skipped — no marks this round.", "err");
     setHelp("Answer: " + current.answer + ". " + (current.explain || ""), "err");
+    setNextPrimary(true);
+    byId("nextBtn").focus();
   }
 
   function nextQuestion(switched) {
@@ -351,6 +358,7 @@
       btn.addEventListener("click", function () { onChoose(opt); });
       box.appendChild(btn);
     });
+    setNextPrimary(false);
     if (switched) {
       setNote("Switched to " + topicName(topicId) + " · " + levelName(levelId) + ". Pick an answer when you like.");
     } else {
