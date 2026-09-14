@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Site checks for rmkr-dev.github.io
- * - Validate skillbook/skills.json and promptbook/prompts.json
+ * - Validate skillbook/skills.json, promptbook/prompts.json, and games/quiz/questions.json
  * - Ensure every tool path in assets/site.js has index.html
  * - Basic HTML well-formedness for key pages
  */
@@ -115,6 +115,7 @@ function checkToolPages() {
   // Optional hub
   if (!exists("ai/index.html")) warn("Optional ai/index.html not found");
   if (!exists("games/index.html")) warn("Optional games/index.html not found");
+  if (!exists("games/quiz/index.html")) fail("Missing games/quiz/index.html");
 }
 
 function basicHtmlCheck(rel) {
@@ -133,9 +134,139 @@ function basicHtmlCheck(rel) {
   if (closes < opens * 0.35) warn(`${rel}: unusually few closing tags (opens=${opens}, closes=${closes})`);
 }
 
+function kebab(s) {
+  return typeof s === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
+}
+
+function isMixTopic(t) {
+  return !!(t && (t.mix === true || t.combine === true));
+}
+
+function validateQuiz(rel) {
+  if (!exists(rel)) {
+    fail(`Missing ${rel}`);
+    return;
+  }
+  let data;
+  try {
+    data = JSON.parse(read(rel));
+  } catch (e) {
+    fail(`${rel}: invalid JSON (${e.message})`);
+    return;
+  }
+  if (data.$schema_name !== "rmkr-quiz") fail(`${rel}: expected $schema_name "rmkr-quiz"`);
+  if (data.version !== 1) fail(`${rel}: expected version 1`);
+  if (typeof data.storageKey !== "string" || !data.storageKey.startsWith("rmkr-game-")) {
+    fail(`${rel}: storageKey must start with rmkr-game-`);
+  }
+  if (!Array.isArray(data.topics) || data.topics.length < 2) {
+    fail(`${rel}: topics must be an array with at least 2 entries`);
+    return;
+  }
+  if (!Array.isArray(data.levels) || data.levels.length < 1) {
+    fail(`${rel}: levels must be a non-empty array`);
+    return;
+  }
+  if (!Array.isArray(data.questions) || data.questions.length < 12) {
+    fail(`${rel}: questions must be an array with at least 12 entries`);
+    return;
+  }
+
+  const topicIds = new Set();
+  const mixIds = new Set();
+  data.topics.forEach((t, i) => {
+    const label = `${rel} topics[${i}]`;
+    if (!t || typeof t !== "object") {
+      fail(`${label}: must be an object`);
+      return;
+    }
+    if (!kebab(t.id)) fail(`${label}: id must be kebab-case`);
+    if (typeof t.name !== "string" || !t.name.trim()) fail(`${label}: missing name`);
+    if (t.id && topicIds.has(t.id)) fail(`${rel}: duplicate topic id "${t.id}"`);
+    if (t.id) topicIds.add(t.id);
+    if (isMixTopic(t)) mixIds.add(t.id);
+  });
+  if (!mixIds.size) fail(`${rel}: at least one topic must have mix:true (General)`);
+
+  const levelIds = new Set();
+  data.levels.forEach((lv, i) => {
+    const label = `${rel} levels[${i}]`;
+    if (!lv || typeof lv !== "object") {
+      fail(`${label}: must be an object`);
+      return;
+    }
+    if (!kebab(lv.id)) fail(`${label}: id must be kebab-case`);
+    if (typeof lv.name !== "string" || !lv.name.trim()) fail(`${label}: missing name`);
+    if (typeof lv.points !== "number" || lv.points < 0) fail(`${label}: points must be a number >= 0`);
+    if (lv.id && levelIds.has(lv.id)) fail(`${rel}: duplicate level id "${lv.id}"`);
+    if (lv.id) levelIds.add(lv.id);
+  });
+
+  if (data.defaultTopic && !topicIds.has(data.defaultTopic)) {
+    fail(`${rel}: defaultTopic "${data.defaultTopic}" is not in topics`);
+  }
+  if (data.defaultLevel && !levelIds.has(data.defaultLevel)) {
+    fail(`${rel}: defaultLevel "${data.defaultLevel}" is not in levels`);
+  }
+
+  const qids = new Set();
+  const cells = new Map();
+  data.questions.forEach((q, i) => {
+    const label = `${rel} questions[${i}]`;
+    if (!q || typeof q !== "object") {
+      fail(`${label}: must be an object`);
+      return;
+    }
+    if (!kebab(q.id)) fail(`${label}: id must be kebab-case`);
+    if (q.id) {
+      if (qids.has(q.id)) fail(`${rel}: duplicate question id "${q.id}"`);
+      qids.add(q.id);
+    }
+    if (!topicIds.has(q.topic)) fail(`${label}: unknown topic "${q.topic}"`);
+    if (mixIds.has(q.topic)) fail(`${label}: mix topic "${q.topic}" should not have its own questions`);
+    if (!levelIds.has(q.level)) fail(`${label}: unknown level "${q.level}"`);
+    if (typeof q.question !== "string" || !q.question.trim()) fail(`${label}: missing question`);
+    if (!Array.isArray(q.options) || q.options.length < 2) {
+      fail(`${label}: options must have at least 2 strings`);
+    } else {
+      const seen = new Set();
+      for (const opt of q.options) {
+        if (typeof opt !== "string" || !opt.trim()) fail(`${label}: options must be non-empty strings`);
+        if (seen.has(opt)) fail(`${label}: duplicate option "${opt}"`);
+        seen.add(opt);
+      }
+      if (typeof q.answer !== "string" || !seen.has(q.answer)) {
+        fail(`${label}: answer must match one of the options exactly`);
+      }
+    }
+    if (typeof q.hint !== "string" || !q.hint.trim()) fail(`${label}: missing hint`);
+    if (typeof q.explain !== "string" || !q.explain.trim()) fail(`${label}: missing explain`);
+    if (q.topic && q.level) {
+      const key = q.topic + "/" + q.level;
+      cells.set(key, (cells.get(key) || 0) + 1);
+    }
+  });
+
+  for (const tid of topicIds) {
+    if (mixIds.has(tid)) continue;
+    for (const lid of levelIds) {
+      const n = cells.get(tid + "/" + lid) || 0;
+      if (n < 1) fail(`${rel}: no questions for topic "${tid}" level "${lid}"`);
+    }
+  }
+}
+
 function checkHtmlPages() {
   const tools = extractToolsFromSiteJs();
-  const pages = new Set(["index.html", "profile.html", "ai/index.html", "games/index.html", "skillbook/index.html", "promptbook/index.html"]);
+  const pages = new Set([
+    "index.html",
+    "profile.html",
+    "ai/index.html",
+    "games/index.html",
+    "games/quiz/index.html",
+    "skillbook/index.html",
+    "promptbook/index.html"
+  ]);
   for (const t of tools) {
     pages.add(path.posix.join(t.path.replace(/\/?$/, "/"), "index.html"));
   }
@@ -164,6 +295,7 @@ function checkSiteJsSyntax() {
 
 validateBook("skillbook/skills.json", "skills", "rmkr-skillbook");
 validateBook("promptbook/prompts.json", "prompts", "rmkr-promptbook");
+validateQuiz("games/quiz/questions.json");
 checkSiteJsSyntax();
 checkToolPages();
 checkHtmlPages();
@@ -192,4 +324,4 @@ if (errors.length) {
   process.exit(1);
 }
 console.log("site-check: OK");
-console.log(`  skills/prompts validated; tool paths checked; ${warnings.length} warning(s).`);
+console.log(`  skills/prompts/quiz validated; tool paths checked; ${warnings.length} warning(s).`);

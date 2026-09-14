@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Focus Games | RMKR Toolkit</title>
-  <meta name="description" content="Simple browser focus games — memory, sequence, number slide, word scramble, reaction tap, and tap order. No accounts, works offline after load.">
+  <meta name="description" content="Simple browser focus games — memory, sequence, number slide, word scramble, reaction tap, tap order, and a casual quiz. No accounts, works offline after load.">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -41,6 +41,10 @@
       <h3>Tap Order</h3>
       <p>Numbers 1–9 are shuffled on a 3×3 grid. Tap them in order as fast as you can.</p>
     </a>
+    <a class="tool-card ai-card-accent" href="quiz/">
+      <h3>Casual Quiz</h3>
+      <p>Multiple-choice on India, Tamil Nadu, science, tech, and more. Switch topic or level anytime.</p>
+    </a>
   </div>
 
   <h2 class="section-title">How it works</h2>
@@ -48,6 +52,7 @@
     <ul>
       <li>Everything runs client-side — nothing is uploaded.</li>
       <li>Best score / streak values use <code>localStorage</code> keys prefixed with <code>rmkr-game-</code>.</li>
+      <li>Casual Quiz questions, topics, and levels live in <code>quiz/questions.json</code> — update that file to add more.</li>
       <li>No ads, accounts, or external game CDNs.</li>
     </ul>
   </div>
