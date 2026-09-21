@@ -979,6 +979,80 @@ body[data-tool="collab"] .site-footer { display: none; }
   color: var(--color-text);
 }
 
+
+/* Color Clash */
+.colors-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  width: min(100%, 420px);
+  margin: 0 auto;
+}
+.colors-word {
+  margin: 0;
+  min-height: 3.2rem;
+  font-size: clamp(2rem, 8vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.15;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.colors-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(132px, 1fr));
+  gap: 0.65rem;
+  width: 100%;
+}
+.colors-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 64px;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--color-line);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: left;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.12s ease, background 0.12s ease, transform 0.08s ease;
+}
+.colors-choice:hover:not(:disabled) {
+  border-color: rgba(255, 195, 0, 0.55);
+}
+.colors-choice:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.colors-choice:disabled { cursor: default; }
+.colors-swatch {
+  flex: 0 0 1.55rem;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+.colors-label { line-height: 1.2; }
+.colors-choice.is-correct {
+  border-color: rgba(74, 222, 128, 0.55);
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--color-ok);
+}
+.colors-choice.is-miss {
+  border-color: rgba(248, 113, 113, 0.7);
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--color-error);
+}
+
 @media (max-width: 420px) {
   .memory-grid,
   .slide-grid {
@@ -1007,4 +1081,13 @@ body[data-tool="collab"] .site-footer { display: none; }
   }
   .quiz-option { min-height: 56px; }
   .quiz-actions .btn { flex: 1 1 calc(50% - 0.5rem); }
+  .colors-choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .colors-choice {
+    min-height: 60px;
+    padding: 0.75rem 0.85rem;
+    font-size: 0.98rem;
+  }
+
 }
