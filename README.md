@@ -81,6 +81,7 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **Reaction Tap** (`games/reaction/`) — wait for gold, tap fast; best average ms
 - **Tap Order** (`games/order/`) — tap 1–9 in order on a 3×3 grid; best time
 - **Color Clash** (`games/colors/`) — Stroop-style: tap the ink color, not the word; best streak
+- **Odd One Out** (`games/odd/`) — four tiles, three match; tap the different shape or color; best streak
 - **Casual Quiz** (`games/quiz/`) — multiple-choice on India, Tamil Nadu, science, technology, and more, plus a General mix. Switch topic or level anytime. Marks stay in `localStorage`. Questions live only in `games/quiz/questions.json`.
 
 #### How to add or change quiz questions

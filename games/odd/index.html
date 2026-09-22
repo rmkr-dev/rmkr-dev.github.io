@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odd One Out | RMKR Toolkit</title>
+  <meta name="description" content="Four tiles appear. Three match; one is different. Tap the odd one. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="odd">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Odd One Out</h1>
+  <p class="page-lead">Four tiles appear. Three match; one is different. Tap the <strong>odd one</strong>. Keep a streak going.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, then tap the tile that does not match.</p>
+  <div class="game-board-wrap">
+    <div class="odd-grid" id="stage" aria-live="polite" aria-label="Odd one out tiles"></div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-odd-best";
+  var COLORS = [
+    { id: "gold", name: "gold", hex: "#ffc300" },
+    { id: "red", name: "red", hex: "#f87171" },
+    { id: "blue", name: "blue", hex: "#60a5fa" },
+    { id: "green", name: "green", hex: "#4ade80" },
+    { id: "violet", name: "violet", hex: "#c084fc" }
+  ];
+  var SHAPES = [
+    { id: "circle", name: "circle" },
+    { id: "square", name: "square" },
+    { id: "triangle", name: "triangle" }
+  ];
+  var streak = 0;
+  var busy = false;
+  var playing = false;
+  var oddIndex = -1;
+  var stageEl = document.getElementById("stage");
+  var startBtn = document.getElementById("startBtn");
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function renderStreak() {
+    document.getElementById("streak").textContent = String(streak);
+  }
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i];
+      arr[i] = arr[j];
+      arr[j] = t;
+    }
+    return arr;
+  }
+  function pickOther(list, id) {
+    var pool = list.filter(function (item) { return item.id !== id; });
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function buildRound() {
+    var baseShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+    var baseColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+    var differBy = Math.random() < 0.5 ? "shape" : "color";
+    var oddShape = baseShape;
+    var oddColor = baseColor;
+    if (differBy === "shape") {
+      oddShape = pickOther(SHAPES, baseShape.id);
+    } else {
+      oddColor = pickOther(COLORS, baseColor.id);
+    }
+    var tiles = [
+      { shape: baseShape, color: baseColor, odd: false },
+      { shape: baseShape, color: baseColor, odd: false },
+      { shape: baseShape, color: baseColor, odd: false },
+      { shape: oddShape, color: oddColor, odd: true }
+    ];
+    shuffle(tiles);
+    return tiles;
+  }
+  function clearBoard() {
+    stageEl.innerHTML = "";
+  }
+  function nextRound() {
+    busy = false;
+    var tiles = buildRound();
+    oddIndex = -1;
+    clearBoard();
+    tiles.forEach(function (tile, i) {
+      if (tile.odd) oddIndex = i;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "odd-tile";
+      btn.setAttribute("data-index", String(i));
+      btn.setAttribute(
+        "aria-label",
+        tile.color.name + " " + tile.shape.name
+      );
+      var shape = document.createElement("span");
+      shape.className = "odd-shape odd-shape--" + tile.shape.id;
+      shape.style.backgroundColor = tile.color.hex;
+      shape.setAttribute("aria-hidden", "true");
+      btn.appendChild(shape);
+      btn.addEventListener("click", onPick);
+      stageEl.appendChild(btn);
+    });
+    setNote("Find the odd one out.");
+  }
+  function onPick(ev) {
+    if (!playing || busy) return;
+    var btn = ev.currentTarget;
+    var idx = parseInt(btn.getAttribute("data-index") || "-1", 10);
+    busy = true;
+    var buttons = stageEl.querySelectorAll(".odd-tile");
+    if (idx === oddIndex) {
+      btn.classList.add("is-correct");
+      streak += 1;
+      renderStreak();
+      var best = saveBest(streak);
+      renderBest();
+      setNote(
+        "Correct. Streak " + streak + (best === streak ? " — new best!" : "."),
+        "ok"
+      );
+      setTimeout(function () {
+        if (playing) nextRound();
+      }, 450);
+      return;
+    }
+    btn.classList.add("is-miss");
+    for (var i = 0; i < buttons.length; i++) {
+      if (parseInt(buttons[i].getAttribute("data-index") || "-1", 10) === oddIndex) {
+        buttons[i].classList.add("is-correct");
+      }
+      buttons[i].disabled = true;
+    }
+    var ended = streak;
+    streak = 0;
+    renderStreak();
+    setNote(
+      ended > 0
+        ? "Miss — press Start. Streak reset from " + ended + "."
+        : "Miss — press Start.",
+      "err"
+    );
+    startBtn.textContent = "Play again";
+    playing = false;
+    busy = false;
+  }
+  function startGame() {
+    playing = true;
+    streak = 0;
+    renderStreak();
+    renderBest();
+    startBtn.textContent = "Restart";
+    nextRound();
+  }
+  startBtn.addEventListener("click", startGame);
+  renderBest();
+  renderStreak();
+  clearBoard();
+})();
+</script>
+</body>
+</html>
