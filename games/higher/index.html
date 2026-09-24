@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Higher or Lower | RMKR Toolkit</title>
+  <meta name="description" content="Guess whether the next number is higher or lower. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="higher">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Higher or Lower</h1>
+  <p class="page-lead">A number from 1–99 is shown. Guess whether the <strong>next</strong> number will be higher or lower. Keep a streak going.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, then guess Higher or Lower.</p>
+  <div class="game-board-wrap">
+    <div class="higher-stage" id="stage" aria-live="polite" aria-label="Higher or Lower board">
+      <p class="higher-number" id="number" hidden>—</p>
+      <div class="higher-actions" id="actions" hidden>
+        <button type="button" class="btn btn-gold higher-btn" id="higherBtn" aria-label="Guess higher">Higher</button>
+        <button type="button" class="btn higher-btn" id="lowerBtn" aria-label="Guess lower">Lower</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-higher-best";
+  var streak = 0;
+  var busy = false;
+  var playing = false;
+  var current = null;
+  var numberEl = document.getElementById("number");
+  var actionsEl = document.getElementById("actions");
+  var higherBtn = document.getElementById("higherBtn");
+  var lowerBtn = document.getElementById("lowerBtn");
+  var startBtn = document.getElementById("startBtn");
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function renderStreak() {
+    document.getElementById("streak").textContent = String(streak);
+  }
+  function drawNumber(exclude) {
+    var n;
+    do {
+      n = 1 + Math.floor(Math.random() * 99);
+    } while (exclude != null && n === exclude);
+    return n;
+  }
+  function setButtonsEnabled(on) {
+    higherBtn.disabled = !on;
+    lowerBtn.disabled = !on;
+  }
+  function showBoard() {
+    numberEl.hidden = false;
+    actionsEl.hidden = false;
+  }
+  function showCurrent(n) {
+    current = n;
+    numberEl.textContent = String(n);
+    numberEl.classList.remove("ok", "err");
+  }
+  function onGuess(direction) {
+    if (!playing || busy || current == null) return;
+    busy = true;
+    setButtonsEnabled(false);
+    var next = drawNumber(current);
+    var correct =
+      (direction === "higher" && next > current) ||
+      (direction === "lower" && next < current);
+    if (correct) {
+      streak += 1;
+      renderStreak();
+      var best = saveBest(streak);
+      renderBest();
+      numberEl.classList.add("ok");
+      setNote(
+        "Correct — next was " + next + ". Streak " + streak +
+          (best === streak ? " — new best!" : "."),
+        "ok"
+      );
+      setTimeout(function () {
+        if (!playing) return;
+        showCurrent(next);
+        setButtonsEnabled(true);
+        setNote("Higher or lower than " + next + "?");
+        busy = false;
+      }, 450);
+      return;
+    }
+    numberEl.classList.add("err");
+    var ended = streak;
+    streak = 0;
+    renderStreak();
+    setNote(
+      "Wrong — next was " + next +
+        (ended > 0 ? ". Streak reset from " + ended + "." : ". Press Start."),
+      "err"
+    );
+    numberEl.textContent = String(next);
+    startBtn.textContent = "Play again";
+    playing = false;
+    busy = false;
+  }
+  function startGame() {
+    playing = true;
+    busy = false;
+    streak = 0;
+    renderStreak();
+    renderBest();
+    startBtn.textContent = "Restart";
+    showBoard();
+    showCurrent(drawNumber(null));
+    setButtonsEnabled(true);
+    setNote("Higher or lower than " + current + "?");
+  }
+  higherBtn.addEventListener("click", function () { onGuess("higher"); });
+  lowerBtn.addEventListener("click", function () { onGuess("lower"); });
+  startBtn.addEventListener("click", startGame);
+  renderBest();
+  renderStreak();
+  setButtonsEnabled(false);
+})();
+</script>
+</body>
+</html>
