@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Math | RMKR Toolkit</title>
+  <meta name="description" content="Solve simple addition and subtraction. Tap the right answer from four choices. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="math">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Quick Math</h1>
+  <p class="page-lead">A simple add or subtract problem appears. Tap the <strong>correct</strong> answer from four choices. Keep a streak going.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, then tap the right answer.</p>
+  <div class="game-board-wrap">
+    <div class="math-stage" id="stage" aria-live="polite" aria-label="Quick Math board">
+      <p class="math-problem" id="problem" hidden>—</p>
+      <div class="math-choices" id="choices" hidden aria-label="Answer choices"></div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-math-best";
+  var streak = 0;
+  var busy = false;
+  var playing = false;
+  var answer = null;
+  var problemEl = document.getElementById("problem");
+  var choicesEl = document.getElementById("choices");
+  var startBtn = document.getElementById("startBtn");
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function renderStreak() {
+    document.getElementById("streak").textContent = String(streak);
+  }
+  function randInt(min, max) {
+    return min + Math.floor(Math.random() * (max - min + 1));
+  }
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i];
+      a[i] = a[j];
+      a[j] = t;
+    }
+    return a;
+  }
+  function makeProblem() {
+    var op = Math.random() < 0.5 ? "+" : "-";
+    var a, b, ans;
+    if (op === "+") {
+      a = randInt(1, 20);
+      b = randInt(1, 20);
+      ans = a + b;
+    } else {
+      a = randInt(2, 20);
+      b = randInt(1, a);
+      ans = a - b;
+    }
+    var wrongs = {};
+    var tries = 0;
+    while (Object.keys(wrongs).length < 3 && tries < 40) {
+      tries += 1;
+      var delta = randInt(1, 5);
+      var sign = Math.random() < 0.5 ? -1 : 1;
+      var w = ans + sign * delta;
+      if (w === ans || w < 0 || wrongs[w]) continue;
+      wrongs[w] = true;
+    }
+    while (Object.keys(wrongs).length < 3) {
+      var fill = ans + Object.keys(wrongs).length + 1;
+      if (fill !== ans && fill >= 0 && !wrongs[fill]) wrongs[fill] = true;
+      else wrongs[ans + 7 + Object.keys(wrongs).length] = true;
+    }
+    var choices = shuffle([ans].concat(Object.keys(wrongs).map(Number)));
+    return { text: a + " " + op + " " + b, answer: ans, choices: choices };
+  }
+  function setChoicesEnabled(on) {
+    var buttons = choicesEl.querySelectorAll("button");
+    for (var i = 0; i < buttons.length; i++) buttons[i].disabled = !on;
+  }
+  function showBoard() {
+    problemEl.hidden = false;
+    choicesEl.hidden = false;
+  }
+  function renderRound(p) {
+    answer = p.answer;
+    problemEl.textContent = p.text + " = ?";
+    problemEl.classList.remove("ok", "err");
+    choicesEl.innerHTML = "";
+    p.choices.forEach(function (n) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn math-choice";
+      btn.textContent = String(n);
+      btn.setAttribute("aria-label", "Answer " + n);
+      btn.addEventListener("click", function () { onPick(n, btn); });
+      choicesEl.appendChild(btn);
+    });
+  }
+  function onPick(picked, btn) {
+    if (!playing || busy || answer == null) return;
+    busy = true;
+    setChoicesEnabled(false);
+    var correct = picked === answer;
+    if (correct) {
+      streak += 1;
+      renderStreak();
+      var best = saveBest(streak);
+      renderBest();
+      problemEl.classList.add("ok");
+      btn.classList.add("is-correct");
+      setNote(
+        "Correct — " + problemEl.textContent.replace(" = ?", "") + " = " + answer +
+          ". Streak " + streak + (best === streak ? " — new best!" : "."),
+        "ok"
+      );
+      setTimeout(function () {
+        if (!playing) return;
+        var next = makeProblem();
+        renderRound(next);
+        setNote("What is " + next.text + "?");
+        busy = false;
+      }, 450);
+      return;
+    }
+    problemEl.classList.add("err");
+    btn.classList.add("is-miss");
+    var buttons = choicesEl.querySelectorAll("button");
+    for (var i = 0; i < buttons.length; i++) {
+      if (Number(buttons[i].textContent) === answer) {
+        buttons[i].classList.add("is-correct");
+      }
+    }
+    var ended = streak;
+    streak = 0;
+    renderStreak();
+    setNote(
+      "Wrong — answer was " + answer +
+        (ended > 0 ? ". Streak reset from " + ended + "." : ". Press Start."),
+      "err"
+    );
+    startBtn.textContent = "Play again";
+    playing = false;
+    busy = false;
+  }
+  function startGame() {
+    playing = true;
+    busy = false;
+    streak = 0;
+    renderStreak();
+    renderBest();
+    startBtn.textContent = "Restart";
+    showBoard();
+    var p = makeProblem();
+    renderRound(p);
+    setNote("What is " + p.text + "?");
+  }
+  startBtn.addEventListener("click", startGame);
+  renderBest();
+  renderStreak();
+})();
+</script>
+</body>
+</html>
