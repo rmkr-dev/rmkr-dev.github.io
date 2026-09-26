@@ -84,6 +84,7 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **Odd One Out** (`games/odd/`) — four tiles, three match; tap the different shape or color; best streak
 - **Higher or Lower** (`games/higher/`) — guess if the next number is higher or lower; best streak
 - **Quick Math** (`games/math/`) — mental arithmetic; tap the right answer; best streak
+- **Find Number** (`games/find/`) — spot the target number in a 4×4 grid; best streak
 - **Casual Quiz** (`games/quiz/`) — multiple-choice on India, Tamil Nadu, science, technology, and more, plus a General mix. Switch topic or level anytime. Marks stay in `localStorage`. Questions live only in `games/quiz/questions.json`.
 
 #### How to add or change quiz questions
