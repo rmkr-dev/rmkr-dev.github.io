@@ -1195,6 +1195,70 @@ body[data-tool="collab"] .site-footer { display: none; }
   padding: 0.85rem 1rem;
 }
 
+/* Find Number */
+.find-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  width: min(100%, 420px);
+  margin: 0 auto;
+}
+.find-target {
+  margin: 0;
+  font-size: clamp(2.8rem, 12vw, 4rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-gold, #ffc300);
+  min-height: 1.1em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.find-target.ok { color: #4ade80; }
+.find-target.err { color: #f87171; }
+.find-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  width: 100%;
+}
+.find-cell {
+  min-height: 68px;
+  min-width: 0;
+  padding: 0.55rem 0.3rem;
+  border-radius: 14px;
+  border: 1px solid var(--color-line);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.12s ease, background 0.12s ease, transform 0.08s ease, color 0.12s ease;
+}
+.find-cell:hover:not(:disabled) {
+  border-color: rgba(255, 195, 0, 0.55);
+  color: var(--color-accent);
+}
+.find-cell:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.find-cell:disabled { cursor: default; }
+.find-cell.is-correct {
+  border-color: rgba(74, 222, 128, 0.7);
+  background: rgba(74, 222, 128, 0.14);
+  color: #4ade80;
+}
+.find-cell.is-miss {
+  border-color: rgba(248, 113, 113, 0.7);
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+}
+
 
 @media (max-width: 420px) {
   .memory-grid,
@@ -1259,6 +1323,12 @@ body[data-tool="collab"] .site-footer { display: none; }
   .higher-btn {
     min-height: 56px;
     font-size: 1rem;
+  }
+
+  .find-cell {
+    min-height: 56px;
+    font-size: 1.05rem;
+    padding: 0.45rem 0.2rem;
   }
 
 }
