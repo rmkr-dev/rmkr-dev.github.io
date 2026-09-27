@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pop Light | RMKR Toolkit</title>
+  <meta name="description" content="Tap the gold cell on a 3×3 grid before it fades. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="pop">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Pop Light</h1>
+  <p class="page-lead">One cell on a 3×3 grid lights gold. Tap <strong>that</strong> cell before it fades. A wrong tap or a slow one resets your streak.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, then tap the gold cell.</p>
+  <div class="game-board-wrap">
+    <div class="pop-stage" id="stage" aria-live="polite" aria-label="Pop Light board">
+      <div class="pop-grid" id="grid" hidden aria-label="Light grid"></div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-pop-best";
+  var CELLS = 9;
+  var streak = 0;
+  var busy = false;
+  var playing = false;
+  var roundId = 0;
+  var lit = -1;
+  var timer = null;
+  var gridEl = document.getElementById("grid");
+  var startBtn = document.getElementById("startBtn");
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function renderStreak() {
+    document.getElementById("streak").textContent = String(streak);
+  }
+  function windowMs() {
+    var ms = 1200 - streak * 35;
+    return ms < 700 ? 700 : ms;
+  }
+  function clearTimer() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  }
+  function cellButtons() {
+    return gridEl.querySelectorAll(".pop-cell");
+  }
+  function setEnabled(on) {
+    var buttons = cellButtons();
+    for (var i = 0; i < buttons.length; i++) buttons[i].disabled = !on;
+  }
+  function clearMarks() {
+    var buttons = cellButtons();
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.remove("is-lit", "is-correct", "is-miss");
+      buttons[i].setAttribute("aria-label", "Cell " + (i + 1));
+    }
+  }
+  function buildGrid() {
+    gridEl.innerHTML = "";
+    for (var i = 0; i < CELLS; i++) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pop-cell";
+      btn.dataset.index = String(i);
+      btn.setAttribute("aria-label", "Cell " + (i + 1));
+      btn.addEventListener("click", function () {
+        onTap(Number(this.dataset.index));
+      });
+      gridEl.appendChild(btn);
+    }
+  }
+  function pickNext(prev) {
+    var i = Math.floor(Math.random() * CELLS);
+    if (prev < 0 || i !== prev) return i;
+    if (Math.random() < 0.7) {
+      return (prev + 1 + Math.floor(Math.random() * (CELLS - 1))) % CELLS;
+    }
+    return i;
+  }
+  function lightAt(index) {
+    if (!playing) return;
+    clearMarks();
+    lit = index;
+    var btn = cellButtons()[index];
+    btn.classList.add("is-lit");
+    btn.setAttribute("aria-label", "Lit cell " + (index + 1));
+    setEnabled(true);
+    busy = false;
+    var id = roundId;
+    clearTimer();
+    timer = setTimeout(function () {
+      if (!playing || id !== roundId || lit !== index) return;
+      onTimeout();
+    }, windowMs());
+  }
+  function scheduleNext(prev) {
+    var id = roundId;
+    clearTimer();
+    timer = setTimeout(function () {
+      if (!playing || id !== roundId) return;
+      lightAt(pickNext(prev));
+      setNote("Tap the gold cell.");
+    }, 420);
+  }
+  function finishRound(msg) {
+    playing = false;
+    busy = false;
+    lit = -1;
+    clearTimer();
+    setEnabled(false);
+    startBtn.textContent = "Play again";
+    setNote(msg, "err");
+  }
+  function onTimeout() {
+    var buttons = cellButtons();
+    var btn = buttons[lit];
+    if (btn) {
+      btn.classList.remove("is-lit");
+      btn.classList.add("is-miss");
+    }
+    var ended = streak;
+    streak = 0;
+    renderStreak();
+    finishRound("Too slow" + (ended > 0 ? ". Streak reset from " + ended + "." : ". Press Start."));
+  }
+  function onTap(index) {
+    if (!playing || busy || lit < 0) return;
+    busy = true;
+    clearTimer();
+    setEnabled(false);
+    var buttons = cellButtons();
+    var btn = buttons[index];
+    if (index === lit) {
+      btn.classList.remove("is-lit");
+      btn.classList.add("is-correct");
+      streak += 1;
+      renderStreak();
+      var best = saveBest(streak);
+      renderBest();
+      setNote("Correct. Streak " + streak + (best === streak ? " — new best!" : "."), "ok");
+      var prev = lit;
+      lit = -1;
+      scheduleNext(prev);
+      return;
+    }
+    btn.classList.add("is-miss");
+    if (buttons[lit]) buttons[lit].classList.add("is-lit");
+    var ended = streak;
+    streak = 0;
+    renderStreak();
+    finishRound("Wrong cell" + (ended > 0 ? ". Streak reset from " + ended + "." : ". Press Start."));
+  }
+  function startGame() {
+    roundId += 1;
+    clearTimer();
+    playing = true;
+    busy = true;
+    streak = 0;
+    lit = -1;
+    renderStreak();
+    renderBest();
+    startBtn.textContent = "Restart";
+    gridEl.hidden = false;
+    buildGrid();
+    setEnabled(false);
+    setNote("Watch for gold…");
+    var id = roundId;
+    timer = setTimeout(function () {
+      if (!playing || id !== roundId) return;
+      lightAt(Math.floor(Math.random() * CELLS));
+      setNote("Tap the gold cell.");
+    }, 400);
+  }
+  startBtn.addEventListener("click", startGame);
+  renderBest();
+  renderStreak();
+})();
+</script>
+</body>
+</html>
