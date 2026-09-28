@@ -225,7 +225,7 @@
           (best === streak ? " — new best!" : "."),
         "ok"
       );
-      goNext(id, 480);
+      goNext(id, 900);
       return;
     }
     targetEl.classList.add("err");
@@ -237,7 +237,7 @@
         (ended > 0 ? ". Streak reset from " + ended + "." : "."),
       "err"
     );
-    goNext(id, 780);
+    goNext(id, 1100);
   }
   function startGame() {
     roundId += 1;
