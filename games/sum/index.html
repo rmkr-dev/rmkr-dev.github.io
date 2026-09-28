@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sum Pair | RMKR Toolkit</title>
+  <meta name="description" content="Tap the one pair of numbers that adds up to the target. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="sum">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Sum Pair</h1>
+  <p class="page-lead">A target sum appears above six different numbers. Exactly one pair adds up to it. Tap those <strong>two</strong> tiles. A hit grows your streak; a miss resets it.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, then tap the pair that adds up.</p>
+  <div class="game-board-wrap">
+    <div class="sum-stage" id="stage" aria-live="polite" aria-label="Sum Pair board">
+      <p class="sum-target" id="target" hidden>—</p>
+      <div class="sum-grid" id="grid" hidden aria-label="Number tiles"></div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-sum-best";
+  var streak = 0;
+  var busy = false;
+  var playing = false;
+  var roundId = 0;
+  var target = null;
+  var pair = null;
+  var picked = [];
+  var targetEl = document.getElementById("target");
+  var gridEl = document.getElementById("grid");
+  var startBtn = document.getElementById("startBtn");
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function renderStreak() {
+    document.getElementById("streak").textContent = String(streak);
+  }
+  function randInt(min, max) {
+    return min + Math.floor(Math.random() * (max - min + 1));
+  }
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i];
+      a[i] = a[j];
+      a[j] = t;
+    }
+    return a;
+  }
+  function splitPool(goal) {
+    var pairs = [];
+    var safe = [];
+    for (var n = 1; n <= 12; n++) {
+      var c = goal - n;
+      if (c === n || c < 1 || c > 12) safe.push(n);
+      else if (n < c) pairs.push([n, c]);
+    }
+    return { pairs: pairs, safe: safe };
+  }
+  function solutionCount(cells, goal) {
+    var count = 0;
+    var found = null;
+    for (var i = 0; i < cells.length; i++) {
+      for (var j = i + 1; j < cells.length; j++) {
+        if (cells[i] + cells[j] === goal) {
+          count += 1;
+          found = [cells[i], cells[j]];
+        }
+      }
+    }
+    return { count: count, pair: found };
+  }
+  function distinctOk(cells) {
+    var seen = {};
+    if (cells.length !== 6) return false;
+    for (var i = 0; i < cells.length; i++) {
+      if (cells[i] < 1 || cells[i] > 12 || seen[cells[i]]) return false;
+      seen[cells[i]] = true;
+    }
+    return true;
+  }
+  function makeRound() {
+    for (var attempt = 0; attempt < 40; attempt++) {
+      var goal = randInt(8, 18);
+      var pack = splitPool(goal);
+      if (!pack.pairs.length) continue;
+      var chosen = pack.pairs[randInt(0, pack.pairs.length - 1)];
+      var pool = pack.safe.slice();
+      for (var i = 0; i < pack.pairs.length; i++) {
+        var p = pack.pairs[i];
+        if (p[0] === chosen[0] && p[1] === chosen[1]) continue;
+        pool.push(Math.random() < 0.5 ? p[0] : p[1]);
+      }
+      if (pool.length < 4) continue;
+      var cells = shuffle([chosen[0], chosen[1]].concat(shuffle(pool).slice(0, 4)));
+      var check = solutionCount(cells, goal);
+      if (distinctOk(cells) && check.count === 1) {
+        return { target: goal, cells: cells, pair: check.pair };
+      }
+    }
+    return { target: 13, cells: shuffle([1, 2, 3, 4, 6, 7]), pair: [6, 7] };
+  }
+  function setCellsEnabled(on) {
+    var buttons = gridEl.querySelectorAll("button");
+    for (var i = 0; i < buttons.length; i++) buttons[i].disabled = !on;
+  }
+  function showBoard() {
+    targetEl.hidden = false;
+    gridEl.hidden = false;
+  }
+  function isSolution(n) {
+    return pair && (n === pair[0] || n === pair[1]);
+  }
+  function renderRound(round) {
+    target = round.target;
+    pair = round.pair.slice();
+    picked = [];
+    targetEl.textContent = String(round.target);
+    targetEl.setAttribute("aria-label", "Target sum " + round.target);
+    targetEl.classList.remove("ok", "err");
+    gridEl.innerHTML = "";
+    round.cells.forEach(function (n) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "sum-cell";
+      btn.textContent = String(n);
+      btn.setAttribute("aria-label", "Number " + n);
+      btn.setAttribute("aria-pressed", "false");
+      btn.addEventListener("click", function () { onTap(n, btn); });
+      gridEl.appendChild(btn);
+    });
+  }
+  function goNext(id, delay) {
+    setTimeout(function () {
+      if (!playing || id !== roundId) return;
+      var next = makeRound();
+      renderRound(next);
+      setCellsEnabled(true);
+      setNote("Tap two numbers that add to " + next.target + ".");
+      busy = false;
+    }, delay);
+  }
+  function onTap(n, btn) {
+    if (!playing || busy || target == null) return;
+    if (btn.classList.contains("is-selected")) {
+      btn.classList.remove("is-selected");
+      btn.setAttribute("aria-pressed", "false");
+      picked = picked.filter(function (item) { return item.btn !== btn; });
+      setNote("Tap two numbers that add to " + target + ".");
+      return;
+    }
+    btn.classList.add("is-selected");
+    btn.setAttribute("aria-pressed", "true");
+    picked.push({ n: n, btn: btn });
+    if (picked.length < 2) {
+      setNote("Pick a second number.");
+      return;
+    }
+    busy = true;
+    setCellsEnabled(false);
+    var id = roundId;
+    var a = picked[0];
+    var b = picked[1];
+    var correct = a.n + b.n === target;
+    var buttons = gridEl.querySelectorAll("button");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.remove("is-selected");
+      var value = Number(buttons[i].textContent);
+      if (correct && (buttons[i] === a.btn || buttons[i] === b.btn)) {
+        buttons[i].classList.add("is-correct");
+      } else if (!correct && isSolution(value)) {
+        buttons[i].classList.add("is-correct");
+      } else if (!correct && (buttons[i] === a.btn || buttons[i] === b.btn)) {
+        buttons[i].classList.add("is-miss");
+      }
+    }
+    if (correct) {
+      streak += 1;
+      renderStreak();
+      var best = saveBest(streak);
+      renderBest();
+      targetEl.classList.add("ok");
+      setNote(
+        "Correct — " + a.n + " + " + b.n + ". Streak " + streak +
+          (best === streak ? " — new best!" : "."),
+        "ok"
+      );
+      goNext(id, 480);
+      return;
+    }
+    targetEl.classList.add("err");
+    var ended = streak;
+    streak = 0;
+    renderStreak();
+    setNote(
+      "Miss — " + a.n + " + " + b.n + " is not " + target +
+        (ended > 0 ? ". Streak reset from " + ended + "." : "."),
+      "err"
+    );
+    goNext(id, 780);
+  }
+  function startGame() {
+    roundId += 1;
+    playing = true;
+    busy = false;
+    streak = 0;
+    picked = [];
+    renderStreak();
+    renderBest();
+    startBtn.textContent = "Restart";
+    showBoard();
+    var round = makeRound();
+    renderRound(round);
+    setCellsEnabled(true);
+    setNote("Tap two numbers that add to " + round.target + ".");
+  }
+  startBtn.addEventListener("click", startGame);
+  renderBest();
+  renderStreak();
+})();
+</script>
+</body>
+</html>
