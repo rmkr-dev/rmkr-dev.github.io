@@ -88,6 +88,7 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **Pop Light** (`games/pop/`) — tap the gold cell on a 3×3 grid before it fades; best streak
 - **Sum Pair** (`games/sum/`) — tap the one pair of numbers that adds to the target; best streak
 - **Missing Number** (`games/missing/`) — fill the blank in a short +1/+2/+3 sequence; best streak
+- **Even or Odd** (`games/even/`) — say whether a number from 1–99 is even or odd; best streak
 - **Casual Quiz** (`games/quiz/`) — multiple-choice on India, Tamil Nadu, science, technology, and more, plus a General mix. Switch topic or level anytime. Marks stay in `localStorage`. Questions live only in `games/quiz/questions.json`.
 
 #### How to add or change quiz questions
