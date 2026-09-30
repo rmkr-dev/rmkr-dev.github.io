@@ -1255,6 +1255,42 @@ body[data-tool="collab"] .site-footer { display: none; }
   padding: 0.85rem 1rem;
 }
 
+/* Even or Odd */
+.even-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  width: min(100%, 360px);
+  margin: 0 auto;
+}
+.even-number {
+  margin: 0;
+  font-size: clamp(3.2rem, 14vw, 4.6rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-gold, #ffc300);
+  min-height: 1.1em;
+  text-align: center;
+}
+.even-number.ok { color: #4ade80; }
+.even-number.err { color: #f87171; }
+.even-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  width: 100%;
+  justify-content: center;
+}
+.even-btn {
+  flex: 1 1 calc(50% - 0.5rem);
+  min-height: 56px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 0.85rem 1rem;
+}
+
 /* Find Number */
 .find-stage {
   display: flex;
@@ -1516,6 +1552,11 @@ body[data-tool="collab"] .site-footer { display: none; }
   }
 
   .higher-btn {
+    min-height: 56px;
+    font-size: 1rem;
+  }
+
+  .even-btn {
     min-height: 56px;
     font-size: 1rem;
   }

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Even or Odd | RMKR Toolkit</title>
+  <meta name="description" content="A number from 1–99 appears. Tap even or odd. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="even">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Even or Odd</h1>
+  <p class="page-lead">A number from 1–99 is shown. Tap whether it is <strong>even</strong> or <strong>odd</strong>. Keep a streak going.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, then tap Even or Odd.</p>
+  <div class="game-board-wrap">
+    <div class="even-stage" id="stage" aria-live="polite" aria-label="Even or Odd board">
+      <p class="even-number" id="number" hidden>—</p>
+      <div class="even-actions" id="actions" hidden>
+        <button type="button" class="btn btn-gold even-btn" id="evenBtn" aria-label="Guess even">Even</button>
+        <button type="button" class="btn even-btn" id="oddBtn" aria-label="Guess odd">Odd</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-even-best";
+  var streak = 0;
+  var busy = false;
+  var playing = false;
+  var current = null;
+  var numberEl = document.getElementById("number");
+  var actionsEl = document.getElementById("actions");
+  var evenBtn = document.getElementById("evenBtn");
+  var oddBtn = document.getElementById("oddBtn");
+  var startBtn = document.getElementById("startBtn");
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderBest() {
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function renderStreak() {
+    document.getElementById("streak").textContent = String(streak);
+  }
+  function drawNumber(exclude) {
+    var n;
+    do {
+      n = 1 + Math.floor(Math.random() * 99);
+    } while (exclude != null && n === exclude);
+    return n;
+  }
+  function parityWord(n) {
+    return n % 2 === 0 ? "even" : "odd";
+  }
+  function setButtonsEnabled(on) {
+    evenBtn.disabled = !on;
+    oddBtn.disabled = !on;
+  }
+  function showBoard() {
+    numberEl.hidden = false;
+    actionsEl.hidden = false;
+  }
+  function showCurrent(n) {
+    current = n;
+    numberEl.textContent = String(n);
+    numberEl.classList.remove("ok", "err");
+  }
+  function onGuess(parity) {
+    if (!playing || busy || current == null) return;
+    busy = true;
+    setButtonsEnabled(false);
+    var label = parityWord(current);
+    var correct = parity === label;
+    if (correct) {
+      streak += 1;
+      renderStreak();
+      var best = saveBest(streak);
+      renderBest();
+      numberEl.classList.add("ok");
+      setNote(
+        "Correct — " + current + " is " + label + ". Streak " + streak +
+          (best === streak ? " — new best!" : "."),
+        "ok"
+      );
+      setTimeout(function () {
+        if (!playing) return;
+        showCurrent(drawNumber(current));
+        setButtonsEnabled(true);
+        setNote("Even or odd?");
+        busy = false;
+      }, 450);
+      return;
+    }
+    numberEl.classList.add("err");
+    var ended = streak;
+    streak = 0;
+    renderStreak();
+    setNote(
+      "Wrong — " + current + " is " + label +
+        (ended > 0 ? ". Streak reset from " + ended + "." : ". Press Start."),
+      "err"
+    );
+    startBtn.textContent = "Play again";
+    playing = false;
+    busy = false;
+  }
+  function startGame() {
+    playing = true;
+    busy = false;
+    streak = 0;
+    renderStreak();
+    renderBest();
+    startBtn.textContent = "Restart";
+    showBoard();
+    showCurrent(drawNumber(null));
+    setButtonsEnabled(true);
+    setNote("Even or odd?");
+  }
+  evenBtn.addEventListener("click", function () { onGuess("even"); });
+  oddBtn.addEventListener("click", function () { onGuess("odd"); });
+  startBtn.addEventListener("click", startGame);
+  renderBest();
+  renderStreak();
+  setButtonsEnabled(false);
+})();
+</script>
+</body>
+</html>
