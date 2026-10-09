@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Count the Dots | RMKR Toolkit</title>
+  <meta name="description" content="A few dots flash briefly. Tap how many you saw. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="dots">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Count the Dots</h1>
+  <p class="page-lead">Between 3 and 9 dots flash for a moment. Tap <strong>how many</strong> you saw. Keep a streak going.</p>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, watch the dots, then tap the count.</p>
+  <div class="game-board-wrap">
+    <div class="even-stage" id="stage" aria-live="polite" aria-label="Count the Dots board">
+      <div class="dots-field" id="field" hidden></div>
+      <div class="even-actions" id="actions" hidden></div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-dots-best";
+  var streak = 0, playing = false, busy = false, current = 0;
+  var field = document.getElementById("field");
+  var actions = document.getElementById("actions");
+  var startBtn = document.getElementById("startBtn");
+  function loadBest() {
+    try { var v = parseInt(localStorage.getItem(KEY) || "", 10); return v > 0 ? v : null; } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var c = loadBest();
+    if (c == null || n > c) { try { localStorage.setItem(KEY, String(n)); } catch (e) {} return n; }
+    return c;
+  }
+  function setNote(m, k) { var el = document.getElementById("note"); el.textContent = m; el.className = "game-note" + (k ? " " + k : ""); }
+  function render() {
+    document.getElementById("streak").textContent = String(streak);
+    var b = loadBest(); document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function flashMs() { return Math.max(500, 1200 - streak * 50); }
+  function placeDots(n) {
+    field.innerHTML = "";
+    var cells = [];
+    for (var i = 0; i < 16; i++) cells.push(i);
+    for (var j = cells.length - 1; j > 0; j--) { var k = Math.floor(Math.random() * (j + 1)); var t = cells[j]; cells[j] = cells[k]; cells[k] = t; }
+    for (var d = 0; d < n; d++) {
+      var dot = document.createElement("span");
+      dot.className = "dots-dot";
+      dot.style.left = (12 + (cells[d] % 4) * 25 + Math.random() * 6 - 3) + "%";
+      dot.style.top = (12 + Math.floor(cells[d] / 4) * 25 + Math.random() * 6 - 3) + "%";
+      field.appendChild(dot);
+    }
+  }
+  function choicesFor(n) {
+    var set = [n];
+    while (set.length < 4) { var c = n + Math.floor(Math.random() * 7) - 3; if (c >= 2 && c <= 10 && set.indexOf(c) < 0) set.push(c); }
+    return set.sort(function (x, y) { return x - y; });
+  }
+  function round() {
+    busy = true;
+    current = 3 + Math.floor(Math.random() * 7);
+    actions.innerHTML = "";
+    placeDots(current);
+    setNote("Watch…");
+    setTimeout(function () {
+      if (!playing) return;
+      field.innerHTML = "";
+      choicesFor(current).forEach(function (c) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "btn even-btn"; b.textContent = String(c);
+        b.setAttribute("aria-label", c + " dots");
+        b.addEventListener("click", function () { guess(c); });
+        actions.appendChild(b);
+      });
+      setNote("How many dots?");
+      busy = false;
+    }, flashMs());
+  }
+  function guess(c) {
+    if (!playing || busy) return;
+    busy = true;
+    if (c === current) {
+      streak += 1; var best = saveBest(streak); render();
+      setNote("Correct — " + current + " dots. Streak " + streak + (best === streak ? " — new best!" : "."), "ok");
+      setTimeout(function () { if (playing) round(); }, 600);
+      return;
+    }
+    var ended = streak; streak = 0; playing = false; busy = false; render();
+    actions.innerHTML = "";
+    placeDots(current);
+    setNote("It was " + current + " dots" + (ended > 0 ? ". Streak reset from " + ended + "." : ". Press Play again."), "err");
+    startBtn.textContent = "Play again";
+  }
+  startBtn.addEventListener("click", function () {
+    playing = true; streak = 0; render();
+    field.hidden = false; actions.hidden = false;
+    startBtn.textContent = "Restart";
+    round();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
