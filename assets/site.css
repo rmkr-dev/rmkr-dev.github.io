@@ -1578,3 +1578,20 @@ body[data-tool="collab"] .site-footer { display: none; }
   }
 
 }
+
+.dots-field {
+  position: relative;
+  width: min(280px, 80vw);
+  aspect-ratio: 1;
+  margin: 0 auto 1rem;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 12px;
+}
+.dots-dot {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  background: #d4af37;
+}
