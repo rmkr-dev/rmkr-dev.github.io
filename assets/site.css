@@ -1595,3 +1595,13 @@ body[data-tool="collab"] .site-footer { display: none; }
   border-radius: 50%;
   background: #d4af37;
 }
+
+.arrow-row {
+  font-size: clamp(2rem, 11vw, 3.4rem);
+  letter-spacing: 0.15em;
+  text-align: center;
+  color: #d4af37;
+  min-height: 1.4em;
+  margin: 0 auto 1rem;
+  user-select: none;
+}
