@@ -90,6 +90,7 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **Missing Number** (`games/missing/`) — fill the blank in a short +1/+2/+3 sequence; best streak
 - **Even or Odd** (`games/even/`) — say whether a number from 1–99 is even or odd; best streak
 - **Count the Dots** (`games/dots/`) — 3–9 dots flash briefly; tap the count (flash shortens as the streak grows); best streak
+- **Middle Arrow** (`games/arrow/`) — tap the direction of the middle arrow while ignoring the flankers; time limit tightens with the streak; best streak
 - **Casual Quiz** (`games/quiz/`) — multiple-choice on India, Tamil Nadu, science, technology, and more, plus a General mix. Switch topic or level anytime. Marks stay in `localStorage`. Questions live only in `games/quiz/questions.json`.
 
 #### How to add or change quiz questions
