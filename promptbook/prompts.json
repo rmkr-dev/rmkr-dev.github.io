@@ -472,6 +472,26 @@
       ],
       "formatNotes": "All three. Point the tool at `application*.yml`, any `logback*.xml`, `pom.xml`, and the web filter/config package. Copilot: path-scoped logging instructions plus the files. Claude Code: the spring-boot-structured-logging-guardrails skill plus the service module. Codex: AGENTS.md logging section, then the diff.",
       "body": "Task: Make the service I specify emit structured, correlated, redacted logs. Produce a small diff plus a short verification note.\n\nContext placeholders (fill from the repo or ask only if missing):\n- Service module: {{MODULE}}\n- Spring Boot version: {{BOOT_VERSION}}\n- JSON format: {{FORMAT}}  (ecs | logstash | gelf)\n- Container profile name: {{PROFILE}}  (e.g. k8s)\n- Tracing: {{TRACING}}  (micrometer-tracing | opentelemetry-agent | none)\n\nRequirements:\n1. Inventory current logging: config files, encoders, root/package levels, any file appenders, MDC usage, and log calls that concatenate strings or print stack traces.\n2. Output: for Boot >= 3.4 set `logging.structured.format.console={{FORMAT}}` under profile {{PROFILE}}; otherwise add a profile-scoped JSON encoder in `logback-spring.xml` with the minimum new dependency. Keep pattern logs for local. Remove container file appenders.\n3. Correlation: ensure traceId/spanId land in MDC for {{TRACING}}; add a servlet/WebFlux filter that sets a request id in MDC and clears it in `finally`; propagate MDC to `@Async` executors.\n4. Hygiene: rewrite concatenated messages to parameterized form; pass exceptions as the final argument; remove log-and-rethrow duplicates; flag and redact any line logging tokens, Authorization headers, secrets, or PII.\n5. Levels: prod root INFO (or WARN), noisy libraries WARN, no DEBUG by default.\n6. Tests: add one test using `OutputCaptureExtension` (or equivalent) asserting a request log line is valid JSON, contains traceId/request id, and does not contain a sample bearer token.\n7. Docs: update README/runbook with the log fields and how to query them.\n\nOutput format:\n- Summary of changes (bullets)\n- Unified diff\n- Verification: commands to run tests and a sample JSON log line\n- Risks / follow-ups (e.g. pipeline field mappings to update)\n\nConstraints: do not change business logic; do not add a logging vendor SDK; keep the diff minimal and reviewable.\n"
+    },
+    {
+      "id": "harden-bash-script",
+      "title": "Harden This Bash Script",
+      "whenToUse": "Make an existing Bash script (CI helper, entrypoint, ops tool) strict, safely quoted, ShellCheck-clean, and tested — without changing what it does.",
+      "tools": [
+        "copilot",
+        "claude-code",
+        "codex"
+      ],
+      "tags": [
+        "shell",
+        "bash",
+        "ci",
+        "automation",
+        "security",
+        "linting"
+      ],
+      "formatNotes": "All three. Point the tool at the target `*.sh` file, any workflow or Jenkinsfile that calls it, and the Dockerfile if it is an entrypoint. Copilot: path-scoped bash instructions plus the files. Claude Code: the bash-script-hardening-guardrails skill plus the script. Codex: AGENTS.md shell section, then the diff.",
+      "body": "Task: Harden the Bash script I specify so it fails safely and passes ShellCheck. Produce a small diff plus a short verification note.\n\nContext placeholders (fill from the repo or ask only if missing):\n- Script path: {{SCRIPT}}\n- Runs in: {{RUNTIME}}  (github-actions | jenkins | container-entrypoint | local-ops)\n- Shell target: {{SHELL}}  (bash | posix-sh)\n- Required env vars: {{ENV_VARS}}\n\nRequirements:\n1. Inventory: list external commands used, env vars read, temp files written, destructive operations (`rm`, `mv`, overwrites), and every current ShellCheck finding (`shellcheck -x -f gcc {{SCRIPT}}`).\n2. Header: correct shebang for {{SHELL}}; add `set -Eeuo pipefail` (Bash) or `set -eu` (POSIX) and an ERR trap that reports `$LINENO` and the failing command to stderr.\n3. Quoting and arrays: quote all expansions, convert word-split argument strings to arrays, add `--` before user-supplied paths, replace `$(ls ...)` loops with globs or `find -print0 | while IFS= read -r -d ''`.\n4. Inputs: validate {{ENV_VARS}} with `${VAR:?message}`, check required binaries with `command -v`, add a `usage` function and exit 2 on bad args.\n5. Cleanup and safety: `mktemp` + `trap ... EXIT`; guard any `rm -rf` path against empty variables; make reruns idempotent.\n6. Secrets: remove `set -x` near credentials, move secrets out of argv to env/stdin, and add `::add-mask::` if {{RUNTIME}} is github-actions.\n7. If {{RUNTIME}} is container-entrypoint: end with `exec \"$@\"` so signals reach the main process.\n8. Tests and CI: add `bats` tests for the main branches (happy path, missing env var, bad argument) and a CI step running `shellcheck -x` and `shfmt -d`.\n\nOutput format:\n- Summary of changes (bullets)\n- Unified diff\n- Verification: commands to run shellcheck, shfmt, and bats, with expected results\n- Risks / follow-ups (behaviour that strict mode may now surface as failures)\n\nConstraints: do not change the script's intended behaviour or outputs; do not rewrite it in another language; keep the diff minimal and reviewable.\n"
     }
   ]
 }
