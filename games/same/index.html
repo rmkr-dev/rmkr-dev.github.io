@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Same as Last | RMKR Toolkit</title>
+  <meta name="description" content="Shapes appear one at a time. Tap Same if it matches the one before. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="same">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Same as Last</h1>
+  <p class="page-lead">Shapes appear one at a time. Remember each one, then tap <strong>Same</strong> if the new shape matches the one just before it, or <strong>Different</strong> if it doesn't.</p>
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start. Keyboard: S or ← for Same, D or → for Different.</p>
+  <div class="game-board-wrap">
+    <div class="even-stage" id="stage" aria-live="polite" aria-label="Same as Last board">
+      <div class="arrow-row" id="field" hidden aria-label="Shape"></div>
+      <div class="even-actions" id="actions" hidden></div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-same-best";
+  var SHAPES = [["●", "circle"], ["■", "square"], ["▲", "triangle"], ["◆", "diamond"], ["★", "star"]];
+  var streak = 0, playing = false, busy = true, prev = -1, cur = -1;
+  var field = document.getElementById("field"), actions = document.getElementById("actions"), startBtn = document.getElementById("startBtn");
+  function loadBest() { try { var v = parseInt(localStorage.getItem(KEY) || "", 10); return v > 0 ? v : null; } catch (e) { return null; } }
+  function saveBest(n) { var c = loadBest(); if (c == null || n > c) { try { localStorage.setItem(KEY, String(n)); } catch (e) {} return n; } return c; }
+  function setNote(m, k) { var el = document.getElementById("note"); el.textContent = m; el.className = "game-note" + (k ? " " + k : ""); }
+  function render() { document.getElementById("streak").textContent = String(streak); var b = loadBest(); document.getElementById("best").textContent = b == null ? "—" : String(b); }
+  function show(i) { field.textContent = SHAPES[i][0]; field.setAttribute("aria-label", "Shape: " + SHAPES[i][1]); }
+  function next() {
+    prev = cur;
+    cur = Math.random() < 0.4 ? prev : (prev + 1 + Math.floor(Math.random() * (SHAPES.length - 1))) % SHAPES.length;
+    field.textContent = "";
+    setTimeout(function () { if (!playing) return; show(cur); busy = false; setNote("Same as the last shape, or different?"); }, 250);
+  }
+  function guess(same) {
+    if (!playing || busy) return;
+    busy = true;
+    if (same === (cur === prev)) {
+      streak += 1; var best = saveBest(streak); render();
+      setNote("Correct. Streak " + streak + (best === streak ? " — new best!" : "."), "ok");
+      setTimeout(next, 300);
+      return;
+    }
+    var ended = streak; streak = 0; playing = false; render();
+    setNote("Not quite — the last shape was a " + SHAPES[prev][1] + (ended > 0 ? ". Streak reset from " + ended + "." : ". Press Play again."), "err");
+    startBtn.textContent = "Play again";
+  }
+  [[true, "Same"], [false, "Different"]].forEach(function (p) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "btn even-btn"; b.textContent = p[1];
+    b.addEventListener("click", function () { guess(p[0]); });
+    actions.appendChild(b);
+  });
+  document.addEventListener("keydown", function (e) {
+    var k = e.key.toLowerCase();
+    if (k === "s" || e.key === "ArrowLeft") { e.preventDefault(); guess(true); }
+    else if (k === "d" || e.key === "ArrowRight") { e.preventDefault(); guess(false); }
+  });
+  startBtn.addEventListener("click", function () {
+    playing = true; busy = true; streak = 0; render();
+    field.hidden = false; actions.hidden = false; startBtn.textContent = "Restart";
+    cur = Math.floor(Math.random() * SHAPES.length); show(cur);
+    setNote("Remember this shape…");
+    setTimeout(function () { if (playing) next(); }, 1200);
+  });
+  render();
+})();
+</script>
+</body>
+</html>
