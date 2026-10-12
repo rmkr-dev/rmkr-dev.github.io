@@ -1407,6 +1407,13 @@ body[data-tool="collab"] .site-footer { display: none; }
   transform: none;
 }
 
+/* Light Recall (reuses Pop Light cells) */
+.pop-grid.is-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.pop-grid.is-4 .pop-cell { min-height: 72px; }
+
 /* Sum Pair */
 .sum-stage {
   display: flex;
@@ -1569,6 +1576,8 @@ body[data-tool="collab"] .site-footer { display: none; }
 
   .pop-grid { gap: 0.55rem; }
   .pop-cell { min-height: 84px; border-radius: 14px; }
+  .pop-grid.is-4 { gap: 0.45rem; }
+  .pop-grid.is-4 .pop-cell { min-height: 60px; border-radius: 12px; }
 
   .sum-grid { gap: 0.55rem; }
   .sum-cell {
