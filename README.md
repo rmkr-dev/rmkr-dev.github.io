@@ -92,6 +92,7 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **Count the Dots** (`games/dots/`) — 3–9 dots flash briefly; tap the count (flash shortens as the streak grows); best streak
 - **Middle Arrow** (`games/arrow/`) — tap the direction of the middle arrow while ignoring the flankers; time limit tightens with the streak; best streak
 - **Same as Last** (`games/same/`) — shapes appear one at a time; tap Same or Different versus the previous shape; best streak
+- **Light Recall** (`games/recall/`) — a few cells flash gold; tap every one you saw; one more cell per level, 3×3 growing to 4×4; best level
 - **Casual Quiz** (`games/quiz/`) — multiple-choice on India, Tamil Nadu, science, technology, and more, plus a General mix. Switch topic or level anytime. Marks stay in `localStorage`. Questions live only in `games/quiz/questions.json`.
 
 #### How to add or change quiz questions

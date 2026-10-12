@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Light Recall | RMKR Toolkit</title>
+  <meta name="description" content="A few cells light up for a moment. Tap every one you saw. One more cell each level. Best level saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="recall">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Light Recall</h1>
+  <p class="page-lead">A few cells light up gold for a moment. When they go dark, tap every cell that was lit, in any order. Each level adds one more cell, and the board grows from 3×3 to 4×4.</p>
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Level: <strong id="level">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, watch the lit cells, then tap them back.</p>
+  <div class="game-board-wrap">
+    <div class="pop-stage" id="stage" aria-live="polite" aria-label="Light Recall board">
+      <div class="pop-grid" id="grid" hidden aria-label="Recall grid"></div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-recall-best";
+  var level = 0, playing = false, busy = true, roundId = 0;
+  var target = {}, found = 0, need = 0;
+  var gridEl = document.getElementById("grid"), startBtn = document.getElementById("startBtn");
+
+  function loadBest() { try { var v = parseInt(localStorage.getItem(KEY) || "", 10); return v > 0 ? v : null; } catch (e) { return null; } }
+  function saveBest(n) { var c = loadBest(); if (c == null || n > c) { try { localStorage.setItem(KEY, String(n)); } catch (e) {} return n; } return c; }
+  function setNote(m, k) { var el = document.getElementById("note"); el.textContent = m; el.className = "game-note" + (k ? " " + k : ""); }
+  function render() { document.getElementById("level").textContent = String(level); var b = loadBest(); document.getElementById("best").textContent = b == null ? "—" : String(b); }
+
+  // Level n (1-based) lights n + 2 cells: 3x3 for 3-5 lit cells, 4x4 after that (capped at 10).
+  function litCount(n) { return Math.min(n + 2, 10); }
+  function sizeFor(n) { return litCount(n) <= 5 ? 3 : 4; }
+
+  function cells() { return gridEl.querySelectorAll(".pop-cell"); }
+  function setEnabled(on) { cells().forEach(function (c) { c.disabled = !on; }); }
+
+  function build(size) {
+    gridEl.innerHTML = "";
+    gridEl.classList.toggle("is-4", size === 4);
+    for (var i = 0; i < size * size; i++) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "pop-cell"; b.disabled = true;
+      b.setAttribute("aria-label", "Cell " + (i + 1));
+      b.dataset.idx = String(i);
+      b.addEventListener("click", onTap);
+      gridEl.appendChild(b);
+    }
+  }
+
+  function pick(total, count) {
+    var idx = [];
+    for (var i = 0; i < total; i++) idx.push(i);
+    for (var j = idx.length - 1; j > 0; j--) { var r = Math.floor(Math.random() * (j + 1)); var t = idx[j]; idx[j] = idx[r]; idx[r] = t; }
+    return idx.slice(0, count);
+  }
+
+  function round() {
+    var id = ++roundId;
+    var n = level + 1, size = sizeFor(n);
+    need = litCount(n); found = 0; target = {}; busy = true;
+    build(size);
+    var chosen = pick(size * size, need);
+    var list = cells();
+    setNote("Watch " + need + " cells…");
+    setTimeout(function () {
+      if (id !== roundId) return;
+      chosen.forEach(function (i) { target[i] = true; list[i].classList.add("is-lit"); });
+      var showMs = 900 + need * 120;
+      setTimeout(function () {
+        if (id !== roundId) return;
+        list.forEach(function (c) { c.classList.remove("is-lit"); });
+        busy = false; setEnabled(true);
+        setNote("Tap the " + need + " cells that were lit.");
+      }, showMs);
+    }, 400);
+  }
+
+  function onTap(e) {
+    if (!playing || busy) return;
+    var c = e.currentTarget, i = parseInt(c.dataset.idx, 10);
+    if (c.classList.contains("is-correct")) return;
+    if (target[i]) {
+      c.classList.add("is-correct"); c.disabled = true; found += 1;
+      if (found === need) {
+        busy = true; level += 1; var best = saveBest(level); render();
+        setNote("Level " + level + " cleared" + (best === level ? " — new best!" : ".") + (litCount(level + 1) > need ? " One more cell next." : " Keep it going."), "ok");
+        setTimeout(function () { if (playing) round(); }, 900);
+      }
+      return;
+    }
+    busy = true; playing = false;
+    c.classList.add("is-miss");
+    var list = cells();
+    Object.keys(target).forEach(function (k) { if (!list[k].classList.contains("is-correct")) list[k].classList.add("is-lit"); });
+    setEnabled(false);
+    setNote("Not that one. Gold shows the cells you missed. You reached level " + level + ".", "err");
+    startBtn.textContent = "Play again";
+  }
+
+  startBtn.addEventListener("click", function () {
+    playing = true; level = 0; render();
+    gridEl.hidden = false; startBtn.textContent = "Restart";
+    round();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
