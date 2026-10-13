@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Go Stop | RMKR Toolkit</title>
+  <meta name="description" content="GO cues: tap the pad. STOP cues: do not tap. Inhibition training with a tightening time window. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="stop">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Go Stop</h1>
+  <p class="page-lead">Cues appear one at a time. When you see <strong>GO</strong> (gold), tap the pad or press Space before time runs out. When you see <strong>STOP</strong> (muted), do nothing — wait until it clears.</p>
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start. Tap on GO, hold still on STOP. Space = tap.</p>
+  <div class="game-board-wrap">
+    <div class="even-stage" id="stage" aria-live="polite" aria-label="Go Stop board">
+      <button type="button" class="stop-pad is-idle" id="pad" aria-label="Cue pad" disabled>Ready</button>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-stop-best";
+  var streak = 0, playing = false, busy = false, cue = null, timer = null, roundId = 0;
+  var pad = document.getElementById("pad");
+  var startBtn = document.getElementById("startBtn");
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function render() {
+    document.getElementById("streak").textContent = String(streak);
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  // ~1400ms down toward ~800ms as the streak grows (same idea as Middle Arrow / Pop Light).
+  function windowMs() {
+    var ms = 1400 - streak * 40;
+    return ms < 800 ? 800 : ms;
+  }
+  function clearTimer() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  }
+  function setPad(cls, label, enabled) {
+    pad.className = "stop-pad " + cls;
+    pad.textContent = label;
+    pad.disabled = !enabled;
+    pad.setAttribute("aria-label", label === "GO" ? "GO — tap now" : label === "STOP" ? "STOP — do not tap" : "Cue pad");
+  }
+  function end(why) {
+    clearTimer();
+    var ended = streak;
+    streak = 0;
+    playing = false;
+    busy = false;
+    cue = null;
+    render();
+    setPad("is-idle", "Ready", false);
+    setNote(why + (ended > 0 ? " Streak reset from " + ended + "." : " Press Play again."), "err");
+    startBtn.textContent = "Play again";
+  }
+  function success() {
+    clearTimer();
+    busy = true;
+    cue = null;
+    streak += 1;
+    var best = saveBest(streak);
+    render();
+    setNote("Nice. Streak " + streak + (best === streak ? " — new best!" : "."), "ok");
+    setPad("is-idle", "…", false);
+    setTimeout(function () {
+      if (playing) nextCue();
+    }, 380);
+  }
+  function nextCue() {
+    var id = ++roundId;
+    busy = true;
+    cue = null;
+    setPad("is-idle", "…", false);
+    setNote("Watch for GO or STOP…");
+    setTimeout(function () {
+      if (!playing || id !== roundId) return;
+      // ~55–60% GO, ~40–45% STOP
+      var isGo = Math.random() < 0.58;
+      cue = isGo ? "go" : "stop";
+      busy = false;
+      if (isGo) {
+        setPad("is-go", "GO", true);
+        setNote("GO — tap the pad (or Space).");
+      } else {
+        setPad("is-stop", "STOP", true);
+        setNote("STOP — do not tap.");
+      }
+      clearTimer();
+      timer = setTimeout(function () {
+        timer = null;
+        if (!playing || id !== roundId || busy) return;
+        if (cue === "stop") {
+          success();
+        } else if (cue === "go") {
+          end("Too slow — missed the GO window.");
+        }
+      }, windowMs());
+    }, 320);
+  }
+  function onTap() {
+    if (!playing || busy || !cue) return;
+    if (cue === "go") {
+      busy = true;
+      success();
+      return;
+    }
+    if (cue === "stop") {
+      end("False start — you tapped on STOP.");
+    }
+  }
+
+  pad.addEventListener("click", function (e) {
+    e.preventDefault();
+    onTap();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.code === "Space" || e.key === " ") {
+      e.preventDefault();
+      onTap();
+    }
+  });
+  startBtn.addEventListener("click", function () {
+    clearTimer();
+    roundId += 1;
+    playing = true;
+    busy = true;
+    cue = null;
+    streak = 0;
+    render();
+    startBtn.textContent = "Restart";
+    setPad("is-idle", "…", false);
+    nextCue();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

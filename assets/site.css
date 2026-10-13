@@ -814,6 +814,41 @@ body[data-tool="collab"] .site-footer { display: none; }
   transform: scale(0.98);
 }
 
+/* Go Stop */
+.stop-pad {
+  width: min(100%, 320px);
+  min-height: 220px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 195, 0, 0.35);
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  color: var(--color-text);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.08s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.stop-pad:disabled { cursor: default; }
+.stop-pad.is-idle {
+  background: linear-gradient(145deg, #1c2844, #121a2c);
+  color: var(--color-muted);
+}
+.stop-pad.is-go {
+  background: linear-gradient(145deg, #c9a000, #ffc300);
+  color: #12161f;
+  border-color: #ffc300;
+  transform: scale(1.02);
+}
+.stop-pad.is-stop {
+  background: linear-gradient(145deg, #2a3144, #161b28);
+  color: #9aa3b5;
+  border-color: rgba(154, 163, 181, 0.35);
+}
+.stop-pad:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
 /* Tap Order */
 .order-grid {
   display: grid;
