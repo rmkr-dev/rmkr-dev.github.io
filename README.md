@@ -95,6 +95,7 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **Light Recall** (`games/recall/`) — a few cells flash gold; tap every one you saw; one more cell per level, 3×3 growing to 4×4; best level
 - **Go Stop** (`games/stop/`) — tap on GO, hold still on STOP; time window tightens with the streak; best streak
 - **Turned or Flipped** (`games/turn/`) — reference vs probe shape; tap whether the probe is rotated or mirrored; best streak
+- **Spot the Change** (`games/change/`) — a grid of shapes blinks off and returns with one cell changed in shape or color; tap it; 3×3 growing to 4×4, look time shrinks with the streak; best streak
 - **Casual Quiz** (`games/quiz/`) — multiple-choice on India, Tamil Nadu, science, technology, and more, plus a General mix. Switch topic or level anytime. Marks stay in `localStorage`. Questions live only in `games/quiz/questions.json`.
 
 #### How to add or change quiz questions
