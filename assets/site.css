@@ -1693,3 +1693,19 @@ body[data-tool="collab"] .site-footer { display: none; }
 .turn-cell.is-on {
   background: linear-gradient(145deg, #c9a000, #ffc300);
 }
+
+/* Spot the Change (reuses Pop Light cells) */
+.change-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.change-sym {
+  width: 58%;
+  height: 58%;
+  pointer-events: none;
+}
+.change-grid.is-4 .change-sym {
+  width: 62%;
+  height: 62%;
+}
