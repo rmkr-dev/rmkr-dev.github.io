@@ -1709,3 +1709,22 @@ body[data-tool="collab"] .site-footer { display: none; }
   width: 62%;
   height: 62%;
 }
+
+/* More Dots (reuses Turned or Flipped pair + Count the Dots field) */
+.more-pair .dots-field {
+  width: min(200px, 40vw);
+  margin: 0;
+  transition: box-shadow 0.15s ease;
+}
+.more-pair .dots-dot {
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+}
+.more-card.is-correct .dots-field {
+  box-shadow: 0 0 0 2px #4ade80;
+}
+.more-actions .even-btn {
+  flex: 1 1 0;
+  min-width: 0;
+}

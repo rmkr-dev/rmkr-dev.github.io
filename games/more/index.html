@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>More Dots | RMKR Toolkit</title>
+  <meta name="description" content="Two panels of dots. Tap Left, Equal, or Right for the side with more. Counts get closer and the view gets shorter as the streak grows. Best streak saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body data-root="../../" data-tool="more">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">More Dots</h1>
+  <p class="page-lead">Two panels of dots appear for a moment. Tap <strong>Left</strong> or <strong>Right</strong> for the side with more dots, or <strong>Equal</strong> if they match. Don't count — estimate.</p>
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Streak: <strong id="streak">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start. Keyboard: ← Left, ↓ or E Equal, → Right.</p>
+  <div class="game-board-wrap">
+    <div class="even-stage more-stage" id="stage" aria-live="polite" aria-label="More Dots board">
+      <div class="turn-pair more-pair" id="pair" hidden>
+        <div class="turn-card more-card" id="leftCard">
+          <span class="turn-label">Left</span>
+          <div class="dots-field" id="leftField" aria-hidden="true"></div>
+        </div>
+        <div class="turn-card more-card" id="rightCard">
+          <span class="turn-label">Right</span>
+          <div class="dots-field" id="rightField" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="even-actions more-actions" id="actions" hidden></div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-more-best";
+  var GRID = 6;
+  var streak = 0, playing = false, busy = true, roundId = 0, answer = null, counts = [0, 0];
+  var pair = document.getElementById("pair");
+  var actions = document.getElementById("actions");
+  var leftField = document.getElementById("leftField");
+  var rightField = document.getElementById("rightField");
+  var leftCard = document.getElementById("leftCard");
+  var rightCard = document.getElementById("rightCard");
+  var startBtn = document.getElementById("startBtn");
+
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(n) {
+    var cur = loadBest();
+    if (cur == null || n > cur) {
+      try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+      return n;
+    }
+    return cur;
+  }
+  function setNote(msg, kind) {
+    var el = document.getElementById("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function render() {
+    document.getElementById("streak").textContent = String(streak);
+    var b = loadBest();
+    document.getElementById("best").textContent = b == null ? "—" : String(b);
+  }
+  function rand(n) { return Math.floor(Math.random() * n); }
+
+  // Difficulty: the gap between sides narrows and the view time shrinks with the streak.
+  function gapFor(s) {
+    if (s < 3) return 3 + rand(3);
+    if (s < 6) return 2 + rand(2);
+    if (s < 10) return 1 + rand(2);
+    return 1;
+  }
+  function viewMs(s) { return Math.max(800, 2600 - s * 120); }
+
+  function makeCounts(s) {
+    var hi = Math.min(24, 10 + s);
+    if (Math.random() < 0.2) {
+      var n = 4 + rand(hi - 3);
+      return [n, n];
+    }
+    var gap = gapFor(s);
+    var small = 3 + rand(Math.max(1, hi - gap - 2));
+    var big = small + gap;
+    return Math.random() < 0.5 ? [big, small] : [small, big];
+  }
+
+  function placeDots(field, n) {
+    field.innerHTML = "";
+    var slots = [];
+    for (var i = 0; i < GRID * GRID; i++) slots.push(i);
+    for (var j = slots.length - 1; j > 0; j--) { var k = rand(j + 1); var t = slots[j]; slots[j] = slots[k]; slots[k] = t; }
+    var step = 100 / GRID;
+    for (var d = 0; d < n; d++) {
+      var dot = document.createElement("span");
+      dot.className = "dots-dot";
+      dot.style.left = (step / 2 + (slots[d] % GRID) * step + Math.random() * 5 - 2.5) + "%";
+      dot.style.top = (step / 2 + Math.floor(slots[d] / GRID) * step + Math.random() * 5 - 2.5) + "%";
+      field.appendChild(dot);
+    }
+  }
+  function clearMarks() {
+    leftCard.classList.remove("is-correct");
+    rightCard.classList.remove("is-correct");
+  }
+  function setEnabled(on) {
+    actions.querySelectorAll("button").forEach(function (b) { b.disabled = !on; });
+  }
+
+  function round() {
+    busy = true;
+    roundId += 1;
+    var id = roundId;
+    clearMarks();
+    counts = makeCounts(streak);
+    answer = counts[0] > counts[1] ? "left" : counts[0] < counts[1] ? "right" : "equal";
+    placeDots(leftField, counts[0]);
+    placeDots(rightField, counts[1]);
+    setEnabled(true);
+    busy = false;
+    setNote("Which side has more?");
+    setTimeout(function () {
+      if (id !== roundId || !playing || busy) return;
+      leftField.innerHTML = "";
+      rightField.innerHTML = "";
+      setNote("Hidden — Left, Equal, or Right?");
+    }, viewMs(streak));
+  }
+
+  function word(a) { return a === "left" ? "Left" : a === "right" ? "Right" : "Equal"; }
+
+  function guess(choice) {
+    if (!playing || busy) return;
+    busy = true;
+    setEnabled(false);
+    placeDots(leftField, counts[0]);
+    placeDots(rightField, counts[1]);
+    if (answer === "left") leftCard.classList.add("is-correct");
+    if (answer === "right") rightCard.classList.add("is-correct");
+    var tally = counts[0] + " vs " + counts[1];
+    if (choice === answer) {
+      streak += 1;
+      var best = saveBest(streak);
+      render();
+      setNote("Correct — " + tally + ". Streak " + streak + (best === streak ? " — new best!" : "."), "ok");
+      var id = roundId;
+      setTimeout(function () { if (playing && id === roundId) round(); }, 750);
+      return;
+    }
+    var ended = streak;
+    streak = 0;
+    playing = false;
+    render();
+    setNote("It was " + word(answer) + " (" + tally + ")" + (ended > 0 ? ". Streak reset from " + ended + "." : ". Press Play again."), "err");
+    startBtn.textContent = "Play again";
+  }
+
+  [["left", "← Left"], ["equal", "Equal"], ["right", "Right →"]].forEach(function (p) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn even-btn" + (p[0] === "equal" ? "" : " btn-gold");
+    b.textContent = p[1];
+    b.setAttribute("aria-label", p[0] === "equal" ? "Both sides equal" : word(p[0]) + " has more");
+    b.disabled = true;
+    b.addEventListener("click", function () { guess(p[0]); });
+    actions.appendChild(b);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var k = e.key.toLowerCase();
+    if (e.key === "ArrowLeft") { e.preventDefault(); guess("left"); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); guess("right"); }
+    else if (e.key === "ArrowDown" || k === "e") { e.preventDefault(); guess("equal"); }
+  });
+  startBtn.addEventListener("click", function () {
+    playing = true;
+    streak = 0;
+    render();
+    pair.hidden = false;
+    actions.hidden = false;
+    startBtn.textContent = "Restart";
+    round();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
