@@ -1830,3 +1830,10 @@ body[data-tool="collab"] .site-footer { display: none; }
   color: var(--color-accent);
 }
 .lv-paused[hidden] { display: none; }
+
+/* Echo Path */
+.lv-cell.is-trail {
+  border-color: rgba(255, 195, 0, 0.6);
+  color: var(--color-accent);
+}
+.lv-lives { letter-spacing: 0.15em; }
