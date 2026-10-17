@@ -99,6 +99,7 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **More Dots** (`games/more/`) — two panels of dots; tap Left, Equal, or Right for the side with more; counts get closer and view time shrinks with the streak; best streak
 - **Glow Grid** (`games/glow/`) — 12-level logic puzzle from 3×3 to 5×5; each tap flips a cell and its four neighbours, light every cell; par-move and time bonuses, pause and restart; best total score
 - **Echo Path** (`games/echo/`) — staged memory game; watch a path of adjacent cells light up, then trace it in order; one step longer per stage, grid grows 3×3 → 5×5, three lives, combo multiplier up to ×5, pause and restart; best score
+- **Number Forge** (`games/forge/`) — target-number puzzle; tap a tile, a sign, and a second tile to merge them, and make the target; Journey runs 15 puzzles over 5 tiers (3 → 5 tiles, × then ÷ unlock, 3 skips), Blitz is 2 minutes (+5s per solve); par and speed bonuses, clean-streak bonus, undo/reset/hint, results summary; best score per mode
 
 #### Casual Quiz (unlisted)
 
