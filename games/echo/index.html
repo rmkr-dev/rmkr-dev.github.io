@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Echo Path | RMKR Toolkit</title>
+  <meta name="description" content="A staged memory game: watch a path wind across the grid, then trace it back in order. Paths grow and grids widen as you climb. Best score saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body class="game-page" data-root="../../" data-tool="echo">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Echo Path</h1>
+  <p class="page-lead">A path lights up one cell at a time. When it finishes, trace the same path back in order. Each stage adds a step, and the grid grows from 3×3 to 5×5.</p>
+
+  <details class="lv-help">
+    <summary>How to play</summary>
+    <ul>
+      <li>Watch the gold cells light up in sequence. Each one touches the one before it.</li>
+      <li>Then tap the same cells in the same order.</li>
+      <li>Clear a stage to go up: the path gets one step longer, and the grid widens at stages 4 and 7.</li>
+      <li>You have three lives. A wrong tap costs one and replays the stage with a new path.</li>
+      <li>Scoring: each correct step earns 10 × stage × combo. Clean stages in a row raise the combo, up to ×5. A miss resets it.</li>
+      <li>Keyboard: arrow keys move, Enter or Space taps, P pauses, R starts over. Pausing mid-preview replays the path when you resume.</li>
+      <li>Your best score stays in this browser only.</li>
+    </ul>
+  </details>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span>Stage: <strong id="stage">1</strong></span>
+      <span>Lives: <strong id="lives" class="lv-lives">♥♥♥</strong></span>
+      <span>Combo: <strong id="combo">×1</strong></span>
+      <span>Score: <strong id="score">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+      <button type="button" class="btn btn-ghost" id="pauseBtn" disabled>Pause</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Press Start, watch the path, then trace it.</p>
+  <div class="game-board-wrap">
+    <div class="lv-stage">
+      <div class="lv-grid" id="grid" role="grid" aria-label="Echo Path board"></div>
+      <div class="lv-paused" id="paused" hidden>Paused</div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = "rmkr-game-echo-best";
+  var MAX_LIVES = 3;
+  var gridEl = document.getElementById("grid");
+  var startBtn = document.getElementById("startBtn");
+  var pauseBtn = document.getElementById("pauseBtn");
+  var pausedEl = document.getElementById("paused");
+
+  var stage = 1, lives = MAX_LIVES, combo = 1, score = 0, n = 3;
+  var path = [], step = 0, phase = "idle"; // idle | watch | input | between | over
+  var playing = false, paused = false, token = 0, focusIdx = 0;
+
+  function $(id) { return document.getElementById(id); }
+  function loadBest() {
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(v) {
+    var cur = loadBest();
+    if (v > 0 && (cur == null || v > cur)) {
+      try { localStorage.setItem(KEY, String(v)); } catch (e) {}
+      return true;
+    }
+    return false;
+  }
+  function setNote(msg, kind) {
+    var el = $("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function renderHud() {
+    $("stage").textContent = String(stage);
+    var h = "";
+    for (var i = 0; i < MAX_LIVES; i++) h += i < lives ? "♥" : "♡";
+    $("lives").textContent = h;
+    $("lives").setAttribute("aria-label", lives + " lives");
+    $("combo").textContent = "×" + combo;
+    $("score").textContent = String(score);
+    var b = loadBest();
+    $("best").textContent = b == null ? "—" : String(b);
+  }
+  function sizeFor(s) { return s >= 7 ? 5 : s >= 4 ? 4 : 3; }
+  function lengthFor(s) { return Math.min(2 + s, 16); }
+  function speedFor(s) { return Math.max(380, 700 - s * 25); }
+
+  function buildGrid() {
+    gridEl.innerHTML = "";
+    gridEl.style.setProperty("--n", String(n));
+    for (var i = 0; i < n * n; i++) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "lv-cell";
+      b.dataset.index = String(i);
+      b.tabIndex = i === focusIdx ? 0 : -1;
+      b.setAttribute("aria-label", "Row " + (Math.floor(i / n) + 1) + " column " + (i % n + 1));
+      b.addEventListener("click", function () { onTap(Number(this.dataset.index)); });
+      gridEl.appendChild(b);
+    }
+    setEnabled(false);
+  }
+  function setEnabled(on) {
+    var bs = gridEl.children;
+    for (var i = 0; i < bs.length; i++) bs[i].disabled = !on;
+  }
+  function clearMarks() {
+    var bs = gridEl.children;
+    for (var i = 0; i < bs.length; i++) {
+      bs[i].classList.remove("is-on", "is-ok", "is-miss", "is-trail");
+      bs[i].textContent = "";
+    }
+  }
+  function neighbours(i) {
+    var r = Math.floor(i / n), c = i % n, out = [];
+    if (r > 0) out.push(i - n);
+    if (r < n - 1) out.push(i + n);
+    if (c > 0) out.push(i - 1);
+    if (c < n - 1) out.push(i + 1);
+    return out;
+  }
+  function makePath(len) {
+    for (var tries = 0; tries < 200; tries++) {
+      var p = [Math.floor(Math.random() * n * n)];
+      while (p.length < len) {
+        var opts = neighbours(p[p.length - 1]).filter(function (x) { return p.indexOf(x) === -1; });
+        if (!opts.length) break;
+        p.push(opts[Math.floor(Math.random() * opts.length)]);
+      }
+      if (p.length === len) return p;
+    }
+    return p;
+  }
+  function wait(ms, t) {
+    return new Promise(function (res, rej) {
+      setTimeout(function () { t === token ? res() : rej(); }, ms);
+    });
+  }
+  function playPreview() {
+    phase = "watch";
+    var t = ++token;
+    clearMarks();
+    setEnabled(false);
+    setNote("Watch the path… (" + path.length + " steps)");
+    var bs = gridEl.children, ms = speedFor(stage), chain = wait(450, t);
+    path.forEach(function (idx, k) {
+      chain = chain.then(function () {
+        bs[idx].classList.add("is-on");
+        bs[idx].textContent = String(k + 1);
+        return wait(ms, t);
+      }).then(function () {
+        bs[idx].classList.remove("is-on");
+        bs[idx].textContent = "";
+        return wait(90, t);
+      });
+    });
+    chain.then(function () {
+      phase = "input";
+      step = 0;
+      setEnabled(true);
+      setNote("Your turn: trace " + path.length + " steps.");
+    }, function () {});
+  }
+  function beginStage() {
+    var newN = sizeFor(stage);
+    if (newN !== n || !gridEl.children.length) {
+      n = newN;
+      focusIdx = Math.min(focusIdx, n * n - 1);
+      buildGrid();
+    }
+    path = makePath(lengthFor(stage));
+    renderHud();
+    playPreview();
+  }
+  function onTap(i) {
+    if (!playing || paused || phase !== "input") return;
+    focusIdx = i;
+    var bs = gridEl.children;
+    if (i === path[step]) {
+      bs[i].classList.add("is-trail");
+      bs[i].textContent = String(step + 1);
+      score += 10 * stage * combo;
+      step += 1;
+      renderHud();
+      if (step === path.length) stageClear();
+      return;
+    }
+    phase = "between";
+    setEnabled(false);
+    bs[i].classList.add("is-miss");
+    if (bs[path[step]]) bs[path[step]].classList.add("is-ok");
+    lives -= 1;
+    combo = 1;
+    renderHud();
+    if (lives <= 0) { gameOver(); return; }
+    setNote("Missed. " + lives + (lives === 1 ? " life" : " lives") + " left — new path for stage " + stage + ".", "err");
+    var t = ++token;
+    wait(1300, t).then(beginStage, function () {});
+  }
+  function stageClear() {
+    phase = "between";
+    setEnabled(false);
+    var bs = gridEl.children;
+    for (var k = 0; k < path.length; k++) bs[path[k]].classList.add("is-ok");
+    var bonus = 25 * stage;
+    score += bonus;
+    var isBest = saveBest(score);
+    combo = Math.min(5, combo + 1);
+    renderHud();
+    setNote("Stage " + stage + " clear (+" + bonus + " bonus)" + (isBest ? " — new best!" : "."), "ok");
+    stage += 1;
+    var t = ++token;
+    wait(1100, t).then(beginStage, function () {});
+  }
+  function gameOver() {
+    phase = "over";
+    playing = false;
+    token++;
+    pauseBtn.disabled = true;
+    startBtn.textContent = "Play again";
+    var isBest = saveBest(score);
+    renderHud();
+    setNote("Out of lives at stage " + stage + ". Score " + score + (isBest ? " — new best!" : "."), "err");
+  }
+  function startGame() {
+    token++;
+    playing = true;
+    paused = false;
+    pausedEl.hidden = true;
+    stage = 1; lives = MAX_LIVES; combo = 1; score = 0;
+    gridEl.innerHTML = "";
+    startBtn.textContent = "Restart";
+    pauseBtn.disabled = false;
+    pauseBtn.textContent = "Pause";
+    beginStage();
+  }
+  function togglePause() {
+    if (!playing) return;
+    paused = !paused;
+    pausedEl.hidden = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+    if (paused) {
+      var wasWatching = phase === "watch" || phase === "between";
+      token++;
+      setEnabled(false);
+      if (wasWatching) phase = "replay";
+      setNote("Paused.");
+      return;
+    }
+    if (phase === "replay") { beginStageKeepPath(); return; }
+    if (phase === "input") { setEnabled(true); setNote("Resumed: step " + (step + 1) + " of " + path.length + "."); }
+  }
+  function beginStageKeepPath() {
+    if (sizeFor(stage) !== n) { beginStage(); return; }
+    if (!path.length || path.length !== lengthFor(stage)) path = makePath(lengthFor(stage));
+    renderHud();
+    playPreview();
+  }
+  startBtn.addEventListener("click", startGame);
+  pauseBtn.addEventListener("click", togglePause);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key;
+    if (k === "p" || k === "P") { togglePause(); e.preventDefault(); return; }
+    if (k === "r" || k === "R") { startGame(); e.preventDefault(); return; }
+    if (!playing || paused || !gridEl.children.length) return;
+    var r = Math.floor(focusIdx / n), c = focusIdx % n, moved = true;
+    if (k === "ArrowUp") r = Math.max(0, r - 1);
+    else if (k === "ArrowDown") r = Math.min(n - 1, r + 1);
+    else if (k === "ArrowLeft") c = Math.max(0, c - 1);
+    else if (k === "ArrowRight") c = Math.min(n - 1, c + 1);
+    else moved = false;
+    if (moved) {
+      e.preventDefault();
+      var bs = gridEl.children;
+      if (bs[focusIdx]) bs[focusIdx].tabIndex = -1;
+      focusIdx = r * n + c;
+      bs[focusIdx].tabIndex = 0;
+      bs[focusIdx].focus();
+    }
+  });
+  buildGrid();
+  renderHud();
+})();
+</script>
+</body>
+</html>
