@@ -1728,3 +1728,31 @@ body[data-tool="collab"] .site-footer { display: none; }
   flex: 1 1 0;
   min-width: 0;
 }
+
+/* Focus Games: mobile tap handling.
+   Double-tap zoom is turned off on game pages via touch-action (pinch zoom
+   still works), taps don't select text or flash a highlight, and controls
+   keep a 44px minimum tap target. */
+.game-page main {
+  touch-action: manipulation;
+}
+.game-page main button,
+.game-page main .btn,
+.game-page main .chip,
+.game-page .game-board-wrap {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.game-page main .btn,
+.game-page main .chip {
+  min-height: 44px;
+  min-width: 44px;
+}
+.game-page .game-board-wrap input,
+.game-page .game-board-wrap textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
