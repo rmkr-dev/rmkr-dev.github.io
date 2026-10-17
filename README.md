@@ -97,6 +97,7 @@ The home page lists one **Games Hub** card (`games/`). Individual games live on 
 - **Turned or Flipped** (`games/turn/`) — reference vs probe shape; tap whether the probe is rotated or mirrored; best streak
 - **Spot the Change** (`games/change/`) — a grid of shapes blinks off and returns with one cell changed in shape or color; tap it; 3×3 growing to 4×4, look time shrinks with the streak; best streak
 - **More Dots** (`games/more/`) — two panels of dots; tap Left, Equal, or Right for the side with more; counts get closer and view time shrinks with the streak; best streak
+- **Glow Grid** (`games/glow/`) — 12-level logic puzzle from 3×3 to 5×5; each tap flips a cell and its four neighbours, light every cell; par-move and time bonuses, pause and restart; best total score
 
 #### Casual Quiz (unlisted)
 

@@ -1756,3 +1756,77 @@ body[data-tool="collab"] .site-footer { display: none; }
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* Level games (Glow Grid, Echo Path): shared layout */
+.lv-help {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.lv-help summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--color-text);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.lv-help ul { margin: 0.25rem 0 0.4rem; padding-left: 1.2rem; }
+.lv-stage {
+  position: relative;
+  width: min(100%, 420px);
+}
+.lv-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+  gap: 0.5rem;
+  width: 100%;
+}
+.lv-cell {
+  aspect-ratio: 1;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid var(--color-line);
+  background: linear-gradient(145deg, #1c2844, #121a2c);
+  color: var(--color-text);
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, transform 0.08s ease;
+}
+.lv-cell:hover:not(:disabled) { border-color: rgba(255, 195, 0, 0.5); }
+.lv-cell:disabled { cursor: default; }
+.lv-cell:active:not(:disabled) { transform: scale(0.96); }
+.lv-cell.is-on {
+  background: linear-gradient(145deg, #c9a000, #ffc300);
+  border-color: #ffc300;
+  color: var(--color-bg);
+  box-shadow: 0 0 0 2px rgba(255, 195, 0, 0.3);
+}
+.lv-cell.is-ok {
+  background: linear-gradient(145deg, #15803d, #4ade80);
+  border-color: #86efac;
+}
+.lv-cell.is-miss {
+  background: linear-gradient(145deg, #b91c1c, #f87171);
+  border-color: #fecaca;
+}
+.lv-paused {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 21, 36, 0.94);
+  border-radius: var(--radius);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--color-accent);
+}
+.lv-paused[hidden] { display: none; }
