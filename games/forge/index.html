@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Number Forge | RMKR Toolkit</title>
+  <meta name="description" content="A target-number puzzle: combine number tiles with +, −, × and ÷ to hit the target. Fifteen-puzzle Journey or two-minute Blitz. Best score per mode saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body class="game-page" data-root="../../" data-tool="forge">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Number Forge</h1>
+  <p class="page-lead">Combine number tiles two at a time to make the target. Start with plus and minus on three tiles; times and divide unlock as you climb.</p>
+
+  <details class="lv-help">
+    <summary>How to play</summary>
+    <ul>
+      <li>Tap a number, tap a sign, then tap a second number. The two merge into their result.</li>
+      <li>Make any tile equal the target to clear the puzzle. You don't have to use every tile.</li>
+      <li>Results must be whole numbers above zero, so subtract the smaller number and only divide when it goes in evenly.</li>
+      <li><strong>Journey:</strong> 15 puzzles over 5 tiers. Tiles go from 3 to 5, and × then ÷ unlock. You get 3 skips.</li>
+      <li><strong>Blitz:</strong> 2 minutes. Each solve adds 5 seconds and a skip costs 10. Puzzles get harder every 3 solves.</li>
+      <li>Scoring: higher tiers are worth more. Finish at or under <em>par</em> (the fewest steps possible) for a bonus. In Journey, speed adds a bonus too. Clean solves in a row add up to +50%. A hint halves that puzzle's points.</li>
+      <li>Undo takes back one step, Reset goes back to the start of the puzzle, and Hint shows a step that works from where you are.</li>
+      <li>Keyboard: 1–5 pick tiles, + − * / pick the sign, Backspace or U undo, R reset, H hint, S skip, Esc clears, P pauses.</li>
+      <li>Each mode's best score stays in this browser only.</li>
+    </ul>
+  </details>
+
+  <div class="book-chips" id="modes" role="group" aria-label="Game mode">
+    <button type="button" class="chip is-active" data-mode="journey" aria-pressed="true">Journey · 15 puzzles</button>
+    <button type="button" class="chip" data-mode="blitz" aria-pressed="false">Blitz · 2 minutes</button>
+  </div>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span><span id="progLabel">Puzzle</span>: <strong id="prog">—</strong></span>
+      <span><span id="timeLabel">Time</span>: <strong id="time">0s</strong></span>
+      <span id="skipsWrap">Skips: <strong id="skips">3</strong></span>
+      <span>Score: <strong id="score">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+      <button type="button" class="btn btn-ghost" id="pauseBtn" disabled>Pause</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Pick a mode and press Start.</p>
+
+  <div class="game-board-wrap">
+    <div class="lv-stage">
+      <div class="nf-board" id="board">
+        <div class="nf-target">
+          <span class="nf-target-label" id="tierLabel">Target</span>
+          <strong class="nf-target-num" id="target">?</strong>
+        </div>
+        <div class="nf-tiles" id="tiles" role="group" aria-label="Number tiles"></div>
+        <div class="nf-ops" id="ops" role="group" aria-label="Signs">
+          <button type="button" class="nf-op" data-op="+" aria-label="plus" aria-pressed="false" disabled>+</button>
+          <button type="button" class="nf-op" data-op="-" aria-label="minus" aria-pressed="false" disabled>−</button>
+          <button type="button" class="nf-op" data-op="*" aria-label="times" aria-pressed="false" disabled>×</button>
+          <button type="button" class="nf-op" data-op="/" aria-label="divide" aria-pressed="false" disabled>÷</button>
+        </div>
+        <div class="nf-tools">
+          <button type="button" class="btn btn-ghost" id="undoBtn" disabled>Undo</button>
+          <button type="button" class="btn btn-ghost" id="resetBtn" disabled>Reset</button>
+          <button type="button" class="btn btn-ghost" id="hintBtn" disabled>Hint</button>
+          <button type="button" class="btn btn-ghost" id="skipBtn" disabled>Skip</button>
+        </div>
+        <ol class="nf-log" id="log" aria-label="Steps so far"></ol>
+      </div>
+      <div class="nf-results" id="results" hidden>
+        <h2 class="nf-results-title" id="resTitle">Run complete</h2>
+        <dl class="nf-results-list" id="resList"></dl>
+        <button type="button" class="btn btn-gold" id="againBtn">Play again</button>
+      </div>
+      <div class="lv-paused" id="paused" hidden>Paused</div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  // core:start
+  var TIERS = [
+    { count: 3, ops: "+-", lo: 1, hi: 9, steps: [1, 2], tmin: 5, tmax: 25, parMin: 1 },
+    { count: 4, ops: "+-", lo: 1, hi: 12, steps: [2, 3], tmin: 10, tmax: 40, parMin: 2 },
+    { count: 4, ops: "+-*", lo: 1, hi: 10, steps: [2, 3], tmin: 12, tmax: 90, parMin: 2, focus: "*" },
+    { count: 5, ops: "+-*", lo: 1, hi: 10, big: [15, 20, 25], steps: [3, 4], tmin: 20, tmax: 150, parMin: 2 },
+    { count: 5, ops: "+-*/", lo: 1, hi: 12, big: [20, 25, 50], steps: [3, 4], tmin: 20, tmax: 200, parMin: 3, focus: "/" }
+  ];
+  var MAX_VALUE = 9999;
+  var OP_LABEL = { "+": "+", "-": "−", "*": "×", "/": "÷" };
+
+  function applyOp(a, op, b) {
+    var r = null;
+    if (op === "+") r = a + b;
+    else if (op === "-") r = a - b > 0 ? a - b : null;
+    else if (op === "*") r = a * b;
+    else if (op === "/") r = b > 0 && a % b === 0 ? a / b : null;
+    if (r != null && r > MAX_VALUE) return null;
+    return r;
+  }
+  // Steps that give back one of their inputs never help reach a target.
+  function useless(a, op, b) {
+    return (op === "*" && (a === 1 || b === 1)) || (op === "/" && b === 1);
+  }
+  // Merge rule shared by the board and the solver: the result takes the
+  // second tile's place and the first tile is removed.
+  function mergeVals(v, i, j, r) {
+    var out = [];
+    for (var k = 0; k < v.length; k++) {
+      if (k === i) continue;
+      out.push(k === j ? r : v[k]);
+    }
+    return out;
+  }
+  // Shortest list of [i, op, j] steps that makes the target, or null.
+  function solve(vals, target, ops) {
+    if (vals.indexOf(target) !== -1) return [];
+    var failed = {};
+    function dfs(v, depth) {
+      var key = depth + ":" + v.slice().sort(function (a, b) { return a - b; }).join(",");
+      if (failed[key]) return null;
+      for (var i = 0; i < v.length; i++) {
+        for (var j = 0; j < v.length; j++) {
+          if (i === j) continue;
+          for (var k = 0; k < ops.length; k++) {
+            var op = ops.charAt(k);
+            if ((op === "+" || op === "*") && i > j) continue;
+            if (useless(v[i], op, v[j])) continue;
+            var r = applyOp(v[i], op, v[j]);
+            if (r == null) continue;
+            if (r === target) return [[i, op, j]];
+            if (depth > 1 && v.length > 2) {
+              var rest = dfs(mergeVals(v, i, j, r), depth - 1);
+              if (rest) return [[i, op, j]].concat(rest);
+            }
+          }
+        }
+      }
+      failed[key] = true;
+      return null;
+    }
+    for (var d = 1; d < vals.length; d++) {
+      var s = dfs(vals, d);
+      if (s) return s;
+    }
+    return null;
+  }
+  function describe(vals, steps) {
+    var v = vals.slice(), out = [];
+    for (var s = 0; s < steps.length; s++) {
+      var i = steps[s][0], op = steps[s][1], j = steps[s][2];
+      var r = applyOp(v[i], op, v[j]);
+      out.push(v[i] + " " + OP_LABEL[op] + " " + v[j] + " = " + r);
+      v = mergeVals(v, i, j, r);
+    }
+    return out;
+  }
+  // Builds a puzzle by playing random legal steps forward, so it is always
+  // solvable; par comes from the solver's shortest route.
+  function makePuzzle(tierIdx, rnd) {
+    rnd = rnd || Math.random;
+    var cfg = TIERS[tierIdx];
+    function ri(lo, hi) { return lo + Math.floor(rnd() * (hi - lo + 1)); }
+    function seen(arr, x) { var c = 0; for (var q = 0; q < arr.length; q++) if (arr[q] === x) c++; return c; }
+    var fallback = null;
+    for (var attempt = 0; attempt < 300; attempt++) {
+      var tiles = [];
+      while (tiles.length < cfg.count) {
+        var t = ri(cfg.lo, cfg.hi);
+        if (seen(tiles, t) < 2) tiles.push(t);
+      }
+      if (cfg.big && rnd() < 0.6) {
+        var bigVal = cfg.big[ri(0, cfg.big.length - 1)];
+        if (tiles.indexOf(bigVal) === -1) tiles[ri(0, tiles.length - 1)] = bigVal;
+      }
+      var steps = ri(cfg.steps[0], cfg.steps[1]);
+      var pool = tiles.slice(), target = null, ok = true;
+      for (var s = 0; s < steps && ok; s++) {
+        var done = false;
+        for (var tries = 0; tries < 40 && !done; tries++) {
+          var i = ri(0, pool.length - 1), j = ri(0, pool.length - 1);
+          if (i === j) continue;
+          var op = cfg.ops.charAt(ri(0, cfg.ops.length - 1));
+          if (useless(pool[i], op, pool[j])) continue;
+          var r = applyOp(pool[i], op, pool[j]);
+          if (r == null || r > cfg.tmax) continue;
+          pool = mergeVals(pool, i, j, r);
+          target = r;
+          done = true;
+        }
+        if (!done) ok = false;
+      }
+      if (!ok || target == null || target < cfg.tmin || target > cfg.tmax || tiles.indexOf(target) !== -1) continue;
+      var sol = solve(tiles, target, cfg.ops);
+      if (!sol || !sol.length) continue;
+      // Lean toward puzzles that need the sign this tier introduces.
+      if (cfg.focus && attempt < 150 && rnd() < 0.5 && !sol.some(function (x) { return x[1] === cfg.focus; })) continue;
+      var p = { tiles: tiles, target: target, par: sol.length, ops: cfg.ops, tier: tierIdx };
+      if (sol.length >= cfg.parMin) return p;
+      if (!fallback || sol.length > fallback.par) fallback = p;
+    }
+    if (fallback) return fallback;
+    var ft = [2, 3, 4, 5, 6].slice(0, cfg.count);
+    var ftarget = cfg.count >= 4 ? 14 : 9;
+    return { tiles: ft, target: ftarget, par: solve(ft, ftarget, cfg.ops).length, ops: cfg.ops, tier: tierIdx };
+  }
+  // core:end
+
+  var KEYS = { journey: "rmkr-game-forge-best-journey", blitz: "rmkr-game-forge-best-blitz" };
+  var JOURNEY_LEN = 15, JOURNEY_SKIPS = 3;
+  var BLITZ_SECONDS = 120, BLITZ_SOLVE_BONUS = 5, BLITZ_SKIP_COST = 10;
+
+  function $(id) { return document.getElementById(id); }
+  var tilesEl = $("tiles"), opsEl = $("ops"), logEl = $("log");
+  var startBtn = $("startBtn"), pauseBtn = $("pauseBtn"), pausedEl = $("paused");
+  var undoBtn = $("undoBtn"), resetBtn = $("resetBtn"), hintBtn = $("hintBtn"), skipBtn = $("skipBtn");
+  var boardEl = $("board"), resultsEl = $("results");
+  var modeBtns = $("modes").querySelectorAll("button[data-mode]");
+  var opBtns = opsEl.querySelectorAll("button[data-op]");
+
+  var mode = "journey", phase = "idle", paused = false, token = 0, ticker = null;
+  var puzzle = null, tiles = [], history = [], log = [], pick = -1, op = null;
+  var hinted = false, hintPair = null, newId = -1, goalId = -1, nextId = 1, lastOps = "";
+  var st = null;
+
+  function loadBest(m) {
+    try {
+      var v = parseInt(localStorage.getItem(KEYS[m]) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(m, v) {
+    var cur = loadBest(m);
+    if (v > 0 && (cur == null || v > cur)) {
+      try { localStorage.setItem(KEYS[m], String(v)); } catch (e) {}
+      return true;
+    }
+    return false;
+  }
+  function setNote(msg, kind) {
+    var el = $("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function fmtClock(s) {
+    s = Math.max(0, s);
+    return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60);
+  }
+  function freshStats() {
+    return { score: 0, solved: 0, parHits: 0, hints: 0, skips: 0, skipsLeft: JOURNEY_SKIPS,
+      streak: 0, bestStreak: 0, index: 0, total: 0, secs: 0, left: BLITZ_SECONDS };
+  }
+  function canPlay() { return phase === "play" && !paused; }
+
+  function renderHud() {
+    var s = st || freshStats();
+    if (mode === "journey") {
+      $("progLabel").textContent = "Puzzle";
+      $("prog").textContent = phase === "idle" ? "—" : Math.min(s.index + 1, JOURNEY_LEN) + "/" + JOURNEY_LEN;
+      $("timeLabel").textContent = "Time";
+      $("time").textContent = s.total + "s";
+      $("skipsWrap").hidden = false;
+      $("skips").textContent = String(s.skipsLeft);
+    } else {
+      $("progLabel").textContent = "Solved";
+      $("prog").textContent = String(s.solved);
+      $("timeLabel").textContent = "Left";
+      $("time").textContent = fmtClock(s.left);
+      $("skipsWrap").hidden = true;
+    }
+    $("score").textContent = String(s.score);
+    var b = loadBest(mode);
+    $("best").textContent = b == null ? "—" : String(b);
+  }
+  function renderBoard() {
+    var live = canPlay();
+    $("target").textContent = puzzle ? String(puzzle.target) : "?";
+    $("tierLabel").textContent = puzzle ? "Target · Tier " + (puzzle.tier + 1) + " · par " + puzzle.par : "Target";
+    tilesEl.innerHTML = "";
+    tilesEl.style.setProperty("--count", String(Math.max(tiles.length, 1)));
+    for (var i = 0; i < tiles.length; i++) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "nf-tile";
+      if (i === pick) b.classList.add("is-picked");
+      if (hintPair && (hintPair[0] === i || hintPair[1] === i)) b.classList.add("is-hint");
+      if (tiles[i].id === newId) b.classList.add("is-new");
+      if (tiles[i].id === goalId) b.classList.add("is-goal");
+      b.dataset.index = String(i);
+      b.textContent = String(tiles[i].v);
+      b.setAttribute("aria-label", "Tile " + (i + 1) + ": " + tiles[i].v);
+      b.setAttribute("aria-pressed", i === pick ? "true" : "false");
+      b.disabled = !live;
+      b.addEventListener("click", onTileClick);
+      tilesEl.appendChild(b);
+    }
+    for (var k = 0; k < opBtns.length; k++) {
+      var o = opBtns[k].dataset.op;
+      var allowed = !!puzzle && puzzle.ops.indexOf(o) !== -1;
+      opBtns[k].disabled = !live || !allowed;
+      opBtns[k].classList.toggle("is-picked", o === op);
+      opBtns[k].setAttribute("aria-pressed", o === op ? "true" : "false");
+      opBtns[k].title = allowed || !puzzle ? "" : "Unlocks in a later tier";
+    }
+    undoBtn.disabled = !live || !history.length;
+    resetBtn.disabled = !live || !history.length;
+    hintBtn.disabled = !live;
+    skipBtn.disabled = !live || (mode === "journey" && st.skipsLeft <= 0);
+    logEl.innerHTML = "";
+    for (var n = 0; n < log.length; n++) {
+      var li = document.createElement("li");
+      li.textContent = log[n];
+      logEl.appendChild(li);
+    }
+  }
+  function render() { renderHud(); renderBoard(); }
+
+  function onTileClick() { onTile(Number(this.dataset.index)); }
+  function onTile(i) {
+    if (!canPlay() || i < 0 || i >= tiles.length) return;
+    newId = -1;
+    if (pick === -1) { pick = i; op = null; }
+    else if (pick === i) { pick = -1; op = null; }
+    else if (!op) { pick = i; }
+    else { combine(pick, op, i); return; }
+    render();
+  }
+  function onOp(o) {
+    if (!canPlay() || !puzzle || puzzle.ops.indexOf(o) === -1) return;
+    if (pick === -1) { setNote("Tap a number first, then a sign."); return; }
+    op = op === o ? null : o;
+    newId = -1;
+    render();
+  }
+  function combine(i, o, j) {
+    var a = tiles[i].v, b = tiles[j].v;
+    var r = applyOp(a, o, b);
+    if (r == null) {
+      if (o === "-") setNote(a + " − " + b + " would drop to zero or below. Pick the bigger number first.", "err");
+      else if (o === "/") setNote(a + " ÷ " + b + " doesn't divide evenly. Try another pair.", "err");
+      else setNote("That result is too big to be useful.", "err");
+      op = null;
+      render();
+      return;
+    }
+    history.push({ tiles: tiles.slice(), log: log.slice() });
+    var t = { v: r, id: nextId++ };
+    var out = [];
+    for (var k = 0; k < tiles.length; k++) {
+      if (k === i) continue;
+      out.push(k === j ? t : tiles[k]);
+    }
+    tiles = out;
+    log.push(a + " " + OP_LABEL[o] + " " + b + " = " + r);
+    pick = -1; op = null; hintPair = null; newId = t.id;
+    if (r === puzzle.target) { goalId = t.id; solved(); return; }
+    if (tiles.length === 1) setNote("No pairs left to combine. Undo a step or Reset.", "err");
+    else setNote(a + " " + OP_LABEL[o] + " " + b + " = " + r + ". Keep going, target " + puzzle.target + ".");
+    render();
+  }
+  function undo() {
+    if (!canPlay() || !history.length) return;
+    var prev = history.pop();
+    tiles = prev.tiles; log = prev.log;
+    pick = -1; op = null; hintPair = null; newId = -1;
+    setNote("Step undone.");
+    render();
+  }
+  function resetPuzzle() {
+    if (!canPlay() || !history.length) return;
+    tiles = history[0].tiles; log = [];
+    history = [];
+    pick = -1; op = null; hintPair = null; newId = -1;
+    setNote("Back to the start. Make " + puzzle.target + ".");
+    render();
+  }
+  function values() { return tiles.map(function (t) { return t.v; }); }
+  function hint() {
+    if (!canPlay()) return;
+    var sol = solve(values(), puzzle.target, puzzle.ops);
+    if (!sol) { setNote("The target can't be reached from here. Undo a step or Reset.", "err"); return; }
+    if (!hinted) { hinted = true; st.hints += 1; }
+    var s = sol[0];
+    hintPair = [s[0], s[2]];
+    pick = -1; op = null; newId = -1;
+    setNote("Hint: try " + tiles[s[0]].v + " " + OP_LABEL[s[1]] + " " + tiles[s[2]].v + ". This puzzle now scores half.");
+    render();
+  }
+  function skip() {
+    if (!canPlay()) return;
+    if (mode === "journey") {
+      if (st.skipsLeft <= 0) return;
+      st.skipsLeft -= 1;
+    } else {
+      st.left -= BLITZ_SKIP_COST;
+    }
+    st.skips += 1;
+    st.streak = 0;
+    var way = describe(puzzle.tiles, solve(puzzle.tiles, puzzle.target, puzzle.ops) || []);
+    phase = "between";
+    pick = -1; op = null; hintPair = null;
+    setNote("Skipped. One way: " + way.join(", then ") + ".");
+    render();
+    if (mode === "blitz" && st.left <= 0) { endRun("time"); return; }
+    queueNext(2200);
+  }
+  function solved() {
+    phase = "between";
+    var tier = puzzle.tier + 1, used = history.length;
+    var base = 50 + 50 * tier;
+    var parBonus = used <= puzzle.par ? 25 * tier : 0;
+    var timeBonus = mode === "journey" ? Math.max(0, 45 - st.secs) * tier : 0;
+    var mult = 0.5;
+    if (!hinted) {
+      st.streak += 1;
+      st.bestStreak = Math.max(st.bestStreak, st.streak);
+      mult = 1 + Math.min(st.streak - 1, 5) * 0.1;
+    } else {
+      st.streak = 0;
+    }
+    var gained = Math.round((base + parBonus + timeBonus) * mult);
+    st.score += gained;
+    st.solved += 1;
+    if (parBonus) st.parHits += 1;
+    var extra = "";
+    if (mode === "blitz") { st.left += BLITZ_SOLVE_BONUS; extra = " +" + BLITZ_SOLVE_BONUS + "s."; }
+    var parText = parBonus ? (used < puzzle.par ? "under par!" : "on par!") : "par " + puzzle.par + ".";
+    var streakText = !hinted && st.streak > 1 ? " Clean streak " + st.streak + "." : "";
+    setNote("Made " + puzzle.target + " in " + used + " step" + (used === 1 ? "" : "s") + ", " + parText + " +" + gained + "." + extra + streakText, "ok");
+    render();
+    queueNext(1300);
+  }
+  function queueNext(ms) {
+    var my = token;
+    setTimeout(function () {
+      if (my !== token || phase !== "between") return;
+      if (mode === "journey") {
+        st.index += 1;
+        if (st.index >= JOURNEY_LEN) { endRun("done"); return; }
+      }
+      loadPuzzle();
+    }, ms);
+  }
+  function currentTier() {
+    if (mode === "journey") return Math.min(TIERS.length - 1, Math.floor(st.index / 3));
+    return Math.min(TIERS.length - 1, Math.floor(st.solved / 3));
+  }
+  function loadPuzzle() {
+    puzzle = makePuzzle(currentTier());
+    tiles = puzzle.tiles.map(function (v) { return { v: v, id: nextId++ }; });
+    history = []; log = [];
+    pick = -1; op = null; hinted = false; hintPair = null; newId = -1; goalId = -1;
+    st.secs = 0;
+    phase = "play";
+    var unlocked = "";
+    for (var k = 0; k < puzzle.ops.length; k++) {
+      var c = puzzle.ops.charAt(k);
+      if (lastOps && lastOps.indexOf(c) === -1) unlocked += OP_LABEL[c];
+    }
+    lastOps = puzzle.ops;
+    var moreTiles = tiles.length > 3 && puzzle.tier > 0 && TIERS[puzzle.tier - 1].count < tiles.length;
+    var lead = unlocked ? "New sign: " + unlocked + "! " : moreTiles ? "Now " + tiles.length + " tiles. " : "";
+    setNote(lead + "Make " + puzzle.target + ". Par is " + puzzle.par + " step" + (puzzle.par === 1 ? "" : "s") + ".");
+    render();
+  }
+  function tick() {
+    if (phase !== "play" || paused) return;
+    st.secs += 1;
+    st.total += 1;
+    if (mode === "blitz") {
+      st.left -= 1;
+      if (st.left <= 0) { endRun("time"); return; }
+    }
+    renderHud();
+  }
+  function startRun() {
+    token += 1;
+    st = freshStats();
+    paused = false;
+    pausedEl.hidden = true;
+    resultsEl.hidden = true;
+    boardEl.hidden = false;
+    lastOps = "";
+    startBtn.textContent = "End run";
+    startBtn.className = "btn btn-ghost";
+    pauseBtn.disabled = false;
+    pauseBtn.textContent = "Pause";
+    setModeLock(true);
+    if (ticker) clearInterval(ticker);
+    ticker = setInterval(tick, 1000);
+    loadPuzzle();
+  }
+  function endRun(why) {
+    token += 1;
+    phase = "over";
+    paused = false;
+    pausedEl.hidden = true;
+    if (ticker) { clearInterval(ticker); ticker = null; }
+    var isBest = saveBest(mode, st.score);
+    startBtn.textContent = "Start";
+    startBtn.className = "btn btn-gold";
+    pauseBtn.disabled = true;
+    pauseBtn.textContent = "Pause";
+    setModeLock(false);
+    var title = why === "time" ? "Time's up" : why === "done" ? "Journey complete" : "Run ended";
+    $("resTitle").textContent = title + (isBest ? " · new best!" : "");
+    var best = loadBest(mode);
+    var rows = [
+      ["Score", String(st.score)],
+      ["Best (" + (mode === "journey" ? "Journey" : "Blitz") + ")", best == null ? "—" : String(best)],
+      ["Puzzles solved", mode === "journey" ? st.solved + " of " + JOURNEY_LEN : String(st.solved)],
+      ["At or under par", String(st.parHits)],
+      ["Longest clean streak", String(st.bestStreak)],
+      ["Hints used", String(st.hints)],
+      ["Skips used", String(st.skips)],
+      ["Time played", fmtClock(st.total)]
+    ];
+    var dl = $("resList");
+    dl.innerHTML = "";
+    rows.forEach(function (r) {
+      var dt = document.createElement("dt"); dt.textContent = r[0];
+      var dd = document.createElement("dd"); dd.textContent = r[1];
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+    boardEl.hidden = true;
+    resultsEl.hidden = false;
+    setNote(title + ". Final score " + st.score + (isBest ? " — a new best for this mode!" : "."), "ok");
+    renderHud();
+    $("againBtn").focus({ preventScroll: true });
+  }
+  function togglePause() {
+    if (phase !== "play") return;
+    paused = !paused;
+    pausedEl.hidden = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+    setNote(paused ? "Paused. The clock is stopped." : "Back to it. Make " + puzzle.target + ".");
+    render();
+  }
+  function setModeLock(lock) {
+    for (var k = 0; k < modeBtns.length; k++) modeBtns[k].disabled = lock;
+  }
+  function setMode(m) {
+    if (phase === "play" || phase === "between" || !KEYS[m]) return;
+    mode = m;
+    for (var k = 0; k < modeBtns.length; k++) {
+      var on = modeBtns[k].dataset.mode === m;
+      modeBtns[k].classList.toggle("is-active", on);
+      modeBtns[k].setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    st = null;
+    renderHud();
+    setNote(m === "journey" ? "Journey: 15 puzzles across 5 tiers, 3 skips. Press Start." : "Blitz: solve as many as you can in 2 minutes. Press Start.");
+  }
+
+  for (var mb = 0; mb < modeBtns.length; mb++) {
+    modeBtns[mb].addEventListener("click", function () { setMode(this.dataset.mode); });
+  }
+  for (var ob = 0; ob < opBtns.length; ob++) {
+    opBtns[ob].addEventListener("click", function () { onOp(this.dataset.op); });
+  }
+  startBtn.addEventListener("click", function () {
+    if (phase === "play" || phase === "between") endRun("quit"); else startRun();
+  });
+  $("againBtn").addEventListener("click", startRun);
+  pauseBtn.addEventListener("click", togglePause);
+  undoBtn.addEventListener("click", undo);
+  resetBtn.addEventListener("click", resetPuzzle);
+  hintBtn.addEventListener("click", hint);
+  skipBtn.addEventListener("click", skip);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = e.target && e.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    var k = e.key;
+    if (k === "p" || k === "P") { togglePause(); e.preventDefault(); return; }
+    if (!canPlay()) return;
+    var handled = true;
+    if (k >= "1" && k <= "9" && k.length === 1) onTile(Number(k) - 1);
+    else if (k === "+" || k === "=") onOp("+");
+    else if (k === "-" || k === "_") onOp("-");
+    else if (k === "*" || k === "x" || k === "X") onOp("*");
+    else if (k === "/") onOp("/");
+    else if (k === "Backspace" || k === "u" || k === "U") undo();
+    else if (k === "r" || k === "R") resetPuzzle();
+    else if (k === "h" || k === "H") hint();
+    else if (k === "s" || k === "S") skip();
+    else if (k === "Escape") { pick = -1; op = null; render(); }
+    else handled = false;
+    if (handled) e.preventDefault();
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden && canPlay()) togglePause();
+  });
+
+  renderHud();
+  renderBoard();
+})();
+</script>
+</body>
+</html>
