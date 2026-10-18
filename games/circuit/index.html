@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Circuit Link | RMKR Toolkit</title>
+  <meta name="description" content="A rotate-the-tiles logic puzzle: turn wire tiles until every lamp on the board is wired back to the gold core. Twelve-circuit Journey, three-minute Blitz, and a Daily circuit. Best score per mode saved locally.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body class="game-page" data-root="../../" data-tool="circuit">
+<main class="wrap page-main" id="main">
+  <a class="game-back" href="../">← Focus Games</a>
+  <h1 class="page-title">Circuit Link</h1>
+  <p class="page-lead">Every tile is a piece of wire. Turn them until the whole board is one circuit fed by the gold core, with every lamp lit and no loose ends.</p>
+
+  <details class="lv-help">
+    <summary>How to play</summary>
+    <ul>
+      <li>Tap a tile to turn it a quarter turn. Switch <em>Turn</em> to ↺ if you'd rather go the other way.</li>
+      <li>Power flows out of the gold core through wires that meet end to end. Lit wire turns gold.</li>
+      <li>A circuit is done when every tile is lit and no wire points at an edge or at a tile that doesn't connect back.</li>
+      <li>Tip: corners and edges limit how a tile can sit. Start there, then lock what you're sure of with <em>Lock</em> mode so you don't knock it out by accident.</li>
+      <li><strong>Journey:</strong> 12 circuits over 4 tiers: 4×4, 5×5, 6×6, then a tall 6×8. You get 3 skips.</li>
+      <li><strong>Blitz:</strong> 3 minutes. Each solve adds 10 seconds and a skip costs 10. Boards grow every 3 solves.</li>
+      <li><strong>Daily:</strong> one 6×6 circuit, the same for everyone on a given date. Replay it to beat your score.</li>
+      <li>Scoring: bigger boards are worth more. Finish in <em>par</em> taps or fewer (the fewest turns needed) for a bonus. In Journey and Daily, speed adds a bonus too. Clean solves in a row add up to +50%. A hint halves that circuit's points.</li>
+      <li>Undo takes back one move, Reset puts the board back as it started, and Hint turns one wrong tile into place and locks it.</li>
+      <li>Keyboard: arrow keys move between tiles, Enter or Space turns, T flips the turn direction, L locks, U or Backspace undoes, R resets, H hints, S skips, P pauses.</li>
+      <li>Each mode's best score stays in this browser only.</li>
+    </ul>
+  </details>
+
+  <div class="book-chips" id="modes" role="group" aria-label="Game mode">
+    <button type="button" class="chip is-active" data-mode="journey" aria-pressed="true">Journey · 12 circuits</button>
+    <button type="button" class="chip" data-mode="blitz" aria-pressed="false">Blitz · 3 minutes</button>
+    <button type="button" class="chip" data-mode="daily" aria-pressed="false">Daily circuit</button>
+  </div>
+
+  <div class="game-hud">
+    <div class="game-hud-stats">
+      <span><span id="progLabel">Circuit</span>: <strong id="prog">—</strong></span>
+      <span><span id="timeLabel">Time</span>: <strong id="time">0s</strong></span>
+      <span id="skipsWrap">Skips: <strong id="skips">3</strong></span>
+      <span>Score: <strong id="score">0</strong></span>
+      <span>Best: <strong id="best">—</strong></span>
+    </div>
+    <div class="game-hud-actions">
+      <button type="button" class="btn btn-gold" id="startBtn">Start</button>
+      <button type="button" class="btn btn-ghost" id="pauseBtn" disabled>Pause</button>
+    </div>
+  </div>
+  <p class="game-note" id="note" role="status">Pick a mode and press Start.</p>
+
+  <div class="game-board-wrap">
+    <div class="lv-stage cl-stage">
+      <div class="cl-board" id="board">
+        <div class="cl-strip" aria-live="off">
+          <span id="tierLabel">Tier —</span>
+          <span>Par <strong id="par">—</strong></span>
+          <span>Taps <strong id="taps">0</strong></span>
+          <span>Lamps <strong id="lamps">—</strong></span>
+        </div>
+        <div class="cl-grid" id="grid" role="group" aria-label="Circuit board"></div>
+        <div class="cl-tools">
+          <button type="button" class="btn btn-ghost cl-toggle cl-wide" id="dirBtn" aria-pressed="false" disabled>Turn ↻</button>
+          <button type="button" class="btn btn-ghost cl-toggle cl-wide" id="lockBtn" aria-pressed="false" disabled>Lock mode: off</button>
+          <button type="button" class="btn btn-ghost" id="undoBtn" disabled>Undo</button>
+          <button type="button" class="btn btn-ghost" id="resetBtn" disabled>Reset</button>
+          <button type="button" class="btn btn-ghost" id="hintBtn" disabled>Hint</button>
+          <button type="button" class="btn btn-ghost" id="skipBtn" disabled>Skip</button>
+        </div>
+      </div>
+      <div class="cl-results" id="results" hidden>
+        <h2 class="cl-results-title" id="resTitle">Run complete</h2>
+        <dl class="cl-results-list" id="resList"></dl>
+        <button type="button" class="btn btn-gold" id="againBtn">Play again</button>
+      </div>
+      <div class="lv-paused" id="paused" hidden>Paused</div>
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  // core:start
+  // Wire sides as bits: N=1, E=2, S=4, W=8.
+  var DIRS = [
+    { bit: 1, dr: -1, dc: 0, opp: 4 },
+    { bit: 2, dr: 0, dc: 1, opp: 8 },
+    { bit: 4, dr: 1, dc: 0, opp: 1 },
+    { bit: 8, dr: 0, dc: -1, opp: 2 }
+  ];
+  var TIERS = [
+    { rows: 4, cols: 4 },
+    { rows: 5, cols: 5 },
+    { rows: 6, cols: 6 },
+    { rows: 8, cols: 6 }
+  ];
+  var DAILY_TIER = 2;
+
+  // Quarter turns clockwise (k may be negative).
+  function rot(m, k) {
+    k = ((k % 4) + 4) % 4;
+    for (var i = 0; i < k; i++) m = ((m << 1) | (m >> 3)) & 15;
+    return m;
+  }
+  function degree(m) {
+    var d = 0;
+    for (var i = 0; i < 4; i++) if (m & (1 << i)) d++;
+    return d;
+  }
+  // Smallest signed turn d (in -1..2) that brings a tile with base shape m
+  // and current turn r back to its solved orientation.
+  function fixTurn(m, r) {
+    var tries = [0, 1, -1, 2];
+    for (var i = 0; i < tries.length; i++) if (rot(m, r + tries[i]) === m) return tries[i];
+    return 0;
+  }
+  function tapsToFix(m, r) { return Math.abs(fixTurn(m, r)); }
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function hashStr(s) {
+    var h = 2166136261;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return h >>> 0;
+  }
+
+  // Lit cells are those reachable from the core through sides that meet
+  // end to end. Solved means every cell is lit and no side is left open.
+  function evaluate(rows, cols, masks, src) {
+    var n = rows * cols, lit = new Array(n), open = 0, i, d;
+    for (i = 0; i < n; i++) lit[i] = false;
+    for (i = 0; i < n; i++) {
+      var r = Math.floor(i / cols), c = i % cols;
+      for (d = 0; d < 4; d++) {
+        if (!(masks[i] & DIRS[d].bit)) continue;
+        var nr = r + DIRS[d].dr, nc = c + DIRS[d].dc;
+        if (nr < 0 || nc < 0 || nr >= rows || nc >= cols || !(masks[nr * cols + nc] & DIRS[d].opp)) open++;
+      }
+    }
+    var stack = [src], count = 0;
+    lit[src] = true;
+    while (stack.length) {
+      var cur = stack.pop();
+      count++;
+      var cr = Math.floor(cur / cols), cc = cur % cols;
+      for (d = 0; d < 4; d++) {
+        if (!(masks[cur] & DIRS[d].bit)) continue;
+        var rr = cr + DIRS[d].dr, ccc = cc + DIRS[d].dc;
+        if (rr < 0 || ccc < 0 || rr >= rows || ccc >= cols) continue;
+        var j = rr * cols + ccc;
+        if (lit[j] || !(masks[j] & DIRS[d].opp)) continue;
+        lit[j] = true;
+        stack.push(j);
+      }
+    }
+    return { lit: lit, litCount: count, open: open, solved: count === n && open === 0 };
+  }
+
+  // A random spanning tree (no tile with more than three wires), then
+  // every tile is turned at random. The tree is a known solution, so every
+  // board is solvable; par counts the fewest turns back to it.
+  function makePuzzle(tierIdx, rnd) {
+    rnd = rnd || Math.random;
+    var cfg = TIERS[tierIdx], rows = cfg.rows, cols = cfg.cols, n = rows * cols;
+    function ri(lo, hi) { return lo + Math.floor(rnd() * (hi - lo + 1)); }
+    for (var attempt = 0; attempt < 200; attempt++) {
+      var masks = [], deg = [], inTree = [], i;
+      for (i = 0; i < n; i++) { masks.push(0); deg.push(0); inTree.push(false); }
+      var sr = Math.floor((rows - 1) / 2) + (rows % 2 === 0 ? ri(0, 1) : 0);
+      var sc = Math.floor((cols - 1) / 2) + (cols % 2 === 0 ? ri(0, 1) : 0);
+      var src = sr * cols + sc;
+      var frontier = [], count = 1;
+      inTree[src] = true;
+      var addEdges = function (u) {
+        var ur = Math.floor(u / cols), uc = u % cols;
+        for (var d = 0; d < 4; d++) {
+          var vr = ur + DIRS[d].dr, vc = uc + DIRS[d].dc;
+          if (vr < 0 || vc < 0 || vr >= rows || vc >= cols) continue;
+          var v = vr * cols + vc;
+          if (!inTree[v]) frontier.push([u, v, d]);
+        }
+      };
+      addEdges(src);
+      while (frontier.length) {
+        var k = ri(0, frontier.length - 1), e = frontier[k];
+        frontier[k] = frontier[frontier.length - 1];
+        frontier.pop();
+        var u = e[0], v = e[1], dd = e[2];
+        if (inTree[v] || deg[u] >= 3) continue;
+        masks[u] |= DIRS[dd].bit;
+        masks[v] |= DIRS[dd].opp;
+        deg[u]++; deg[v]++;
+        inTree[v] = true;
+        count++;
+        addEdges(v);
+      }
+      if (count < n) continue;
+      var lamps = 0, straights = 0;
+      for (i = 0; i < n; i++) {
+        if (deg[i] === 1 && i !== src) lamps++;
+        if (masks[i] === 5 || masks[i] === 10) straights++;
+      }
+      // Skip boards that are mostly straight runs or have very few lamps.
+      if (lamps < Math.max(3, Math.round(n * 0.18)) || straights > n * 0.4) continue;
+      var turns = [], par = 0;
+      for (i = 0; i < n; i++) {
+        var t = ri(0, 3);
+        // Most tiles start out of place so the board never opens half done.
+        if (rot(masks[i], t) === masks[i] && rnd() < 0.85) {
+          t = (masks[i] === 5 || masks[i] === 10) ? (rnd() < 0.5 ? 1 : 3) : ri(1, 3);
+        }
+        turns.push(t);
+        par += tapsToFix(masks[i], t);
+      }
+      var startMasks = masks.map(function (m, idx) { return rot(m, turns[idx]); });
+      if (evaluate(rows, cols, startMasks, src).solved) continue;
+      if (par < Math.round(n * 0.55)) continue;
+      return { tier: tierIdx, rows: rows, cols: cols, src: src, masks: masks, turns: turns, par: par, lamps: lamps };
+    }
+    return null;
+  }
+  // core:end
+
+  var KEYS = {
+    journey: "rmkr-game-circuit-best-journey",
+    blitz: "rmkr-game-circuit-best-blitz",
+    daily: "rmkr-game-circuit-best-daily"
+  };
+  var DAILY_LAST_KEY = "rmkr-game-circuit-daily-last";
+  var JOURNEY_LEN = 12, JOURNEY_SKIPS = 3;
+  var BLITZ_SECONDS = 180, BLITZ_SOLVE_BONUS = 10, BLITZ_SKIP_COST = 10;
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var SIDE_END = [[50, 0], [100, 50], [50, 100], [0, 50]];
+
+  function $(id) { return document.getElementById(id); }
+  var gridEl = $("grid"), boardEl = $("board"), resultsEl = $("results"), pausedEl = $("paused");
+  var startBtn = $("startBtn"), pauseBtn = $("pauseBtn");
+  var dirBtn = $("dirBtn"), lockBtn = $("lockBtn");
+  var undoBtn = $("undoBtn"), resetBtn = $("resetBtn"), hintBtn = $("hintBtn"), skipBtn = $("skipBtn");
+  var modeBtns = $("modes").querySelectorAll("button[data-mode]");
+
+  var mode = "journey", phase = "idle", paused = false, token = 0, ticker = null;
+  var puzzle = null, turns = [], locks = [], fixed = [], history = [], taps = 0;
+  var ccw = false, lockMode = false, hinted = false, hintCell = -1, cursor = 0;
+  var cells = [], pipes = [], last = null, st = null;
+
+  function loadBest(m) {
+    try {
+      var v = parseInt(localStorage.getItem(KEYS[m]) || "", 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(m, v) {
+    var cur = loadBest(m);
+    if (v > 0 && (cur == null || v > cur)) {
+      try { localStorage.setItem(KEYS[m], String(v)); } catch (e) {}
+      return true;
+    }
+    return false;
+  }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + "-" + (d.getMonth() < 9 ? "0" : "") + (d.getMonth() + 1) + "-" + (d.getDate() < 10 ? "0" : "") + d.getDate();
+  }
+  function dailyDoneToday() {
+    try { return localStorage.getItem(DAILY_LAST_KEY) === todayStr(); } catch (e) { return false; }
+  }
+  function setNote(msg, kind) {
+    var el = $("note");
+    el.textContent = msg || "";
+    el.className = "game-note" + (kind ? " " + kind : "");
+  }
+  function fmtClock(s) {
+    s = Math.max(0, s);
+    return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60);
+  }
+  function freshStats() {
+    return { score: 0, solved: 0, parHits: 0, hints: 0, skips: 0, skipsLeft: JOURNEY_SKIPS,
+      streak: 0, bestStreak: 0, index: 0, total: 0, secs: 0, left: BLITZ_SECONDS };
+  }
+  function canPlay() { return phase === "play" && !paused; }
+  function curMasks() {
+    return puzzle.masks.map(function (m, i) { return rot(m, turns[i]); });
+  }
+  function shapeName(m, isSrc) {
+    var d = degree(m);
+    if (isSrc) return "core";
+    if (d === 1) return "lamp";
+    if (d === 3) return "tee";
+    return (m === 5 || m === 10) ? "straight" : "corner";
+  }
+
+  function buildGrid() {
+    gridEl.innerHTML = "";
+    cells = []; pipes = [];
+    if (!puzzle) return;
+    gridEl.style.setProperty("--cols", String(puzzle.cols));
+    for (var i = 0; i < puzzle.masks.length; i++) {
+      var m = puzzle.masks[i], isSrc = i === puzzle.src;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "cl-cell" + (isSrc ? " is-src" : "");
+      b.dataset.index = String(i);
+      b.tabIndex = i === cursor ? 0 : -1;
+      var svg = document.createElementNS(SVGNS, "svg");
+      svg.setAttribute("viewBox", "0 0 100 100");
+      svg.setAttribute("class", "cl-pipe");
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("focusable", "false");
+      for (var d = 0; d < 4; d++) {
+        if (!(m & DIRS[d].bit)) continue;
+        var ln = document.createElementNS(SVGNS, "line");
+        ln.setAttribute("x1", "50"); ln.setAttribute("y1", "50");
+        ln.setAttribute("x2", String(SIDE_END[d][0])); ln.setAttribute("y2", String(SIDE_END[d][1]));
+        svg.appendChild(ln);
+      }
+      var dot = document.createElementNS(SVGNS, "circle");
+      dot.setAttribute("cx", "50"); dot.setAttribute("cy", "50");
+      if (isSrc) { dot.setAttribute("r", "21"); dot.setAttribute("class", "cl-core"); }
+      else if (degree(m) === 1) { dot.setAttribute("r", "17"); dot.setAttribute("class", "cl-lamp"); }
+      else { dot.setAttribute("r", "8"); dot.setAttribute("class", "cl-joint"); }
+      svg.appendChild(dot);
+      svg.style.transform = "rotate(" + (turns[i] * 90) + "deg)";
+      b.appendChild(svg);
+      gridEl.appendChild(b);
+      cells.push(b); pipes.push(svg);
+    }
+  }
+  function renderHud() {
+    var s = st || freshStats();
+    $("skipsWrap").hidden = mode !== "journey";
+    if (mode === "journey") {
+      $("progLabel").textContent = "Circuit";
+      $("prog").textContent = phase === "idle" ? "—" : Math.min(s.index + 1, JOURNEY_LEN) + "/" + JOURNEY_LEN;
+      $("timeLabel").textContent = "Time";
+      $("time").textContent = s.total + "s";
+      $("skips").textContent = String(s.skipsLeft);
+    } else if (mode === "blitz") {
+      $("progLabel").textContent = "Solved";
+      $("prog").textContent = String(s.solved);
+      $("timeLabel").textContent = "Left";
+      $("time").textContent = fmtClock(s.left);
+    } else {
+      $("progLabel").textContent = "Daily";
+      $("prog").textContent = todayStr() + (dailyDoneToday() ? " ✓" : "");
+      $("timeLabel").textContent = "Time";
+      $("time").textContent = s.total + "s";
+    }
+    $("score").textContent = String(s.score);
+    var b = loadBest(mode);
+    $("best").textContent = b == null ? "—" : String(b);
+  }
+  function renderBoard() {
+    var live = canPlay();
+    if (puzzle) {
+      var t = TIERS[puzzle.tier];
+      $("tierLabel").textContent = (mode === "daily" ? "Daily" : "Tier " + (puzzle.tier + 1)) + " · " + t.cols + "×" + t.rows;
+      $("par").textContent = String(puzzle.par);
+      $("taps").textContent = String(taps);
+      last = evaluate(puzzle.rows, puzzle.cols, curMasks(), puzzle.src);
+      var lampsLit = 0;
+      for (var i = 0; i < cells.length; i++) {
+        var m = puzzle.masks[i], isSrc = i === puzzle.src;
+        var lamp = !isSrc && degree(m) === 1;
+        if (lamp && last.lit[i]) lampsLit++;
+        var b = cells[i];
+        b.classList.toggle("is-lit", last.lit[i]);
+        b.classList.toggle("is-locked", !!locks[i]);
+        b.classList.toggle("is-hint", i === hintCell);
+        b.disabled = !live;
+        pipes[i].style.transform = "rotate(" + (turns[i] * 90) + "deg)";
+        var r = Math.floor(i / puzzle.cols) + 1, c = (i % puzzle.cols) + 1;
+        b.setAttribute("aria-label", "Row " + r + ", column " + c + ": " + shapeName(m, isSrc) +
+          (last.lit[i] ? ", lit" : ", dark") + (locks[i] ? ", locked" : ""));
+      }
+      $("lamps").textContent = lampsLit + "/" + puzzle.lamps;
+      gridEl.classList.toggle("is-solved", last.solved);
+    } else {
+      $("tierLabel").textContent = "Tier —";
+      $("par").textContent = "—";
+      $("taps").textContent = "0";
+      $("lamps").textContent = "—";
+    }
+    dirBtn.disabled = !live;
+    lockBtn.disabled = !live;
+    dirBtn.textContent = ccw ? "Turn ↺" : "Turn ↻";
+    dirBtn.setAttribute("aria-pressed", ccw ? "true" : "false");
+    dirBtn.classList.toggle("is-on", ccw);
+    lockBtn.textContent = lockMode ? "Lock mode: on" : "Lock mode: off";
+    lockBtn.setAttribute("aria-pressed", lockMode ? "true" : "false");
+    lockBtn.classList.toggle("is-on", lockMode);
+    undoBtn.disabled = !live || !history.length;
+    resetBtn.disabled = !live || (!history.length && !locks.some(Boolean));
+    hintBtn.disabled = !live;
+    skipBtn.hidden = mode === "daily";
+    skipBtn.disabled = !live || (mode === "journey" && st.skipsLeft <= 0);
+  }
+  function render() { renderHud(); renderBoard(); }
+
+  function turnCell(i, d) {
+    turns[i] += d;
+    taps += 1;
+    history.push({ kind: "turn", i: i, d: d });
+  }
+  function onCell(i) {
+    if (!canPlay() || !puzzle || i < 0 || i >= turns.length) return;
+    cursor = i;
+    hintCell = -1;
+    if (lockMode) {
+      if (fixed[i]) { setNote("A hint placed this tile, so it stays locked."); return; }
+      locks[i] = !locks[i];
+      history.push({ kind: "lock", i: i });
+      setNote(locks[i] ? "Locked. Taps won't turn it until you unlock it." : "Unlocked.");
+      render();
+      return;
+    }
+    if (locks[i]) {
+      setNote("That tile is locked. Switch Lock mode on and tap it to unlock.", "err");
+      return;
+    }
+    turnCell(i, ccw ? -1 : 1);
+    afterMove();
+  }
+  function afterMove() {
+    render();
+    if (last && last.solved) { solved(); return; }
+    var lit = last.litCount, n = turns.length;
+    setNote(lit === n ? "Everything is lit, but " + last.open + " wire end" + (last.open === 1 ? " is" : "s are") + " still loose." : lit + " of " + n + " tiles lit.");
+  }
+  function undo() {
+    if (!canPlay() || !history.length) return;
+    var h = history.pop();
+    if (h.kind === "turn") { turns[h.i] -= h.d; taps = Math.max(0, taps - 1); }
+    else locks[h.i] = !locks[h.i];
+    hintCell = -1;
+    setNote("Move undone.");
+    render();
+  }
+  function resetBoard() {
+    if (!canPlay()) return;
+    for (var i = 0; i < turns.length; i++) {
+      if (fixed[i]) continue;
+      turns[i] = puzzle.turns[i];
+      locks[i] = false;
+    }
+    history = []; taps = 0; hintCell = -1;
+    setNote("Board reset. Tiles a hint placed stay put.");
+    render();
+  }
+  function hint() {
+    if (!canPlay()) return;
+    var wrongLocked = [], wrong = [];
+    for (var i = 0; i < turns.length; i++) {
+      if (fixed[i]) continue;
+      if (fixTurn(puzzle.masks[i], turns[i]) !== 0) (locks[i] ? wrongLocked : wrong).push(i);
+    }
+    var pool = wrongLocked.length ? wrongLocked : wrong;
+    if (!pool.length) {
+      setNote("Every tile is already in place. Check for loose ends.");
+      return;
+    }
+    var pickI = pool[Math.floor(Math.random() * pool.length)];
+    if (!hinted) { hinted = true; st.hints += 1; }
+    turns[pickI] += fixTurn(puzzle.masks[pickI], turns[pickI]);
+    locks[pickI] = true;
+    fixed[pickI] = true;
+    history = history.filter(function (h) { return h.i !== pickI; });
+    hintCell = pickI;
+    cursor = pickI;
+    render();
+    if (last.solved) { solved(); return; }
+    var r = Math.floor(pickI / puzzle.cols) + 1, c = (pickI % puzzle.cols) + 1;
+    setNote((wrongLocked.length ? "That locked tile was off. " : "") + "Hint: row " + r + ", column " + c + " is now in place and locked. This circuit now scores half.");
+  }
+  function skip() {
+    if (!canPlay() || mode === "daily") return;
+    if (mode === "journey") {
+      if (st.skipsLeft <= 0) return;
+      st.skipsLeft -= 1;
+    } else {
+      st.left -= BLITZ_SKIP_COST;
+    }
+    st.skips += 1;
+    st.streak = 0;
+    for (var i = 0; i < turns.length; i++) turns[i] += fixTurn(puzzle.masks[i], turns[i]);
+    phase = "between";
+    hintCell = -1;
+    render();
+    setNote("Skipped. Here is how it connects.");
+    if (mode === "blitz" && st.left <= 0) { endRun("time"); return; }
+    queueNext(2200);
+  }
+  function solved() {
+    phase = "between";
+    var tierPts = puzzle.tier + 1, n = turns.length;
+    var base = 60 + 40 * tierPts;
+    var parBonus = taps <= puzzle.par ? 30 * tierPts : 0;
+    var timeBonus = mode !== "blitz" ? Math.max(0, 15 + 2 * n - st.secs) * tierPts : 0;
+    var mult = 0.5;
+    if (!hinted) {
+      st.streak += 1;
+      st.bestStreak = Math.max(st.bestStreak, st.streak);
+      mult = 1 + Math.min(st.streak - 1, 5) * 0.1;
+    } else {
+      st.streak = 0;
+    }
+    var gained = Math.round((base + parBonus + timeBonus) * mult);
+    st.score += gained;
+    st.solved += 1;
+    if (parBonus) st.parHits += 1;
+    var extra = "";
+    if (mode === "blitz") { st.left += BLITZ_SOLVE_BONUS; extra = " +" + BLITZ_SOLVE_BONUS + "s."; }
+    var parText = parBonus ? (taps < puzzle.par ? "under par!" : "on par!") : "par " + puzzle.par + ".";
+    var streakText = !hinted && st.streak > 1 ? " Clean streak " + st.streak + "." : "";
+    render();
+    setNote("Circuit closed in " + taps + " tap" + (taps === 1 ? "" : "s") + ", " + parText + " +" + gained + "." + extra + streakText, "ok");
+    if (mode === "daily") {
+      try { localStorage.setItem(DAILY_LAST_KEY, todayStr()); } catch (e) {}
+      var my = token;
+      setTimeout(function () { if (my === token && phase === "between") endRun("done"); }, 1300);
+      return;
+    }
+    queueNext(1500);
+  }
+  function queueNext(ms) {
+    var my = token;
+    setTimeout(function () {
+      if (my !== token || phase !== "between") return;
+      if (mode === "journey") {
+        st.index += 1;
+        if (st.index >= JOURNEY_LEN) { endRun("done"); return; }
+      }
+      loadPuzzle();
+    }, ms);
+  }
+  function currentTier() {
+    if (mode === "daily") return DAILY_TIER;
+    if (mode === "journey") return Math.min(TIERS.length - 1, Math.floor(st.index / 3));
+    return Math.min(TIERS.length - 1, Math.floor(st.solved / 3));
+  }
+  function loadPuzzle() {
+    var tier = currentTier();
+    var prevTier = puzzle ? puzzle.tier : -1;
+    var rnd = mode === "daily" ? mulberry32(hashStr("circuit-" + todayStr())) : Math.random;
+    puzzle = makePuzzle(tier, rnd);
+    var n = puzzle.masks.length;
+    turns = puzzle.turns.slice();
+    locks = []; fixed = [];
+    for (var i = 0; i < n; i++) { locks.push(false); fixed.push(false); }
+    history = []; taps = 0; hinted = false; hintCell = -1;
+    cursor = puzzle.src;
+    st.secs = 0;
+    phase = "play";
+    buildGrid();
+    render();
+    var t = TIERS[tier];
+    var lead = mode === "daily" ? "Today's circuit. " : (prevTier !== -1 && tier > prevTier) ? "Bigger board: " + t.cols + "×" + t.rows + ". " : "";
+    setNote(lead + "Light all " + puzzle.lamps + " lamps. Par is " + puzzle.par + " taps.");
+  }
+  function tick() {
+    if (phase !== "play" || paused) return;
+    st.secs += 1;
+    st.total += 1;
+    if (mode === "blitz") {
+      st.left -= 1;
+      if (st.left <= 0) { endRun("time"); return; }
+    }
+    renderHud();
+  }
+  function startRun() {
+    token += 1;
+    st = freshStats();
+    paused = false;
+    puzzle = null;
+    ccw = false; lockMode = false;
+    pausedEl.hidden = true;
+    resultsEl.hidden = true;
+    boardEl.hidden = false;
+    startBtn.textContent = "End run";
+    startBtn.className = "btn btn-ghost";
+    pauseBtn.disabled = false;
+    pauseBtn.textContent = "Pause";
+    setModeLock(true);
+    if (ticker) clearInterval(ticker);
+    ticker = setInterval(tick, 1000);
+    loadPuzzle();
+  }
+  function endRun(why) {
+    token += 1;
+    phase = "over";
+    paused = false;
+    pausedEl.hidden = true;
+    if (ticker) { clearInterval(ticker); ticker = null; }
+    var isBest = saveBest(mode, st.score);
+    startBtn.textContent = "Start";
+    startBtn.className = "btn btn-gold";
+    pauseBtn.disabled = true;
+    pauseBtn.textContent = "Pause";
+    setModeLock(false);
+    var title = why === "time" ? "Time's up" : why === "done" ? (mode === "daily" ? "Daily circuit closed" : "Journey complete") : "Run ended";
+    $("resTitle").textContent = title + (isBest ? " · new best!" : "");
+    var best = loadBest(mode);
+    var label = mode === "journey" ? "Journey" : mode === "blitz" ? "Blitz" : "Daily";
+    var rows = [
+      ["Score", String(st.score)],
+      ["Best (" + label + ")", best == null ? "—" : String(best)],
+      ["Circuits solved", mode === "journey" ? st.solved + " of " + JOURNEY_LEN : mode === "daily" ? st.solved + " of 1" : String(st.solved)],
+      ["At or under par", String(st.parHits)],
+      ["Longest clean streak", String(st.bestStreak)],
+      ["Hints used", String(st.hints)],
+      ["Time played", fmtClock(st.total)]
+    ];
+    if (mode !== "daily") rows.splice(6, 0, ["Skips used", String(st.skips)]);
+    var dl = $("resList");
+    dl.innerHTML = "";
+    rows.forEach(function (r) {
+      var dt = document.createElement("dt"); dt.textContent = r[0];
+      var dd = document.createElement("dd"); dd.textContent = r[1];
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+    boardEl.hidden = true;
+    resultsEl.hidden = false;
+    setNote(title + ". Final score " + st.score + (isBest ? " — a new best for this mode!" : "."), "ok");
+    renderHud();
+    $("againBtn").focus({ preventScroll: true });
+  }
+  function togglePause() {
+    if (phase !== "play") return;
+    paused = !paused;
+    pausedEl.hidden = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+    setNote(paused ? "Paused. The clock is stopped." : "Back to it. Light all " + puzzle.lamps + " lamps.");
+    render();
+  }
+  function setModeLock(lock) {
+    for (var k = 0; k < modeBtns.length; k++) modeBtns[k].disabled = lock;
+  }
+  function setMode(m) {
+    if (phase === "play" || phase === "between" || !KEYS[m]) return;
+    mode = m;
+    for (var k = 0; k < modeBtns.length; k++) {
+      var on = modeBtns[k].dataset.mode === m;
+      modeBtns[k].classList.toggle("is-active", on);
+      modeBtns[k].setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    st = null;
+    renderHud();
+    renderBoard();
+    if (m === "journey") setNote("Journey: 12 circuits across 4 tiers, 3 skips. Press Start.");
+    else if (m === "blitz") setNote("Blitz: close as many circuits as you can in 3 minutes. Press Start.");
+    else setNote("Daily: one 6×6 circuit for " + todayStr() + (dailyDoneToday() ? ". You've closed it today; replay to beat your score." : ". Press Start."));
+  }
+  function moveCursor(dr, dc) {
+    if (!puzzle) return;
+    var r = Math.floor(cursor / puzzle.cols) + dr, c = (cursor % puzzle.cols) + dc;
+    if (r < 0 || c < 0 || r >= puzzle.rows || c >= puzzle.cols) return;
+    if (cells[cursor]) cells[cursor].tabIndex = -1;
+    cursor = r * puzzle.cols + c;
+    cells[cursor].tabIndex = 0;
+    cells[cursor].focus({ preventScroll: false });
+  }
+
+  for (var mb = 0; mb < modeBtns.length; mb++) {
+    modeBtns[mb].addEventListener("click", function () { setMode(this.dataset.mode); });
+  }
+  gridEl.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button.cl-cell") : null;
+    if (!b || !gridEl.contains(b)) return;
+    onCell(Number(b.dataset.index));
+  });
+  // Keep the long-press menu out of the way on touch screens.
+  gridEl.addEventListener("contextmenu", function (e) { if (phase === "play") e.preventDefault(); });
+  startBtn.addEventListener("click", function () {
+    if (phase === "play" || phase === "between") endRun("quit"); else startRun();
+  });
+  $("againBtn").addEventListener("click", startRun);
+  pauseBtn.addEventListener("click", togglePause);
+  dirBtn.addEventListener("click", function () { if (!canPlay()) return; ccw = !ccw; setNote(ccw ? "Taps now turn anticlockwise." : "Taps now turn clockwise."); render(); });
+  lockBtn.addEventListener("click", function () { if (!canPlay()) return; lockMode = !lockMode; setNote(lockMode ? "Lock mode on: tap tiles to lock or unlock them." : "Lock mode off: taps turn tiles again."); render(); });
+  undoBtn.addEventListener("click", undo);
+  resetBtn.addEventListener("click", resetBoard);
+  hintBtn.addEventListener("click", hint);
+  skipBtn.addEventListener("click", skip);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = e.target && e.target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    var k = e.key;
+    if (k === "p" || k === "P") { togglePause(); e.preventDefault(); return; }
+    if (!canPlay()) return;
+    var handled = true;
+    if (k === "ArrowUp") moveCursor(-1, 0);
+    else if (k === "ArrowDown") moveCursor(1, 0);
+    else if (k === "ArrowLeft") moveCursor(0, -1);
+    else if (k === "ArrowRight") moveCursor(0, 1);
+    // Enter and Space on a focused tile fall through to the button's own click.
+    else if (k === "t" || k === "T") dirBtn.click();
+    else if (k === "l" || k === "L") {
+      var was = lockMode; lockMode = true; onCell(cursor); lockMode = was; render();
+    }
+    else if (k === "Backspace" || k === "u" || k === "U") undo();
+    else if (k === "r" || k === "R") resetBoard();
+    else if (k === "h" || k === "H") hint();
+    else if (k === "s" || k === "S") skip();
+    else handled = false;
+    if (handled) e.preventDefault();
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden && canPlay()) togglePause();
+  });
+
+  renderHud();
+  renderBoard();
+})();
+</script>
+</body>
+</html>
